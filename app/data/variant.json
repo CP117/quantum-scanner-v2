@@ -1,0 +1,6 @@
+{
+  "universe_mode": "leveraged",
+  "disable_crypto": false,
+  "build": "market-refinement-dashboard-leveraged",
+  "notes": "Default-active universe = Leveraged/Inverse ETFs only (~270+ symbols). All other exchange shards and the two crypto sets (Core / Extended) are available but DEFAULT OFF — activate them from the 'Scan universes' sidebar panel. Delete this file and restart to default every group ON (full ~12k universe)."
+}

@@ -1,0 +1,4657 @@
+{
+  "A8-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.972556+00:00",
+    "last_price": 0.009922408452368607,
+    "previous_close": 0.01046172100968251,
+    "source": "cryptocompare",
+    "symbol": "A8-USD"
+  },
+  "ACE-USD": {
+    "captured_at_utc": "2026-05-23T12:39:17.987241+00:00",
+    "last_price": 0.1126898721380266,
+    "previous_close": 0.1209561590407021,
+    "source": "cryptocompare",
+    "symbol": "ACE-USD"
+  },
+  "ACH-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.732875+00:00",
+    "last_price": 0.00649802272154884,
+    "previous_close": 0.00723760654538874,
+    "source": "cryptocompare",
+    "symbol": "ACH-USD"
+  },
+  "ACT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:38.252213+00:00",
+    "last_price": 0.00275491,
+    "previous_close": 0.002790511343723221,
+    "source": "coingecko",
+    "symbol": "ACT-USD"
+  },
+  "AERO-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.122091+00:00",
+    "last_price": 5.857543510501273e-05,
+    "previous_close": 5.999999848427251e-05,
+    "source": "yfinance",
+    "symbol": "AERO-USD"
+  },
+  "AEVO-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.483751+00:00",
+    "last_price": 0.02399261635038153,
+    "previous_close": 0.02660308082562039,
+    "source": "cryptocompare",
+    "symbol": "AEVO-USD"
+  },
+  "AGI-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.483751+00:00",
+    "last_price": 0.007567796406606329,
+    "previous_close": 0.008413292138934417,
+    "source": "cryptocompare",
+    "symbol": "AGI-USD"
+  },
+  "AGLD-USD": {
+    "captured_at_utc": "2026-05-23T12:39:11.281969+00:00",
+    "last_price": 0.23280000686645508,
+    "previous_close": 0.23579399287700653,
+    "source": "yfinance",
+    "symbol": "AGLD-USD"
+  },
+  "AGT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:57.562546+00:00",
+    "last_price": 0.01421790670970651,
+    "previous_close": 0.01277803685506409,
+    "source": "cryptocompare",
+    "symbol": "AGT-USD"
+  },
+  "AI-USD": {
+    "captured_at_utc": "2026-05-23T12:38:31.850306+00:00",
+    "last_price": 0.03010993685538478,
+    "previous_close": 0.02802923187148794,
+    "source": "cryptocompare",
+    "symbol": "AI-USD"
+  },
+  "AIOZ-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.496096+00:00",
+    "last_price": 0.06480000168085098,
+    "previous_close": 0.06641600281000137,
+    "source": "yfinance",
+    "symbol": "AIOZ-USD"
+  },
+  "AIXBT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:36.912345+00:00",
+    "last_price": 0.027963127940893173,
+    "previous_close": 0.029225999489426613,
+    "source": "yfinance",
+    "symbol": "AIXBT-USD"
+  },
+  "AKT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:31.374571+00:00",
+    "last_price": 0.7360000014305115,
+    "previous_close": 0.765404999256134,
+    "source": "yfinance",
+    "symbol": "AKT-USD"
+  },
+  "ALCH-USD": {
+    "captured_at_utc": "2026-05-23T12:38:38.252213+00:00",
+    "last_price": 0.072245,
+    "previous_close": 0.07475853907669039,
+    "source": "coingecko",
+    "symbol": "ALCH-USD"
+  },
+  "ALICE-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.000635+00:00",
+    "last_price": 0.12200000137090683,
+    "previous_close": 0.12430199980735779,
+    "source": "yfinance",
+    "symbol": "ALICE-USD"
+  },
+  "ALLO-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.100226+00:00",
+    "last_price": 0.08500000089406967,
+    "previous_close": 0.08946099877357483,
+    "source": "yfinance",
+    "symbol": "ALLO-USD"
+  },
+  "ALPINE-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.496096+00:00",
+    "last_price": 0.4000260829925537,
+    "previous_close": 0.4080660045146942,
+    "source": "yfinance",
+    "symbol": "ALPINE-USD"
+  },
+  "ALT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.051485+00:00",
+    "last_price": 0.007956358861783053,
+    "previous_close": 0.00974727141793598,
+    "source": "cryptocompare",
+    "symbol": "ALT-USD"
+  },
+  "AMP-USD": {
+    "captured_at_utc": "2026-05-23T12:39:05.225180+00:00",
+    "last_price": 0.00080000004347579,
+    "previous_close": 0.000839999974409721,
+    "source": "cryptocompare",
+    "symbol": "AMP-USD"
+  },
+  "ANIME-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.202217+00:00",
+    "last_price": 0.004180881349800366,
+    "previous_close": 0.004476214433303973,
+    "source": "cryptocompare",
+    "symbol": "ANIME-USD"
+  },
+  "ANKR-USD": {
+    "captured_at_utc": "2026-05-23T12:38:44.806164+00:00",
+    "last_price": 0.004480000119656324,
+    "previous_close": 0.0045830002054572105,
+    "source": "yfinance",
+    "symbol": "ANKR-USD"
+  },
+  "APE-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.100226+00:00",
+    "last_price": 0.13185301423072815,
+    "previous_close": 0.1386599987745285,
+    "source": "yfinance",
+    "symbol": "APE-USD"
+  },
+  "APEPE-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.672103+00:00",
+    "last_price": 1.134026069299e-06,
+    "previous_close": 1.144854765803134e-06,
+    "source": "cryptocompare",
+    "symbol": "APEPE-USD"
+  },
+  "APEX-USD": {
+    "captured_at_utc": "2026-05-23T12:38:57.562546+00:00",
+    "last_price": 0.3595289298043755,
+    "previous_close": 0.3561774941043191,
+    "source": "cryptocompare",
+    "symbol": "APEX-USD"
+  },
+  "API3-USD": {
+    "captured_at_utc": "2026-05-23T12:39:10.626294+00:00",
+    "last_price": 0.3140000104904175,
+    "previous_close": 0.32084500789642334,
+    "source": "yfinance",
+    "symbol": "API3-USD"
+  },
+  "APR-USD": {
+    "captured_at_utc": "2026-05-23T12:39:05.225180+00:00",
+    "last_price": 0.176195401545945,
+    "previous_close": 0.179200025997727,
+    "source": "cryptocompare",
+    "symbol": "APR-USD"
+  },
+  "AR-USD": {
+    "captured_at_utc": "2026-05-23T12:38:31.374571+00:00",
+    "last_price": 2.0066845417022705,
+    "previous_close": 2.0462260246276855,
+    "source": "yfinance",
+    "symbol": "AR-USD"
+  },
+  "ARC-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.483751+00:00",
+    "last_price": 0.06391123364502531,
+    "previous_close": 0.06383770727427363,
+    "source": "cryptocompare",
+    "symbol": "ARC-USD"
+  },
+  "ARKM-USD": {
+    "captured_at_utc": "2026-05-23T12:38:37.393866+00:00",
+    "last_price": 0.12399999797344208,
+    "previous_close": 0.1276489943265915,
+    "source": "yfinance",
+    "symbol": "ARKM-USD"
+  },
+  "ARPA-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.000635+00:00",
+    "last_price": 0.010700000450015068,
+    "previous_close": 0.011010999791324139,
+    "source": "yfinance",
+    "symbol": "ARPA-USD"
+  },
+  "AT-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.972556+00:00",
+    "last_price": 0.1151119206795232,
+    "previous_close": 0.1284934866343745,
+    "source": "cryptocompare",
+    "symbol": "AT-USD"
+  },
+  "ATH-USD": {
+    "captured_at_utc": "2026-05-23T12:38:31.378148+00:00",
+    "last_price": 0.00588676476309358,
+    "previous_close": 0.00674846530061907,
+    "source": "cryptocompare",
+    "symbol": "ATH-USD"
+  },
+  "AUCTION-USD": {
+    "captured_at_utc": "2026-05-23T12:39:17.983727+00:00",
+    "last_price": 4.570000171661377,
+    "previous_close": 4.652978897094727,
+    "source": "yfinance",
+    "symbol": "AUCTION-USD"
+  },
+  "AUDIO-USD": {
+    "captured_at_utc": "2026-05-23T12:39:17.983727+00:00",
+    "last_price": 0.019099999219179153,
+    "previous_close": 0.019216999411582947,
+    "source": "yfinance",
+    "symbol": "AUDIO-USD"
+  },
+  "AVA-USD": {
+    "captured_at_utc": "2026-05-23T12:39:09.626685+00:00",
+    "last_price": 0.23212964832782745,
+    "previous_close": 0.23510000109672546,
+    "source": "yfinance",
+    "symbol": "AVA-USD"
+  },
+  "AVL-USD": {
+    "captured_at_utc": "2026-05-23T12:38:43.864524+00:00",
+    "last_price": 0.09515029937028885,
+    "previous_close": 0.09800700098276138,
+    "source": "yfinance",
+    "symbol": "AVL-USD"
+  },
+  "AVLN": {
+    "captured_at_utc": "2026-05-23T12:38:18.126756+00:00",
+    "last_price": 28.84,
+    "previous_close": 29.84,
+    "source": "yahoo-chart",
+    "symbol": "AVLN"
+  },
+  "AVLV": {
+    "captured_at_utc": "2026-05-23T12:38:18.125466+00:00",
+    "last_price": 89.31999969482422,
+    "previous_close": 88.70999908447266,
+    "source": "yfinance",
+    "symbol": "AVLV"
+  },
+  "AVMA": {
+    "captured_at_utc": "2026-05-23T12:38:18.126756+00:00",
+    "last_price": 72.3,
+    "previous_close": 71.55,
+    "source": "yahoo-chart",
+    "symbol": "AVMA"
+  },
+  "AVMC": {
+    "captured_at_utc": "2026-05-23T12:38:18.126756+00:00",
+    "last_price": 77.947,
+    "previous_close": 76.537,
+    "source": "yahoo-chart",
+    "symbol": "AVMC"
+  },
+  "AVMU": {
+    "captured_at_utc": "2026-05-23T12:38:18.126756+00:00",
+    "last_price": 45.91,
+    "previous_close": 45.865,
+    "source": "yahoo-chart",
+    "symbol": "AVMU"
+  },
+  "AVMV": {
+    "captured_at_utc": "2026-05-23T12:38:18.126756+00:00",
+    "last_price": 78.953,
+    "previous_close": 77.6,
+    "source": "yahoo-chart",
+    "symbol": "AVMV"
+  },
+  "AVNM": {
+    "captured_at_utc": "2026-05-23T12:38:18.126756+00:00",
+    "last_price": 83.05,
+    "previous_close": 81.91,
+    "source": "yahoo-chart",
+    "symbol": "AVNM"
+  },
+  "AVNS": {
+    "captured_at_utc": "2026-05-23T12:38:18.126756+00:00",
+    "last_price": 24.61,
+    "previous_close": 24.71,
+    "source": "yahoo-chart",
+    "symbol": "AVNS"
+  },
+  "AVNT": {
+    "captured_at_utc": "2026-05-23T12:38:18.126756+00:00",
+    "last_price": 34.31,
+    "previous_close": 33.77,
+    "source": "yahoo-chart",
+    "symbol": "AVNT"
+  },
+  "AVNT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:32.262966+00:00",
+    "last_price": 0.14010000228881836,
+    "previous_close": 0.14408299326896667,
+    "source": "yfinance",
+    "symbol": "AVNT-USD"
+  },
+  "AVNV": {
+    "captured_at_utc": "2026-05-23T12:38:18.125466+00:00",
+    "last_price": 84.42400360107422,
+    "previous_close": 84.375,
+    "source": "yfinance",
+    "symbol": "AVNV"
+  },
+  "AVNW": {
+    "captured_at_utc": "2026-05-23T12:38:18.936870+00:00",
+    "last_price": 17.59,
+    "previous_close": 16.0,
+    "source": "yahoo-chart",
+    "symbol": "AVNW"
+  },
+  "AVO": {
+    "captured_at_utc": "2026-05-23T12:38:18.936870+00:00",
+    "last_price": 11.92,
+    "previous_close": 11.95,
+    "source": "yahoo-chart",
+    "symbol": "AVO"
+  },
+  "AVOS": {
+    "captured_at_utc": "2026-05-23T12:38:18.935375+00:00",
+    "last_price": 26.81999969482422,
+    "previous_close": 26.719999313354492,
+    "source": "yfinance",
+    "symbol": "AVOS"
+  },
+  "AVPT": {
+    "captured_at_utc": "2026-05-23T12:38:18.935375+00:00",
+    "last_price": 10.289999961853027,
+    "previous_close": 10.239999771118164,
+    "source": "yfinance",
+    "symbol": "AVPT"
+  },
+  "AVR": {
+    "captured_at_utc": "2026-05-23T12:38:18.935375+00:00",
+    "last_price": 9.619999885559082,
+    "previous_close": 9.0,
+    "source": "yfinance",
+    "symbol": "AVR"
+  },
+  "AVRE": {
+    "captured_at_utc": "2026-05-23T12:38:40.214448+00:00",
+    "last_price": 47.7599983215332,
+    "previous_close": 47.849998474121094,
+    "source": "yfinance",
+    "symbol": "AVRE"
+  },
+  "AVRY": {
+    "captured_at_utc": "2026-05-23T12:38:40.214448+00:00",
+    "last_price": 23.965999603271484,
+    "previous_close": 23.790000915527344,
+    "source": "yfinance",
+    "symbol": "AVRY"
+  },
+  "AVS": {
+    "captured_at_utc": "2026-05-23T12:38:40.214448+00:00",
+    "last_price": 7.507999897003174,
+    "previous_close": 7.500999927520752,
+    "source": "yfinance",
+    "symbol": "AVS"
+  },
+  "AVSC": {
+    "captured_at_utc": "2026-05-23T12:38:40.214448+00:00",
+    "last_price": 68.08999633789062,
+    "previous_close": 67.56999969482422,
+    "source": "yfinance",
+    "symbol": "AVSC"
+  },
+  "AVSD": {
+    "captured_at_utc": "2026-05-23T12:38:40.214448+00:00",
+    "last_price": 79.78399658203125,
+    "previous_close": 79.8290023803711,
+    "source": "yfinance",
+    "symbol": "AVSD"
+  },
+  "AVSE": {
+    "captured_at_utc": "2026-05-23T12:38:40.214448+00:00",
+    "last_price": 77.78800201416016,
+    "previous_close": 77.75,
+    "source": "yfinance",
+    "symbol": "AVSE"
+  },
+  "AVSF": {
+    "captured_at_utc": "2026-05-23T12:38:40.214448+00:00",
+    "last_price": 46.520999908447266,
+    "previous_close": 46.540000915527344,
+    "source": "yfinance",
+    "symbol": "AVSF"
+  },
+  "AVSU": {
+    "captured_at_utc": "2026-05-23T12:38:40.214448+00:00",
+    "last_price": 85.56700134277344,
+    "previous_close": 85.0479965209961,
+    "source": "yfinance",
+    "symbol": "AVSU"
+  },
+  "AVT": {
+    "captured_at_utc": "2026-05-23T12:38:40.214448+00:00",
+    "last_price": 85.91000366210938,
+    "previous_close": 83.4000015258789,
+    "source": "yfinance",
+    "symbol": "AVT"
+  },
+  "AVTM": {
+    "captured_at_utc": "2026-05-23T12:38:40.214448+00:00",
+    "last_price": 53.29999923706055,
+    "previous_close": 53.0,
+    "source": "yfinance",
+    "symbol": "AVTM"
+  },
+  "AVTR": {
+    "captured_at_utc": "2026-05-23T12:38:41.177370+00:00",
+    "last_price": 8.119999885559082,
+    "previous_close": 7.869999885559082,
+    "source": "yfinance",
+    "symbol": "AVTR"
+  },
+  "AVTX": {
+    "captured_at_utc": "2026-05-23T12:38:41.177370+00:00",
+    "last_price": 16.350000381469727,
+    "previous_close": 16.600000381469727,
+    "source": "yfinance",
+    "symbol": "AVTX"
+  },
+  "AVUQ": {
+    "captured_at_utc": "2026-05-23T12:38:41.177370+00:00",
+    "last_price": 66.0510025024414,
+    "previous_close": 65.91799926757812,
+    "source": "yfinance",
+    "symbol": "AVUQ"
+  },
+  "AVUS": {
+    "captured_at_utc": "2026-05-23T12:38:41.177370+00:00",
+    "last_price": 125.7699966430664,
+    "previous_close": 125.19000244140625,
+    "source": "yfinance",
+    "symbol": "AVUS"
+  },
+  "AVUV": {
+    "captured_at_utc": "2026-05-23T12:38:41.177370+00:00",
+    "last_price": 120.02999877929688,
+    "previous_close": 119.23999786376953,
+    "source": "yfinance",
+    "symbol": "AVUV"
+  },
+  "AVX": {
+    "captured_at_utc": "2026-05-23T12:38:41.177370+00:00",
+    "last_price": 0.5709999799728394,
+    "previous_close": 0.5820000171661377,
+    "source": "yfinance",
+    "symbol": "AVX"
+  },
+  "AVXC": {
+    "captured_at_utc": "2026-05-23T12:38:41.177370+00:00",
+    "last_price": 80.77100372314453,
+    "previous_close": 80.7760009765625,
+    "source": "yfinance",
+    "symbol": "AVXC"
+  },
+  "AVXL": {
+    "captured_at_utc": "2026-05-23T12:38:41.177370+00:00",
+    "last_price": 2.694999933242798,
+    "previous_close": 2.7100000381469727,
+    "source": "yfinance",
+    "symbol": "AVXL"
+  },
+  "AVXX": {
+    "captured_at_utc": "2026-05-23T12:38:41.177370+00:00",
+    "last_price": 8.675999641418457,
+    "previous_close": 7.590000152587891,
+    "source": "yfinance",
+    "symbol": "AVXX"
+  },
+  "AVY": {
+    "captured_at_utc": "2026-05-23T12:38:41.177370+00:00",
+    "last_price": 159.66000366210938,
+    "previous_close": 158.89999389648438,
+    "source": "yfinance",
+    "symbol": "AVY"
+  },
+  "AWAY": {
+    "captured_at_utc": "2026-05-23T12:38:42.127490+00:00",
+    "last_price": 16.45400047302246,
+    "previous_close": 16.649999618530273,
+    "source": "yfinance",
+    "symbol": "AWAY"
+  },
+  "AWE-USD": {
+    "captured_at_utc": "2026-05-23T12:38:44.332179+00:00",
+    "last_price": 0.0474817119538784,
+    "previous_close": 0.04896099865436554,
+    "source": "yfinance",
+    "symbol": "AWE-USD"
+  },
+  "AWF": {
+    "captured_at_utc": "2026-05-23T12:38:42.127490+00:00",
+    "last_price": 10.210000038146973,
+    "previous_close": 10.239999771118164,
+    "source": "yfinance",
+    "symbol": "AWF"
+  },
+  "AWI": {
+    "captured_at_utc": "2026-05-23T12:38:42.127490+00:00",
+    "last_price": 157.4199981689453,
+    "previous_close": 157.14999389648438,
+    "source": "yfinance",
+    "symbol": "AWI"
+  },
+  "AWK": {
+    "captured_at_utc": "2026-05-23T12:38:42.127490+00:00",
+    "last_price": 125.19999694824219,
+    "previous_close": 123.87999725341797,
+    "source": "yfinance",
+    "symbol": "AWK"
+  },
+  "AWP": {
+    "captured_at_utc": "2026-05-23T12:38:42.127490+00:00",
+    "last_price": 11.65999984741211,
+    "previous_close": 11.699999809265137,
+    "source": "yfinance",
+    "symbol": "AWP"
+  },
+  "AXL-USD": {
+    "captured_at_utc": "2026-05-23T12:38:44.809629+00:00",
+    "last_price": 0.0562000127551451,
+    "previous_close": 0.0627874438531928,
+    "source": "cryptocompare",
+    "symbol": "AXL-USD"
+  },
+  "AXS-USD": {
+    "captured_at_utc": "2026-05-23T12:38:36.912345+00:00",
+    "last_price": 1.1260000467300415,
+    "previous_close": 1.1485430002212524,
+    "source": "yfinance",
+    "symbol": "AXS-USD"
+  },
+  "AZTEC-USD": {
+    "captured_at_utc": "2026-05-23T12:38:43.864524+00:00",
+    "last_price": 0.019920000806450844,
+    "previous_close": 0.021133000031113625,
+    "source": "yfinance",
+    "symbol": "AZTEC-USD"
+  },
+  "B2-USD": {
+    "captured_at_utc": "2026-05-23T12:38:37.839271+00:00",
+    "last_price": 0.6941071152687073,
+    "previous_close": 0.6521750092506409,
+    "source": "yfinance",
+    "symbol": "B2-USD"
+  },
+  "BABY-USD": {
+    "captured_at_utc": "2026-05-23T12:38:44.335275+00:00",
+    "last_price": 0.01594560080310934,
+    "previous_close": 0.01642302046305007,
+    "source": "cryptocompare",
+    "symbol": "BABY-USD"
+  },
+  "BABYDOGE-USD": {
+    "captured_at_utc": "2026-05-23T12:38:38.137612+00:00",
+    "last_price": 3.80547e-10,
+    "previous_close": 4.088873063102054e-10,
+    "source": "coingecko",
+    "symbol": "BABYDOGE-USD"
+  },
+  "BAN-USD": {
+    "captured_at_utc": "2026-05-23T12:38:37.393866+00:00",
+    "last_price": 0.0004617042141035199,
+    "previous_close": 0.00046999999904073775,
+    "source": "yfinance",
+    "symbol": "BAN-USD"
+  },
+  "BANANAS31-USD": {
+    "captured_at_utc": "2026-05-23T12:38:31.374571+00:00",
+    "last_price": 0.010950830765068531,
+    "previous_close": 0.01071999967098236,
+    "source": "yfinance",
+    "symbol": "BANANAS31-USD"
+  },
+  "BANK-USD": {
+    "captured_at_utc": "2026-05-23T12:38:38.137612+00:00",
+    "last_price": 3.5e-06,
+    "previous_close": 3.9417206466539124e-06,
+    "source": "coingecko",
+    "symbol": "BANK-USD"
+  },
+  "BARD-USD": {
+    "captured_at_utc": "2026-05-23T12:38:43.867526+00:00",
+    "last_price": 0.2144397388989071,
+    "previous_close": 0.231782359584406,
+    "source": "cryptocompare",
+    "symbol": "BARD-USD"
+  },
+  "BASED-USD": {
+    "captured_at_utc": "2026-05-23T12:38:19.573504+00:00",
+    "last_price": 0.07021894526396122,
+    "previous_close": 0.07931802406049711,
+    "source": "cryptocompare",
+    "symbol": "BASED-USD"
+  },
+  "BAT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:58.008600+00:00",
+    "last_price": 0.09509000182151794,
+    "previous_close": 0.09716299921274185,
+    "source": "yfinance",
+    "symbol": "BAT-USD"
+  },
+  "BB-USD": {
+    "captured_at_utc": "2026-05-23T12:38:57.562546+00:00",
+    "last_price": 0.02932066362333818,
+    "previous_close": 0.03280233698877595,
+    "source": "cryptocompare",
+    "symbol": "BB-USD"
+  },
+  "BBSOL-USD": {
+    "captured_at_utc": "2026-05-23T12:39:11.773557+00:00",
+    "last_price": 94.72624969482422,
+    "previous_close": 97.0992202758789,
+    "source": "yfinance",
+    "symbol": "BBSOL-USD"
+  },
+  "BDX-USD": {
+    "captured_at_utc": "2026-05-23T12:38:37.839271+00:00",
+    "last_price": 0.07883702218532562,
+    "previous_close": 0.07942800223827362,
+    "source": "yfinance",
+    "symbol": "BDX-USD"
+  },
+  "BEAM-USD": {
+    "captured_at_utc": "2026-05-23T12:38:57.559872+00:00",
+    "last_price": 0.019059257581830025,
+    "previous_close": 0.019442999735474586,
+    "source": "yfinance",
+    "symbol": "BEAM-USD"
+  },
+  "BEAT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.481912+00:00",
+    "last_price": 1.355647537656813,
+    "previous_close": 1.064135326683229,
+    "source": "cryptocompare",
+    "symbol": "BEAT-USD"
+  },
+  "BERA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:31.374571+00:00",
+    "last_price": 0.3610000014305115,
+    "previous_close": 0.3734839856624603,
+    "source": "yfinance",
+    "symbol": "BERA-USD"
+  },
+  "BGB-USD": {
+    "captured_at_utc": "2026-05-23T12:38:32.262966+00:00",
+    "last_price": 1.954127550125122,
+    "previous_close": 1.9750629663467407,
+    "source": "yfinance",
+    "symbol": "BGB-USD"
+  },
+  "BICO-USD": {
+    "captured_at_utc": "2026-05-23T12:38:58.008600+00:00",
+    "last_price": 0.025200000032782555,
+    "previous_close": 0.026088999584317207,
+    "source": "yfinance",
+    "symbol": "BICO-USD"
+  },
+  "BIGTIME-USD": {
+    "captured_at_utc": "2026-05-23T12:39:11.773557+00:00",
+    "last_price": 0.01193000003695488,
+    "previous_close": 0.012059999629855156,
+    "source": "yfinance",
+    "symbol": "BIGTIME-USD"
+  },
+  "BIO-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.993629+00:00",
+    "last_price": 0.03325543178985804,
+    "previous_close": 0.03683991337925805,
+    "source": "cryptocompare",
+    "symbol": "BIO-USD"
+  },
+  "BIRB-USD": {
+    "captured_at_utc": "2026-05-23T12:39:09.626685+00:00",
+    "last_price": 0.00145844800863415,
+    "previous_close": 0.001487000030465424,
+    "source": "yfinance",
+    "symbol": "BIRB-USD"
+  },
+  "BLEND-USD": {
+    "captured_at_utc": "2026-05-23T12:38:19.988238+00:00",
+    "last_price": 0.1071446246460993,
+    "previous_close": 0.1050773878552073,
+    "source": "cryptocompare",
+    "symbol": "BLEND-USD"
+  },
+  "BLUAI-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.483751+00:00",
+    "last_price": 0.009833975258521978,
+    "previous_close": 0.009441893586134145,
+    "source": "cryptocompare",
+    "symbol": "BLUAI-USD"
+  },
+  "BLUE-USD": {
+    "captured_at_utc": "2026-05-23T12:39:09.626685+00:00",
+    "last_price": 0.0007727466290816665,
+    "previous_close": 0.0007730000070296228,
+    "source": "yfinance",
+    "symbol": "BLUE-USD"
+  },
+  "BLUR-USD": {
+    "captured_at_utc": "2026-05-23T12:39:10.626294+00:00",
+    "last_price": 0.021400000900030136,
+    "previous_close": 0.021591000258922577,
+    "source": "yfinance",
+    "symbol": "BLUR-USD"
+  },
+  "BMO": {
+    "captured_at_utc": "2026-05-23T12:38:21.368545+00:00",
+    "last_price": 160.92999267578125,
+    "previous_close": 159.72999572753906,
+    "source": "yfinance",
+    "symbol": "BMO"
+  },
+  "BMOP": {
+    "captured_at_utc": "2026-05-23T12:38:21.368545+00:00",
+    "last_price": 24.700000762939453,
+    "previous_close": 24.674999237060547,
+    "source": "yfinance",
+    "symbol": "BMOP"
+  },
+  "BMR": {
+    "captured_at_utc": "2026-05-23T12:38:21.368545+00:00",
+    "last_price": 1.8600000143051147,
+    "previous_close": 1.7000000476837158,
+    "source": "yfinance",
+    "symbol": "BMR"
+  },
+  "BMRA": {
+    "captured_at_utc": "2026-05-23T12:38:21.368545+00:00",
+    "last_price": 2.490000009536743,
+    "previous_close": 2.440000057220459,
+    "source": "yfinance",
+    "symbol": "BMRA"
+  },
+  "BMRC": {
+    "captured_at_utc": "2026-05-23T12:38:21.368545+00:00",
+    "last_price": 26.040000915527344,
+    "previous_close": 26.239999771118164,
+    "source": "yfinance",
+    "symbol": "BMRC"
+  },
+  "BMRN": {
+    "captured_at_utc": "2026-05-23T12:38:21.368545+00:00",
+    "last_price": 54.09000015258789,
+    "previous_close": 54.099998474121094,
+    "source": "yfinance",
+    "symbol": "BMRN"
+  },
+  "BMVP": {
+    "captured_at_utc": "2026-05-23T12:38:21.368545+00:00",
+    "last_price": 52.040000915527344,
+    "previous_close": 51.36000061035156,
+    "source": "yfinance",
+    "symbol": "BMVP"
+  },
+  "BMX-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.202217+00:00",
+    "last_price": 0.3056521392135891,
+    "previous_close": 0.3120130911197038,
+    "source": "cryptocompare",
+    "symbol": "BMX-USD"
+  },
+  "BMY": {
+    "captured_at_utc": "2026-05-23T12:38:21.368545+00:00",
+    "last_price": 59.459999084472656,
+    "previous_close": 59.54999923706055,
+    "source": "yfinance",
+    "symbol": "BMY"
+  },
+  "BN": {
+    "captured_at_utc": "2026-05-23T12:38:21.368545+00:00",
+    "last_price": 45.369998931884766,
+    "previous_close": 45.439998626708984,
+    "source": "yfinance",
+    "symbol": "BN"
+  },
+  "BNAI": {
+    "captured_at_utc": "2026-05-23T12:38:21.368545+00:00",
+    "last_price": 18.5049991607666,
+    "previous_close": 19.209999084472656,
+    "source": "yfinance",
+    "symbol": "BNAI"
+  },
+  "BNAIW": {
+    "captured_at_utc": "2026-05-23T12:38:21.625366+00:00",
+    "last_price": 0.2775000035762787,
+    "previous_close": 0.2775000035762787,
+    "source": "yfinance",
+    "symbol": "BNAIW"
+  },
+  "BNBX": {
+    "captured_at_utc": "2026-05-23T12:38:21.625366+00:00",
+    "last_price": 0.3799999952316284,
+    "previous_close": 0.3799999952316284,
+    "source": "yfinance",
+    "symbol": "BNBX"
+  },
+  "BNC": {
+    "captured_at_utc": "2026-05-23T12:38:21.625366+00:00",
+    "last_price": 2.630000114440918,
+    "previous_close": 2.619999885559082,
+    "source": "yfinance",
+    "symbol": "BNC"
+  },
+  "BNCWW": {
+    "captured_at_utc": "2026-05-23T12:38:21.625366+00:00",
+    "last_price": 0.04010000079870224,
+    "previous_close": 0.04010000079870224,
+    "source": "yfinance",
+    "symbol": "BNCWW"
+  },
+  "BNCWZ": {
+    "captured_at_utc": "2026-05-23T12:38:21.629301+00:00",
+    "last_price": 0.1399,
+    "previous_close": 0.1399,
+    "source": "yahoo-chart",
+    "symbol": "BNCWZ"
+  },
+  "BND": {
+    "captured_at_utc": "2026-05-23T12:38:21.625366+00:00",
+    "last_price": 73.0,
+    "previous_close": 72.93000030517578,
+    "source": "yfinance",
+    "symbol": "BND"
+  },
+  "BNDC": {
+    "captured_at_utc": "2026-05-23T12:38:21.625366+00:00",
+    "last_price": 21.959999084472656,
+    "previous_close": 21.969999313354492,
+    "source": "yfinance",
+    "symbol": "BNDC"
+  },
+  "BNDD": {
+    "captured_at_utc": "2026-05-23T12:38:21.625366+00:00",
+    "last_price": 97.81700134277344,
+    "previous_close": 97.19400024414062,
+    "source": "yfinance",
+    "symbol": "BNDD"
+  },
+  "BNDI": {
+    "captured_at_utc": "2026-05-23T12:38:21.625366+00:00",
+    "last_price": 46.83000183105469,
+    "previous_close": 46.7760009765625,
+    "source": "yfinance",
+    "symbol": "BNDI"
+  },
+  "BNDP": {
+    "captured_at_utc": "2026-05-23T12:38:21.625366+00:00",
+    "last_price": 73.76499938964844,
+    "previous_close": 73.71499633789062,
+    "source": "yfinance",
+    "symbol": "BNDP"
+  },
+  "BNDS": {
+    "captured_at_utc": "2026-05-23T12:38:21.944840+00:00",
+    "last_price": 50.959999084472656,
+    "previous_close": 50.85599899291992,
+    "source": "yfinance",
+    "symbol": "BNDS"
+  },
+  "BNDW": {
+    "captured_at_utc": "2026-05-23T12:38:21.944840+00:00",
+    "last_price": 68.05999755859375,
+    "previous_close": 67.97000122070312,
+    "source": "yfinance",
+    "symbol": "BNDW"
+  },
+  "BNDX": {
+    "captured_at_utc": "2026-05-23T12:38:21.944840+00:00",
+    "last_price": 48.060001373291016,
+    "previous_close": 47.97999954223633,
+    "source": "yfinance",
+    "symbol": "BNDX"
+  },
+  "BNDY": {
+    "captured_at_utc": "2026-05-23T12:38:21.944840+00:00",
+    "last_price": 25.266000747680664,
+    "previous_close": 25.219999313354492,
+    "source": "yfinance",
+    "symbol": "BNDY"
+  },
+  "BNED": {
+    "captured_at_utc": "2026-05-23T12:38:21.944840+00:00",
+    "last_price": 9.529999732971191,
+    "previous_close": 8.960000038146973,
+    "source": "yfinance",
+    "symbol": "BNED"
+  },
+  "BNGE": {
+    "captured_at_utc": "2026-05-23T12:38:49.696517+00:00",
+    "last_price": 30.7189998626709,
+    "previous_close": 30.81100082397461,
+    "source": "yfinance",
+    "symbol": "BNGE"
+  },
+  "BNGO": {
+    "captured_at_utc": "2026-05-23T12:38:49.696517+00:00",
+    "last_price": 1.2400000095367432,
+    "previous_close": 1.2300000190734863,
+    "source": "yfinance",
+    "symbol": "BNGO"
+  },
+  "BNH": {
+    "captured_at_utc": "2026-05-23T12:38:49.696517+00:00",
+    "last_price": 15.5,
+    "previous_close": 15.470000267028809,
+    "source": "yfinance",
+    "symbol": "BNH"
+  },
+  "BNJ": {
+    "captured_at_utc": "2026-05-23T12:38:49.696517+00:00",
+    "last_price": 14.84000015258789,
+    "previous_close": 14.819999694824219,
+    "source": "yfinance",
+    "symbol": "BNJ"
+  },
+  "BNKD": {
+    "captured_at_utc": "2026-05-23T12:38:49.696517+00:00",
+    "last_price": 42.01900100708008,
+    "previous_close": 42.61600112915039,
+    "source": "yfinance",
+    "symbol": "BNKD"
+  },
+  "BNKK": {
+    "captured_at_utc": "2026-05-23T12:38:49.696517+00:00",
+    "last_price": 1.8700000047683716,
+    "previous_close": 1.9800000190734863,
+    "source": "yfinance",
+    "symbol": "BNKK"
+  },
+  "BNKR-USD": {
+    "captured_at_utc": "2026-05-23T12:38:58.012544+00:00",
+    "last_price": 0.000446,
+    "previous_close": 0.000498,
+    "source": "cryptocompare",
+    "symbol": "BNKR-USD"
+  },
+  "BNKU": {
+    "captured_at_utc": "2026-05-23T12:38:49.696517+00:00",
+    "last_price": 32.56399917602539,
+    "previous_close": 32.11800003051758,
+    "source": "yfinance",
+    "symbol": "BNKU"
+  },
+  "BNL": {
+    "captured_at_utc": "2026-05-23T12:38:49.696517+00:00",
+    "last_price": 20.399999618530273,
+    "previous_close": 20.40999984741211,
+    "source": "yfinance",
+    "symbol": "BNL"
+  },
+  "BNO": {
+    "captured_at_utc": "2026-05-23T12:38:49.696517+00:00",
+    "last_price": 55.0,
+    "previous_close": 55.560001373291016,
+    "source": "yfinance",
+    "symbol": "BNO"
+  },
+  "BNOV": {
+    "captured_at_utc": "2026-05-23T12:38:49.696517+00:00",
+    "last_price": 47.45000076293945,
+    "previous_close": 47.34000015258789,
+    "source": "yfinance",
+    "symbol": "BNOV"
+  },
+  "BNR": {
+    "captured_at_utc": "2026-05-23T12:38:49.957679+00:00",
+    "last_price": 14.510000228881836,
+    "previous_close": 16.31999969482422,
+    "source": "yfinance",
+    "symbol": "BNR"
+  },
+  "BNRG": {
+    "captured_at_utc": "2026-05-23T12:38:49.957679+00:00",
+    "last_price": 1.6299999952316284,
+    "previous_close": 1.5700000524520874,
+    "source": "yfinance",
+    "symbol": "BNRG"
+  },
+  "BNS": {
+    "captured_at_utc": "2026-05-23T12:38:49.957679+00:00",
+    "last_price": 79.77999877929688,
+    "previous_close": 79.43000030517578,
+    "source": "yfinance",
+    "symbol": "BNS"
+  },
+  "BNT": {
+    "captured_at_utc": "2026-05-23T12:38:49.957679+00:00",
+    "last_price": 45.33000183105469,
+    "previous_close": 45.349998474121094,
+    "source": "yfinance",
+    "symbol": "BNT"
+  },
+  "BNTC": {
+    "captured_at_utc": "2026-05-23T12:38:49.957679+00:00",
+    "last_price": 11.229999542236328,
+    "previous_close": 11.359999656677246,
+    "source": "yfinance",
+    "symbol": "BNTC"
+  },
+  "BNTX": {
+    "captured_at_utc": "2026-05-23T12:38:49.957679+00:00",
+    "last_price": 92.13999938964844,
+    "previous_close": 90.93000030517578,
+    "source": "yfinance",
+    "symbol": "BNTX"
+  },
+  "BNY": {
+    "captured_at_utc": "2026-05-23T12:38:49.957679+00:00",
+    "last_price": 139.14999389648438,
+    "previous_close": 138.97999572753906,
+    "source": "yfinance",
+    "symbol": "BNY"
+  },
+  "BNZI": {
+    "captured_at_utc": "2026-05-23T12:38:49.957679+00:00",
+    "last_price": 3.450000047683716,
+    "previous_close": 3.4800000190734863,
+    "source": "yfinance",
+    "symbol": "BNZI"
+  },
+  "BNZIW": {
+    "captured_at_utc": "2026-05-23T12:38:49.957679+00:00",
+    "last_price": 0.014800000004470348,
+    "previous_close": 0.014800000004470348,
+    "source": "yfinance",
+    "symbol": "BNZIW"
+  },
+  "BOAT": {
+    "captured_at_utc": "2026-05-23T12:38:49.957679+00:00",
+    "last_price": 42.0,
+    "previous_close": 43.099998474121094,
+    "source": "yfinance",
+    "symbol": "BOAT"
+  },
+  "BOBA-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.000635+00:00",
+    "last_price": 0.024299999698996544,
+    "previous_close": 0.024517999961972237,
+    "source": "yfinance",
+    "symbol": "BOBA-USD"
+  },
+  "BOBL2-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.125294+00:00",
+    "last_price": 0.0081128559332947,
+    "previous_close": 0.0100036168054657,
+    "source": "cryptocompare",
+    "symbol": "BOBL2-USD"
+  },
+  "BOBP": {
+    "captured_at_utc": "2026-05-23T12:38:50.158110+00:00",
+    "last_price": 30.70800018310547,
+    "previous_close": 30.507999420166016,
+    "source": "yfinance",
+    "symbol": "BOBP"
+  },
+  "BOBS": {
+    "captured_at_utc": "2026-05-23T12:38:50.158110+00:00",
+    "last_price": 11.550000190734863,
+    "previous_close": 11.619999885559082,
+    "source": "yfinance",
+    "symbol": "BOBS"
+  },
+  "BOC": {
+    "captured_at_utc": "2026-05-23T12:38:50.158110+00:00",
+    "last_price": 12.529999732971191,
+    "previous_close": 12.329999923706055,
+    "source": "yfinance",
+    "symbol": "BOC"
+  },
+  "BOCT": {
+    "captured_at_utc": "2026-05-23T12:38:50.158110+00:00",
+    "last_price": 52.529998779296875,
+    "previous_close": 52.439998626708984,
+    "source": "yfinance",
+    "symbol": "BOCT"
+  },
+  "BODI": {
+    "captured_at_utc": "2026-05-23T12:38:50.158110+00:00",
+    "last_price": 10.6899995803833,
+    "previous_close": 10.920000076293945,
+    "source": "yfinance",
+    "symbol": "BODI"
+  },
+  "BOE": {
+    "captured_at_utc": "2026-05-23T12:38:35.263566+00:00",
+    "last_price": 11.850000381469727,
+    "previous_close": 11.859999656677246,
+    "source": "yfinance",
+    "symbol": "BOE"
+  },
+  "BOEG": {
+    "captured_at_utc": "2026-05-23T12:38:35.263566+00:00",
+    "last_price": 14.104000091552734,
+    "previous_close": 14.225000381469727,
+    "source": "yfinance",
+    "symbol": "BOEG"
+  },
+  "BOEU": {
+    "captured_at_utc": "2026-05-23T12:38:35.263566+00:00",
+    "last_price": 35.619998931884766,
+    "previous_close": 35.77000045776367,
+    "source": "yfinance",
+    "symbol": "BOEU"
+  },
+  "BOF": {
+    "captured_at_utc": "2026-05-23T12:38:35.263566+00:00",
+    "last_price": 3.1600000858306885,
+    "previous_close": 3.2300000190734863,
+    "source": "yfinance",
+    "symbol": "BOF"
+  },
+  "BOH": {
+    "captured_at_utc": "2026-05-23T12:38:35.263566+00:00",
+    "last_price": 77.79000091552734,
+    "previous_close": 78.12000274658203,
+    "source": "yfinance",
+    "symbol": "BOH"
+  },
+  "BOIL": {
+    "captured_at_utc": "2026-05-23T12:38:35.263566+00:00",
+    "last_price": 12.739999771118164,
+    "previous_close": 13.670000076293945,
+    "source": "yfinance",
+    "symbol": "BOIL"
+  },
+  "BOKF": {
+    "captured_at_utc": "2026-05-23T12:38:35.263566+00:00",
+    "last_price": 130.75,
+    "previous_close": 129.72000122070312,
+    "source": "yfinance",
+    "symbol": "BOKF"
+  },
+  "BOLD": {
+    "captured_at_utc": "2026-05-23T12:38:35.263566+00:00",
+    "last_price": 1.440000057220459,
+    "previous_close": 1.4500000476837158,
+    "source": "yfinance",
+    "symbol": "BOLD"
+  },
+  "BOLT": {
+    "captured_at_utc": "2026-05-23T12:38:35.263566+00:00",
+    "last_price": 4.949999809265137,
+    "previous_close": 4.590000152587891,
+    "source": "yfinance",
+    "symbol": "BOLT"
+  },
+  "BOME-USD": {
+    "captured_at_utc": "2026-05-23T12:38:37.839271+00:00",
+    "last_price": 0.0005262622144073248,
+    "previous_close": 0.0005579999997280538,
+    "source": "yfinance",
+    "symbol": "BOME-USD"
+  },
+  "BON": {
+    "captured_at_utc": "2026-05-23T12:38:35.263566+00:00",
+    "last_price": 1.2699999809265137,
+    "previous_close": 1.2799999713897705,
+    "source": "yfinance",
+    "symbol": "BON"
+  },
+  "BOND": {
+    "captured_at_utc": "2026-05-23T12:38:35.503037+00:00",
+    "last_price": 91.44999694824219,
+    "previous_close": 91.3499984741211,
+    "source": "yfinance",
+    "symbol": "BOND"
+  },
+  "BOOM": {
+    "captured_at_utc": "2026-05-23T12:38:35.503037+00:00",
+    "last_price": 6.900000095367432,
+    "previous_close": 6.849999904632568,
+    "source": "yfinance",
+    "symbol": "BOOM"
+  },
+  "BOOT": {
+    "captured_at_utc": "2026-05-23T12:38:35.503037+00:00",
+    "last_price": 154.64999389648438,
+    "previous_close": 154.49000549316406,
+    "source": "yfinance",
+    "symbol": "BOOT"
+  },
+  "BORR": {
+    "captured_at_utc": "2026-05-23T12:38:35.503037+00:00",
+    "last_price": 5.519999980926514,
+    "previous_close": 5.639999866485596,
+    "source": "yfinance",
+    "symbol": "BORR"
+  },
+  "BOSC": {
+    "captured_at_utc": "2026-05-23T12:38:35.503037+00:00",
+    "last_price": 4.519999980926514,
+    "previous_close": 4.46999979019165,
+    "source": "yfinance",
+    "symbol": "BOSC"
+  },
+  "BOT": {
+    "captured_at_utc": "2026-05-23T12:38:35.503037+00:00",
+    "last_price": 24.3799991607666,
+    "previous_close": 31.290000915527344,
+    "source": "yfinance",
+    "symbol": "BOT"
+  },
+  "BOTJ": {
+    "captured_at_utc": "2026-05-23T12:38:35.503037+00:00",
+    "last_price": 22.75,
+    "previous_close": 22.899999618530273,
+    "source": "yfinance",
+    "symbol": "BOTJ"
+  },
+  "BOTT": {
+    "captured_at_utc": "2026-05-23T12:38:35.503037+00:00",
+    "last_price": 55.41600036621094,
+    "previous_close": 54.900001525878906,
+    "source": "yfinance",
+    "symbol": "BOTT"
+  },
+  "BOTZ": {
+    "captured_at_utc": "2026-05-23T12:38:35.503037+00:00",
+    "last_price": 40.290000915527344,
+    "previous_close": 39.650001525878906,
+    "source": "yfinance",
+    "symbol": "BOTZ"
+  },
+  "BOUT": {
+    "captured_at_utc": "2026-05-23T12:38:35.503037+00:00",
+    "last_price": 46.22999954223633,
+    "previous_close": 45.79999923706055,
+    "source": "yfinance",
+    "symbol": "BOUT"
+  },
+  "BOW": {
+    "captured_at_utc": "2026-05-23T12:38:35.663601+00:00",
+    "last_price": 28.299999237060547,
+    "previous_close": 28.459999084472656,
+    "source": "yfinance",
+    "symbol": "BOW"
+  },
+  "BOX": {
+    "captured_at_utc": "2026-05-23T12:38:35.663601+00:00",
+    "last_price": 25.899999618530273,
+    "previous_close": 25.399999618530273,
+    "source": "yfinance",
+    "symbol": "BOX"
+  },
+  "BOXA": {
+    "captured_at_utc": "2026-05-23T12:38:35.663601+00:00",
+    "last_price": 104.62000274658203,
+    "previous_close": 104.55000305175781,
+    "source": "yfinance",
+    "symbol": "BOXA"
+  },
+  "BOXL": {
+    "captured_at_utc": "2026-05-23T12:38:35.663601+00:00",
+    "last_price": 0.8209999799728394,
+    "previous_close": 0.7919999957084656,
+    "source": "yfinance",
+    "symbol": "BOXL"
+  },
+  "BOXX": {
+    "captured_at_utc": "2026-05-23T12:38:35.663601+00:00",
+    "last_price": 116.87000274658203,
+    "previous_close": 116.77999877929688,
+    "source": "yfinance",
+    "symbol": "BOXX"
+  },
+  "BP": {
+    "captured_at_utc": "2026-05-23T12:38:41.117177+00:00",
+    "last_price": 44.36000061035156,
+    "previous_close": 44.869998931884766,
+    "source": "yfinance",
+    "symbol": "BP"
+  },
+  "BPAC": {
+    "captured_at_utc": "2026-05-23T12:38:41.117177+00:00",
+    "last_price": 10.09000015258789,
+    "previous_close": 10.069999694824219,
+    "source": "yfinance",
+    "symbol": "BPAC"
+  },
+  "BPACR": {
+    "captured_at_utc": "2026-05-23T12:38:41.120961+00:00",
+    "last_price": 0.1801,
+    "previous_close": 0.1801,
+    "source": "yahoo-chart",
+    "symbol": "BPACR"
+  },
+  "BPACU": {
+    "captured_at_utc": "2026-05-23T12:38:41.117177+00:00",
+    "last_price": 10.25,
+    "previous_close": 10.25,
+    "source": "yfinance",
+    "symbol": "BPACU"
+  },
+  "BPAY": {
+    "captured_at_utc": "2026-05-23T12:38:41.117177+00:00",
+    "last_price": 24.158000946044922,
+    "previous_close": 24.336999893188477,
+    "source": "yfinance",
+    "symbol": "BPAY"
+  },
+  "BPH": {
+    "captured_at_utc": "2026-05-23T12:38:41.117177+00:00",
+    "last_price": 69.1780014038086,
+    "previous_close": 70.05400085449219,
+    "source": "yfinance",
+    "symbol": "BPH"
+  },
+  "BPI": {
+    "captured_at_utc": "2026-05-23T12:38:41.117177+00:00",
+    "last_price": 25.158000946044922,
+    "previous_close": 25.743000030517578,
+    "source": "yfinance",
+    "symbol": "BPI"
+  },
+  "BPOP": {
+    "captured_at_utc": "2026-05-23T12:38:41.117177+00:00",
+    "last_price": 150.5,
+    "previous_close": 149.4600067138672,
+    "source": "yfinance",
+    "symbol": "BPOP"
+  },
+  "BPOPM": {
+    "captured_at_utc": "2026-05-23T12:38:41.117177+00:00",
+    "last_price": 25.200000762939453,
+    "previous_close": 25.200000762939453,
+    "source": "yfinance",
+    "symbol": "BPOPM"
+  },
+  "BPRE": {
+    "captured_at_utc": "2026-05-23T12:38:41.117177+00:00",
+    "last_price": 14.949999809265137,
+    "previous_close": 15.050000190734863,
+    "source": "yfinance",
+    "symbol": "BPRE"
+  },
+  "BPRN": {
+    "captured_at_utc": "2026-05-23T12:38:41.442055+00:00",
+    "last_price": 35.25,
+    "previous_close": 34.689998626708984,
+    "source": "yfinance",
+    "symbol": "BPRN"
+  },
+  "BPRO": {
+    "captured_at_utc": "2026-05-23T12:38:41.442055+00:00",
+    "last_price": 21.825000762939453,
+    "previous_close": 22.027000427246094,
+    "source": "yfinance",
+    "symbol": "BPRO"
+  },
+  "BPYPM": {
+    "captured_at_utc": "2026-05-23T12:38:41.442055+00:00",
+    "last_price": 17.280000686645508,
+    "previous_close": 17.219999313354492,
+    "source": "yfinance",
+    "symbol": "BPYPM"
+  },
+  "BPYPN": {
+    "captured_at_utc": "2026-05-23T12:38:41.442055+00:00",
+    "last_price": 13.920000076293945,
+    "previous_close": 13.90999984741211,
+    "source": "yfinance",
+    "symbol": "BPYPN"
+  },
+  "BPYPO": {
+    "captured_at_utc": "2026-05-23T12:38:41.442055+00:00",
+    "last_price": 15.329999923706055,
+    "previous_close": 15.239999771118164,
+    "source": "yfinance",
+    "symbol": "BPYPO"
+  },
+  "BPYPP": {
+    "captured_at_utc": "2026-05-23T12:38:41.442055+00:00",
+    "last_price": 15.9399995803833,
+    "previous_close": 15.8100004196167,
+    "source": "yfinance",
+    "symbol": "BPYPP"
+  },
+  "BQ": {
+    "captured_at_utc": "2026-05-23T12:38:41.442055+00:00",
+    "last_price": 0.7390000224113464,
+    "previous_close": 0.7200000286102295,
+    "source": "yfinance",
+    "symbol": "BQ"
+  },
+  "BR": {
+    "captured_at_utc": "2026-05-23T12:38:41.442055+00:00",
+    "last_price": 150.49000549316406,
+    "previous_close": 150.02000427246094,
+    "source": "yfinance",
+    "symbol": "BR"
+  },
+  "BRAG": {
+    "captured_at_utc": "2026-05-23T12:38:41.442055+00:00",
+    "last_price": 1.649999976158142,
+    "previous_close": 1.659999966621399,
+    "source": "yfinance",
+    "symbol": "BRAG"
+  },
+  "BRAI": {
+    "captured_at_utc": "2026-05-23T12:38:41.442055+00:00",
+    "last_price": 7.170000076293945,
+    "previous_close": 7.289999961853027,
+    "source": "yfinance",
+    "symbol": "BRAI"
+  },
+  "BRAZ": {
+    "captured_at_utc": "2026-05-23T12:38:41.616466+00:00",
+    "last_price": 30.770999908447266,
+    "previous_close": 31.256999969482422,
+    "source": "yfinance",
+    "symbol": "BRAZ"
+  },
+  "BRBI": {
+    "captured_at_utc": "2026-05-23T12:38:41.616466+00:00",
+    "last_price": 12.899999618530273,
+    "previous_close": 13.449999809265137,
+    "source": "yfinance",
+    "symbol": "BRBI"
+  },
+  "BRBR": {
+    "captured_at_utc": "2026-05-23T12:38:41.616466+00:00",
+    "last_price": 8.90999984741211,
+    "previous_close": 9.050000190734863,
+    "source": "yfinance",
+    "symbol": "BRBR"
+  },
+  "BRBS": {
+    "captured_at_utc": "2026-05-23T12:38:41.616466+00:00",
+    "last_price": 3.2799999713897705,
+    "previous_close": 3.299999952316284,
+    "source": "yfinance",
+    "symbol": "BRBS"
+  },
+  "BRC": {
+    "captured_at_utc": "2026-05-23T12:38:41.616466+00:00",
+    "last_price": 87.5199966430664,
+    "previous_close": 84.55999755859375,
+    "source": "yfinance",
+    "symbol": "BRC"
+  },
+  "BRCB": {
+    "captured_at_utc": "2026-05-23T12:38:47.696477+00:00",
+    "last_price": 6.809999942779541,
+    "previous_close": 6.579999923706055,
+    "source": "yfinance",
+    "symbol": "BRCB"
+  },
+  "BRCC": {
+    "captured_at_utc": "2026-05-23T12:38:47.696477+00:00",
+    "last_price": 1.7200000286102295,
+    "previous_close": 1.7799999713897705,
+    "source": "yfinance",
+    "symbol": "BRCC"
+  },
+  "BRCE": {
+    "captured_at_utc": "2026-05-23T12:38:47.696477+00:00",
+    "last_price": 28.496999740600586,
+    "previous_close": 28.38599967956543,
+    "source": "yfinance",
+    "symbol": "BRCE"
+  },
+  "BREE": {
+    "captured_at_utc": "2026-05-23T12:38:47.696477+00:00",
+    "last_price": 26.079999923706055,
+    "previous_close": 26.190000534057617,
+    "source": "yfinance",
+    "symbol": "BREE"
+  },
+  "BREM": {
+    "captured_at_utc": "2026-05-23T12:38:47.696477+00:00",
+    "last_price": 51.060001373291016,
+    "previous_close": 50.90999984741211,
+    "source": "yfinance",
+    "symbol": "BREM"
+  },
+  "BRES": {
+    "captured_at_utc": "2026-05-23T12:38:47.696477+00:00",
+    "last_price": 26.489999771118164,
+    "previous_close": 26.420000076293945,
+    "source": "yfinance",
+    "symbol": "BRES"
+  },
+  "BRETT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:31.850306+00:00",
+    "last_price": 0.006906917273162992,
+    "previous_close": 0.007996554695919129,
+    "source": "cryptocompare",
+    "symbol": "BRETT-USD"
+  },
+  "BREV-USD": {
+    "captured_at_utc": "2026-05-23T12:38:37.393866+00:00",
+    "last_price": 0.10859999805688858,
+    "previous_close": 0.111285001039505,
+    "source": "yfinance",
+    "symbol": "BREV-USD"
+  },
+  "BREW": {
+    "captured_at_utc": "2026-05-23T12:38:47.696477+00:00",
+    "last_price": 26.84000015258789,
+    "previous_close": 26.780000686645508,
+    "source": "yfinance",
+    "symbol": "BREW"
+  },
+  "BREZU": {
+    "captured_at_utc": "2026-05-23T12:38:47.696477+00:00",
+    "last_price": 10.020000457763672,
+    "previous_close": 10.029999732971191,
+    "source": "yfinance",
+    "symbol": "BREZU"
+  },
+  "BRF": {
+    "captured_at_utc": "2026-05-23T12:38:47.696477+00:00",
+    "last_price": 17.530000686645508,
+    "previous_close": 17.799999237060547,
+    "source": "yfinance",
+    "symbol": "BRF"
+  },
+  "BRFH": {
+    "captured_at_utc": "2026-05-23T12:38:47.696477+00:00",
+    "last_price": 2.440000057220459,
+    "previous_close": 2.3499999046325684,
+    "source": "yfinance",
+    "symbol": "BRFH"
+  },
+  "BRHY": {
+    "captured_at_utc": "2026-05-23T12:38:47.902599+00:00",
+    "last_price": 51.02199935913086,
+    "previous_close": 50.939998626708984,
+    "source": "yfinance",
+    "symbol": "BRHY"
+  },
+  "BRIA": {
+    "captured_at_utc": "2026-05-23T12:38:47.902599+00:00",
+    "last_price": 1.6299999952316284,
+    "previous_close": 1.600000023841858,
+    "source": "yfinance",
+    "symbol": "BRIA"
+  },
+  "BRIB": {
+    "captured_at_utc": "2026-05-23T12:38:47.902599+00:00",
+    "last_price": 24.969999313354492,
+    "previous_close": 24.950000762939453,
+    "source": "yfinance",
+    "symbol": "BRIB"
+  },
+  "BRID": {
+    "captured_at_utc": "2026-05-23T12:38:47.902599+00:00",
+    "last_price": 7.71999979019165,
+    "previous_close": 7.730000019073486,
+    "source": "yfinance",
+    "symbol": "BRID"
+  },
+  "BRIE": {
+    "captured_at_utc": "2026-05-23T12:38:47.902599+00:00",
+    "last_price": 29.34000015258789,
+    "previous_close": 29.475000381469727,
+    "source": "yfinance",
+    "symbol": "BRIE"
+  },
+  "BRIF": {
+    "captured_at_utc": "2026-05-23T12:38:47.902599+00:00",
+    "last_price": 35.06999969482422,
+    "previous_close": 34.60300064086914,
+    "source": "yfinance",
+    "symbol": "BRIF"
+  },
+  "BRKC": {
+    "captured_at_utc": "2026-05-23T12:38:47.905847+00:00",
+    "last_price": 41.0283,
+    "previous_close": 40.967,
+    "source": "yahoo-chart",
+    "symbol": "BRKC"
+  },
+  "BRKR": {
+    "captured_at_utc": "2026-05-23T12:38:47.905847+00:00",
+    "last_price": 45.69,
+    "previous_close": 42.88,
+    "source": "yahoo-chart",
+    "symbol": "BRKR"
+  },
+  "BRKRP": {
+    "captured_at_utc": "2026-05-23T12:38:54.462453+00:00",
+    "last_price": 342.489990234375,
+    "previous_close": 342.489990234375,
+    "source": "yfinance",
+    "symbol": "BRKRP"
+  },
+  "BRKU": {
+    "captured_at_utc": "2026-05-23T12:38:54.462453+00:00",
+    "last_price": 22.040000915527344,
+    "previous_close": 21.5049991607666,
+    "source": "yfinance",
+    "symbol": "BRKU"
+  },
+  "BRKW": {
+    "captured_at_utc": "2026-05-23T12:38:54.462453+00:00",
+    "last_price": 39.45000076293945,
+    "previous_close": 38.891998291015625,
+    "source": "yfinance",
+    "symbol": "BRKW"
+  },
+  "BRLN": {
+    "captured_at_utc": "2026-05-23T12:38:54.462453+00:00",
+    "last_price": 50.92900085449219,
+    "previous_close": 50.84000015258789,
+    "source": "yfinance",
+    "symbol": "BRLN"
+  },
+  "BRLS": {
+    "captured_at_utc": "2026-05-23T12:38:54.462453+00:00",
+    "last_price": 1.4299999475479126,
+    "previous_close": 1.3899999856948853,
+    "source": "yfinance",
+    "symbol": "BRLS"
+  },
+  "BRLSW": {
+    "captured_at_utc": "2026-05-23T12:39:02.185011+00:00",
+    "last_price": 0.0658000037074089,
+    "previous_close": 0.0658000037074089,
+    "source": "yfinance",
+    "symbol": "BRLSW"
+  },
+  "BRLT": {
+    "captured_at_utc": "2026-05-23T12:39:02.185011+00:00",
+    "last_price": 1.2200000286102295,
+    "previous_close": 1.2000000476837158,
+    "source": "yfinance",
+    "symbol": "BRLT"
+  },
+  "BRN": {
+    "captured_at_utc": "2026-05-23T12:39:02.185011+00:00",
+    "last_price": 1.1100000143051147,
+    "previous_close": 1.100000023841858,
+    "source": "yfinance",
+    "symbol": "BRN"
+  },
+  "BRNS": {
+    "captured_at_utc": "2026-05-23T12:39:02.185011+00:00",
+    "last_price": 0.6869999766349792,
+    "previous_close": 0.7009999752044678,
+    "source": "yfinance",
+    "symbol": "BRNS"
+  },
+  "BRNY": {
+    "captured_at_utc": "2026-05-23T12:39:02.185011+00:00",
+    "last_price": 55.86000061035156,
+    "previous_close": 55.79999923706055,
+    "source": "yfinance",
+    "symbol": "BRNY"
+  },
+  "BRO": {
+    "captured_at_utc": "2026-05-23T12:39:02.185011+00:00",
+    "last_price": 57.81999969482422,
+    "previous_close": 58.52000045776367,
+    "source": "yfinance",
+    "symbol": "BRO"
+  },
+  "BROCCOLI-USD": {
+    "captured_at_utc": "2026-05-23T12:38:44.806164+00:00",
+    "last_price": 3.69312365364749e-05,
+    "previous_close": 3.7000001611886546e-05,
+    "source": "yfinance",
+    "symbol": "BROCCOLI-USD"
+  },
+  "BROS": {
+    "captured_at_utc": "2026-05-23T12:39:02.185011+00:00",
+    "last_price": 52.119998931884766,
+    "previous_close": 53.459999084472656,
+    "source": "yfinance",
+    "symbol": "BROS"
+  },
+  "BRR": {
+    "captured_at_utc": "2026-05-23T12:39:02.185011+00:00",
+    "last_price": 1.6399999856948853,
+    "previous_close": 1.7200000286102295,
+    "source": "yfinance",
+    "symbol": "BRR"
+  },
+  "BRRR": {
+    "captured_at_utc": "2026-05-23T12:39:02.185011+00:00",
+    "last_price": 21.37299919128418,
+    "previous_close": 21.893999099731445,
+    "source": "yfinance",
+    "symbol": "BRRR"
+  },
+  "BRRWW": {
+    "captured_at_utc": "2026-05-23T12:39:02.185011+00:00",
+    "last_price": 0.21299999952316284,
+    "previous_close": 0.32199999690055847,
+    "source": "yfinance",
+    "symbol": "BRRWW"
+  },
+  "BRSL": {
+    "captured_at_utc": "2026-05-23T12:39:02.405244+00:00",
+    "last_price": 11.199999809265137,
+    "previous_close": 11.050000190734863,
+    "source": "yfinance",
+    "symbol": "BRSL"
+  },
+  "BRSP": {
+    "captured_at_utc": "2026-05-23T12:39:02.405244+00:00",
+    "last_price": 5.670000076293945,
+    "previous_close": 5.699999809265137,
+    "source": "yfinance",
+    "symbol": "BRSP"
+  },
+  "BRT": {
+    "captured_at_utc": "2026-05-23T12:39:02.405244+00:00",
+    "last_price": 14.529999732971191,
+    "previous_close": 14.59000015258789,
+    "source": "yfinance",
+    "symbol": "BRT"
+  },
+  "BRTR": {
+    "captured_at_utc": "2026-05-23T12:39:02.405244+00:00",
+    "last_price": 49.96500015258789,
+    "previous_close": 49.904998779296875,
+    "source": "yfinance",
+    "symbol": "BRTR"
+  },
+  "BRTX": {
+    "captured_at_utc": "2026-05-23T12:39:02.405244+00:00",
+    "last_price": 0.20800000429153442,
+    "previous_close": 0.19300000369548798,
+    "source": "yfinance",
+    "symbol": "BRTX"
+  },
+  "BRUN": {
+    "captured_at_utc": "2026-05-23T12:39:02.405244+00:00",
+    "last_price": 24.020000457763672,
+    "previous_close": 25.520000457763672,
+    "source": "yfinance",
+    "symbol": "BRUN"
+  },
+  "BRW": {
+    "captured_at_utc": "2026-05-23T12:39:02.405244+00:00",
+    "last_price": 6.75,
+    "previous_close": 6.75,
+    "source": "yfinance",
+    "symbol": "BRW"
+  },
+  "BRX": {
+    "captured_at_utc": "2026-05-23T12:39:02.405244+00:00",
+    "last_price": 30.84000015258789,
+    "previous_close": 30.860000610351562,
+    "source": "yfinance",
+    "symbol": "BRX"
+  },
+  "BRZE": {
+    "captured_at_utc": "2026-05-23T12:39:02.405244+00:00",
+    "last_price": 24.350000381469727,
+    "previous_close": 23.40999984741211,
+    "source": "yfinance",
+    "symbol": "BRZE"
+  },
+  "BRZU": {
+    "captured_at_utc": "2026-05-23T12:39:02.569994+00:00",
+    "last_price": 98.45999908447266,
+    "previous_close": 102.02999877929688,
+    "source": "yfinance",
+    "symbol": "BRZU"
+  },
+  "BSAA": {
+    "captured_at_utc": "2026-05-23T12:39:02.569994+00:00",
+    "last_price": 12.170000076293945,
+    "previous_close": 12.0,
+    "source": "yfinance",
+    "symbol": "BSAA"
+  },
+  "BSAAU": {
+    "captured_at_utc": "2026-05-23T12:39:02.569994+00:00",
+    "last_price": 11.899999618530273,
+    "previous_close": 11.970000267028809,
+    "source": "yfinance",
+    "symbol": "BSAAU"
+  },
+  "BSAC": {
+    "captured_at_utc": "2026-05-23T12:39:02.569994+00:00",
+    "last_price": 30.979999542236328,
+    "previous_close": 31.510000228881836,
+    "source": "yfinance",
+    "symbol": "BSAC"
+  },
+  "BSBK": {
+    "captured_at_utc": "2026-05-23T12:39:07.722126+00:00",
+    "last_price": 8.399999618530273,
+    "previous_close": 8.5,
+    "source": "yfinance",
+    "symbol": "BSBK"
+  },
+  "BSBR": {
+    "captured_at_utc": "2026-05-23T12:39:07.722126+00:00",
+    "last_price": 5.389999866485596,
+    "previous_close": 5.559999942779541,
+    "source": "yfinance",
+    "symbol": "BSBR"
+  },
+  "BSCQ": {
+    "captured_at_utc": "2026-05-23T12:39:07.722126+00:00",
+    "last_price": 19.520000457763672,
+    "previous_close": 19.510000228881836,
+    "source": "yfinance",
+    "symbol": "BSCQ"
+  },
+  "BSCR": {
+    "captured_at_utc": "2026-05-23T12:39:07.722126+00:00",
+    "last_price": 19.614999771118164,
+    "previous_close": 19.604999542236328,
+    "source": "yfinance",
+    "symbol": "BSCR"
+  },
+  "BSCS": {
+    "captured_at_utc": "2026-05-23T12:39:07.722126+00:00",
+    "last_price": 20.350000381469727,
+    "previous_close": 20.350000381469727,
+    "source": "yfinance",
+    "symbol": "BSCS"
+  },
+  "BSCT": {
+    "captured_at_utc": "2026-05-23T12:39:07.722126+00:00",
+    "last_price": 18.545000076293945,
+    "previous_close": 18.545000076293945,
+    "source": "yfinance",
+    "symbol": "BSCT"
+  },
+  "BSCU": {
+    "captured_at_utc": "2026-05-23T12:39:07.722126+00:00",
+    "last_price": 16.604999542236328,
+    "previous_close": 16.594999313354492,
+    "source": "yfinance",
+    "symbol": "BSCU"
+  },
+  "BSCV": {
+    "captured_at_utc": "2026-05-23T12:39:07.722126+00:00",
+    "last_price": 16.334999084472656,
+    "previous_close": 16.334999084472656,
+    "source": "yfinance",
+    "symbol": "BSCV"
+  },
+  "BSCW": {
+    "captured_at_utc": "2026-05-23T12:39:07.722126+00:00",
+    "last_price": 20.40999984741211,
+    "previous_close": 20.40999984741211,
+    "source": "yfinance",
+    "symbol": "BSCW"
+  },
+  "BSCX": {
+    "captured_at_utc": "2026-05-23T12:39:07.722126+00:00",
+    "last_price": 20.989999771118164,
+    "previous_close": 20.969999313354492,
+    "source": "yfinance",
+    "symbol": "BSCX"
+  },
+  "BSCY": {
+    "captured_at_utc": "2026-05-23T12:39:08.218814+00:00",
+    "last_price": 20.565000534057617,
+    "previous_close": 20.53499984741211,
+    "source": "yfinance",
+    "symbol": "BSCY"
+  },
+  "BSCZ": {
+    "captured_at_utc": "2026-05-23T12:39:08.218814+00:00",
+    "last_price": 20.354999542236328,
+    "previous_close": 20.315000534057617,
+    "source": "yfinance",
+    "symbol": "BSCZ"
+  },
+  "BSEP": {
+    "captured_at_utc": "2026-05-23T12:39:08.218814+00:00",
+    "last_price": 52.21699905395508,
+    "previous_close": 52.165000915527344,
+    "source": "yfinance",
+    "symbol": "BSEP"
+  },
+  "BSET": {
+    "captured_at_utc": "2026-05-23T12:39:08.218814+00:00",
+    "last_price": 14.640000343322754,
+    "previous_close": 14.619999885559082,
+    "source": "yfinance",
+    "symbol": "BSET"
+  },
+  "BSJQ": {
+    "captured_at_utc": "2026-05-23T12:39:08.218814+00:00",
+    "last_price": 23.100000381469727,
+    "previous_close": 23.110000610351562,
+    "source": "yfinance",
+    "symbol": "BSJQ"
+  },
+  "BSJR": {
+    "captured_at_utc": "2026-05-23T12:39:08.218814+00:00",
+    "last_price": 22.420000076293945,
+    "previous_close": 22.375999450683594,
+    "source": "yfinance",
+    "symbol": "BSJR"
+  },
+  "BSJS": {
+    "captured_at_utc": "2026-05-23T12:39:08.218814+00:00",
+    "last_price": 21.790000915527344,
+    "previous_close": 21.780000686645508,
+    "source": "yfinance",
+    "symbol": "BSJS"
+  },
+  "BSJT": {
+    "captured_at_utc": "2026-05-23T12:39:08.218814+00:00",
+    "last_price": 21.1200008392334,
+    "previous_close": 21.149999618530273,
+    "source": "yfinance",
+    "symbol": "BSJT"
+  },
+  "BSJU": {
+    "captured_at_utc": "2026-05-23T12:39:08.218814+00:00",
+    "last_price": 25.70599937438965,
+    "previous_close": 25.670000076293945,
+    "source": "yfinance",
+    "symbol": "BSJU"
+  },
+  "BSJV": {
+    "captured_at_utc": "2026-05-23T12:39:08.218814+00:00",
+    "last_price": 26.165000915527344,
+    "previous_close": 26.1299991607666,
+    "source": "yfinance",
+    "symbol": "BSJV"
+  },
+  "BSJW": {
+    "captured_at_utc": "2026-05-23T12:39:08.360232+00:00",
+    "last_price": 25.246000289916992,
+    "previous_close": 25.20199966430664,
+    "source": "yfinance",
+    "symbol": "BSJW"
+  },
+  "BSJX": {
+    "captured_at_utc": "2026-05-23T12:39:08.360232+00:00",
+    "last_price": 25.094999313354492,
+    "previous_close": 24.9950008392334,
+    "source": "yfinance",
+    "symbol": "BSJX"
+  },
+  "BSL": {
+    "captured_at_utc": "2026-05-23T12:39:08.360232+00:00",
+    "last_price": 12.960000038146973,
+    "previous_close": 13.050000190734863,
+    "source": "yfinance",
+    "symbol": "BSL"
+  },
+  "BSM": {
+    "captured_at_utc": "2026-05-23T12:39:08.360232+00:00",
+    "last_price": 13.819999694824219,
+    "previous_close": 13.899999618530273,
+    "source": "yfinance",
+    "symbol": "BSM"
+  },
+  "BSMC": {
+    "captured_at_utc": "2026-05-23T12:39:08.360232+00:00",
+    "last_price": 37.882999420166016,
+    "previous_close": 37.643001556396484,
+    "source": "yfinance",
+    "symbol": "BSMC"
+  },
+  "BSMQ": {
+    "captured_at_utc": "2026-05-23T12:39:14.326576+00:00",
+    "last_price": 23.545000076293945,
+    "previous_close": 23.53499984741211,
+    "source": "yfinance",
+    "symbol": "BSMQ"
+  },
+  "BSMR": {
+    "captured_at_utc": "2026-05-23T12:39:14.326576+00:00",
+    "last_price": 23.576000213623047,
+    "previous_close": 23.541000366210938,
+    "source": "yfinance",
+    "symbol": "BSMR"
+  },
+  "BSMS": {
+    "captured_at_utc": "2026-05-23T12:39:14.326576+00:00",
+    "last_price": 23.334999084472656,
+    "previous_close": 23.315000534057617,
+    "source": "yfinance",
+    "symbol": "BSMS"
+  },
+  "BSMT": {
+    "captured_at_utc": "2026-05-23T12:39:14.326576+00:00",
+    "last_price": 22.94499969482422,
+    "previous_close": 22.950000762939453,
+    "source": "yfinance",
+    "symbol": "BSMT"
+  },
+  "BSMU": {
+    "captured_at_utc": "2026-05-23T12:39:14.326576+00:00",
+    "last_price": 21.735000610351562,
+    "previous_close": 21.7450008392334,
+    "source": "yfinance",
+    "symbol": "BSMU"
+  },
+  "BSMV": {
+    "captured_at_utc": "2026-05-23T12:39:14.326576+00:00",
+    "last_price": 20.79599952697754,
+    "previous_close": 20.795000076293945,
+    "source": "yfinance",
+    "symbol": "BSMV"
+  },
+  "BSMW": {
+    "captured_at_utc": "2026-05-23T12:39:14.326576+00:00",
+    "last_price": 24.81999969482422,
+    "previous_close": 24.798999786376953,
+    "source": "yfinance",
+    "symbol": "BSMW"
+  },
+  "BSMY": {
+    "captured_at_utc": "2026-05-23T12:39:14.326576+00:00",
+    "last_price": 24.173999786376953,
+    "previous_close": 24.165000915527344,
+    "source": "yfinance",
+    "symbol": "BSMY"
+  },
+  "BSMZ": {
+    "captured_at_utc": "2026-05-23T12:39:14.326576+00:00",
+    "last_price": 25.108999252319336,
+    "previous_close": 25.100000381469727,
+    "source": "yfinance",
+    "symbol": "BSMZ"
+  },
+  "BSOL": {
+    "captured_at_utc": "2026-05-23T12:39:14.326576+00:00",
+    "last_price": 11.40999984741211,
+    "previous_close": 11.850000381469727,
+    "source": "yfinance",
+    "symbol": "BSOL"
+  },
+  "BSR": {
+    "captured_at_utc": "2026-05-23T12:39:14.566484+00:00",
+    "last_price": 30.18000030517578,
+    "previous_close": 30.041000366210938,
+    "source": "yfinance",
+    "symbol": "BSR"
+  },
+  "BSRR": {
+    "captured_at_utc": "2026-05-23T12:39:14.566484+00:00",
+    "last_price": 38.189998626708984,
+    "previous_close": 38.5,
+    "source": "yfinance",
+    "symbol": "BSRR"
+  },
+  "BSSX": {
+    "captured_at_utc": "2026-05-23T12:39:14.566484+00:00",
+    "last_price": 25.405000686645508,
+    "previous_close": 25.391000747680664,
+    "source": "yfinance",
+    "symbol": "BSSX"
+  },
+  "BST": {
+    "captured_at_utc": "2026-05-23T12:39:14.566484+00:00",
+    "last_price": 46.4900016784668,
+    "previous_close": 45.81999969482422,
+    "source": "yfinance",
+    "symbol": "BST"
+  },
+  "BSTP": {
+    "captured_at_utc": "2026-05-23T12:39:14.566484+00:00",
+    "last_price": 39.112998962402344,
+    "previous_close": 39.005001068115234,
+    "source": "yfinance",
+    "symbol": "BSTP"
+  },
+  "BSTZ": {
+    "captured_at_utc": "2026-05-23T12:39:14.566484+00:00",
+    "last_price": 28.700000762939453,
+    "previous_close": 28.3799991607666,
+    "source": "yfinance",
+    "symbol": "BSTZ"
+  },
+  "BSV": {
+    "captured_at_utc": "2026-05-23T12:39:14.566484+00:00",
+    "last_price": 77.86000061035156,
+    "previous_close": 77.86000061035156,
+    "source": "yfinance",
+    "symbol": "BSV"
+  },
+  "BSV-USD": {
+    "captured_at_utc": "2026-05-23T12:38:32.774161+00:00",
+    "last_price": 14.435979843139648,
+    "previous_close": 14.752524375915527,
+    "source": "yfinance",
+    "symbol": "BSV-USD"
+  },
+  "BSVN": {
+    "captured_at_utc": "2026-05-23T12:39:14.566484+00:00",
+    "last_price": 43.790000915527344,
+    "previous_close": 43.2599983215332,
+    "source": "yfinance",
+    "symbol": "BSVN"
+  },
+  "BSVO": {
+    "captured_at_utc": "2026-05-23T12:39:14.566484+00:00",
+    "last_price": 27.599000930786133,
+    "previous_close": 27.51300048828125,
+    "source": "yfinance",
+    "symbol": "BSVO"
+  },
+  "BSX": {
+    "captured_at_utc": "2026-05-23T12:39:14.566484+00:00",
+    "last_price": 57.779998779296875,
+    "previous_close": 57.150001525878906,
+    "source": "yfinance",
+    "symbol": "BSX"
+  },
+  "BSY": {
+    "captured_at_utc": "2026-05-23T12:39:14.708805+00:00",
+    "last_price": 33.15999984741211,
+    "previous_close": 33.34000015258789,
+    "source": "yfinance",
+    "symbol": "BSY"
+  },
+  "BTAI": {
+    "captured_at_utc": "2026-05-23T12:39:14.708805+00:00",
+    "last_price": 1.1299999952316284,
+    "previous_close": 1.1399999856948853,
+    "source": "yfinance",
+    "symbol": "BTAI"
+  },
+  "BTAL": {
+    "captured_at_utc": "2026-05-23T12:39:14.708805+00:00",
+    "last_price": 12.199999809265137,
+    "previous_close": 12.239999771118164,
+    "source": "yfinance",
+    "symbol": "BTAL"
+  },
+  "BTBD": {
+    "captured_at_utc": "2026-05-23T12:39:14.708805+00:00",
+    "last_price": 1.1699999570846558,
+    "previous_close": 1.159999966621399,
+    "source": "yfinance",
+    "symbol": "BTBD"
+  },
+  "BTBDW": {
+    "captured_at_utc": "2026-05-23T12:39:14.708805+00:00",
+    "last_price": 0.19900000095367432,
+    "previous_close": 0.19900000095367432,
+    "source": "yfinance",
+    "symbol": "BTBDW"
+  },
+  "BTT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:37.839271+00:00",
+    "last_price": 3.199480431703705e-07,
+    "previous_close": 3.199480431703705e-07,
+    "source": "yfinance",
+    "symbol": "BTT-USD"
+  },
+  "BTW-USD": {
+    "captured_at_utc": "2026-05-23T12:38:38.137612+00:00",
+    "last_price": 4.381e-05,
+    "previous_close": 4.670924269401768e-05,
+    "source": "coingecko",
+    "symbol": "BTW-USD"
+  },
+  "CAKE-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.122091+00:00",
+    "last_price": 1.378999948501587,
+    "previous_close": 1.4141260385513306,
+    "source": "yfinance",
+    "symbol": "CAKE-USD"
+  },
+  "CARV-USD": {
+    "captured_at_utc": "2026-05-23T12:39:17.983727+00:00",
+    "last_price": 0.051708437502384186,
+    "previous_close": 0.0534680001437664,
+    "source": "yfinance",
+    "symbol": "CARV-USD"
+  },
+  "CATI-USD": {
+    "captured_at_utc": "2026-05-23T12:38:58.452234+00:00",
+    "last_price": 0.05368000641465187,
+    "previous_close": 0.04891499876976013,
+    "source": "yfinance",
+    "symbol": "CATI-USD"
+  },
+  "CBETH-USD": {
+    "captured_at_utc": "2026-05-23T12:38:32.262966+00:00",
+    "last_price": 2288.510009765625,
+    "previous_close": 2336.366455078125,
+    "source": "yfinance",
+    "symbol": "CBETH-USD"
+  },
+  "CBK-USD": {
+    "captured_at_utc": "2026-05-23T12:39:09.626685+00:00",
+    "last_price": 0.24547924101352692,
+    "previous_close": 0.246739000082016,
+    "source": "yfinance",
+    "symbol": "CBK-USD"
+  },
+  "CC-USD": {
+    "captured_at_utc": "2026-05-23T12:38:32.266472+00:00",
+    "last_price": 0.155838888288546,
+    "previous_close": 0.153890004436025,
+    "source": "cryptocompare",
+    "symbol": "CC-USD"
+  },
+  "CELO-USD": {
+    "captured_at_utc": "2026-05-23T12:38:58.008600+00:00",
+    "last_price": 0.07800000160932541,
+    "previous_close": 0.07915999740362167,
+    "source": "yfinance",
+    "symbol": "CELO-USD"
+  },
+  "CFG-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.672103+00:00",
+    "last_price": 0.2684,
+    "previous_close": 0.3164,
+    "source": "cryptocompare",
+    "symbol": "CFG-USD"
+  },
+  "CFGV1-USD": {
+    "captured_at_utc": "2026-05-23T12:39:11.285239+00:00",
+    "last_price": 0.268399999967437,
+    "previous_close": 0.315499998072626,
+    "source": "cryptocompare",
+    "symbol": "CFGV1-USD"
+  },
+  "CFX-USD": {
+    "captured_at_utc": "2026-05-23T12:38:38.137612+00:00",
+    "last_price": 1.001e-05,
+    "previous_close": 1.02975487513322e-05,
+    "source": "coingecko",
+    "symbol": "CFX-USD"
+  },
+  "CGPT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:58.008600+00:00",
+    "last_price": 0.02478937804698944,
+    "previous_close": 0.02497600018978119,
+    "source": "yfinance",
+    "symbol": "CGPT-USD"
+  },
+  "CHECK-USD": {
+    "captured_at_utc": "2026-05-23T12:38:58.452234+00:00",
+    "last_price": 0.046620000153779984,
+    "previous_close": 0.04688800126314163,
+    "source": "yfinance",
+    "symbol": "CHECK-USD"
+  },
+  "CHEEMS-USD": {
+    "captured_at_utc": "2026-05-23T12:39:10.626294+00:00",
+    "last_price": 0.00012533199333120137,
+    "previous_close": 0.00012399999832268804,
+    "source": "yfinance",
+    "symbol": "CHEEMS-USD"
+  },
+  "CHILLGUY-USD": {
+    "captured_at_utc": "2026-05-23T12:39:17.473532+00:00",
+    "last_price": 0.012220249511301517,
+    "previous_close": 0.012555000372231007,
+    "source": "yfinance",
+    "symbol": "CHILLGUY-USD"
+  },
+  "CHIP-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.672103+00:00",
+    "last_price": 0.0461731123698522,
+    "previous_close": 0.0484613270482831,
+    "source": "cryptocompare",
+    "symbol": "CHIP-USD"
+  },
+  "CLANKER-USD": {
+    "captured_at_utc": "2026-05-23T12:39:17.983727+00:00",
+    "last_price": 22.06999969482422,
+    "previous_close": 22.72751235961914,
+    "source": "yfinance",
+    "symbol": "CLANKER-USD"
+  },
+  "COAI-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.966669+00:00",
+    "last_price": 0.2900005927457608,
+    "previous_close": 0.3043477432911041,
+    "source": "cryptocompare",
+    "symbol": "COAI-USD"
+  },
+  "COINX-USD": {
+    "captured_at_utc": "2026-05-23T12:39:11.281969+00:00",
+    "last_price": 181.42178344726562,
+    "previous_close": 184.08592224121094,
+    "source": "yfinance",
+    "symbol": "COINX-USD"
+  },
+  "COMP-USD": {
+    "captured_at_utc": "2026-05-23T12:38:19.573504+00:00",
+    "last_price": 19.7887913250527,
+    "previous_close": 22.6416954310273,
+    "source": "cryptocompare",
+    "symbol": "COMP-USD"
+  },
+  "COOKIE-USD": {
+    "captured_at_utc": "2026-05-23T12:38:43.867526+00:00",
+    "last_price": 0.0138588312045124,
+    "previous_close": 0.0153499964957808,
+    "source": "cryptocompare",
+    "symbol": "COOKIE-USD"
+  },
+  "CORE-USD": {
+    "captured_at_utc": "2026-05-23T12:38:59.172297+00:00",
+    "last_price": 5093.93798828125,
+    "previous_close": 5378.09326171875,
+    "source": "yfinance",
+    "symbol": "CORE-USD"
+  },
+  "COS-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.100226+00:00",
+    "last_price": 0.001460274332202971,
+    "previous_close": 0.0010989999864250422,
+    "source": "yfinance",
+    "symbol": "COS-USD"
+  },
+  "CRCLX-USD": {
+    "captured_at_utc": "2026-05-23T12:38:45.262902+00:00",
+    "last_price": 111.11595916748047,
+    "previous_close": 112.2850341796875,
+    "source": "yfinance",
+    "symbol": "CRCLX-USD"
+  },
+  "CRO-USD": {
+    "captured_at_utc": "2026-05-23T12:38:43.864524+00:00",
+    "last_price": 0.06789000332355499,
+    "previous_close": 0.06785000115633011,
+    "source": "yfinance",
+    "symbol": "CRO-USD"
+  },
+  "CRVUSD-USD": {
+    "captured_at_utc": "2026-05-23T12:38:32.262966+00:00",
+    "last_price": 0.9988016486167908,
+    "previous_close": 0.9990630149841309,
+    "source": "yfinance",
+    "symbol": "CRVUSD-USD"
+  },
+  "CTC-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.202217+00:00",
+    "last_price": 0.1358695462006321,
+    "previous_close": 0.1427631397804739,
+    "source": "cryptocompare",
+    "symbol": "CTC-USD"
+  },
+  "CVX-USD": {
+    "captured_at_utc": "2026-05-23T12:39:11.773557+00:00",
+    "last_price": 1.6169999837875366,
+    "previous_close": 1.6543949842453003,
+    "source": "yfinance",
+    "symbol": "CVX-USD"
+  },
+  "CYBER-USD": {
+    "captured_at_utc": "2026-05-23T12:38:58.008600+00:00",
+    "last_price": 0.00017965229926630855,
+    "previous_close": 0.00015199999324977398,
+    "source": "yfinance",
+    "symbol": "CYBER-USD"
+  },
+  "DAI-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.122091+00:00",
+    "last_price": 0.9993726015090942,
+    "previous_close": 0.9994999766349792,
+    "source": "yfinance",
+    "symbol": "DAI-USD"
+  },
+  "DBR-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.483751+00:00",
+    "last_price": 0.0134106735908118,
+    "previous_close": 0.01394858118171202,
+    "source": "cryptocompare",
+    "symbol": "DBR-USD"
+  },
+  "DEEP-USD": {
+    "captured_at_utc": "2026-05-23T12:39:17.476578+00:00",
+    "last_price": 0.03069288688719258,
+    "previous_close": 0.03500890509169179,
+    "source": "cryptocompare",
+    "symbol": "DEEP-USD"
+  },
+  "DEFINITIVE-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.202217+00:00",
+    "last_price": 0.0908929169676022,
+    "previous_close": 0.0936433170184293,
+    "source": "cryptocompare",
+    "symbol": "DEFINITIVE-USD"
+  },
+  "DEXE-USD": {
+    "captured_at_utc": "2026-05-23T12:38:37.839271+00:00",
+    "last_price": 13.90809440612793,
+    "previous_close": 13.660874366760254,
+    "source": "yfinance",
+    "symbol": "DEXE-USD"
+  },
+  "DGB-USD": {
+    "captured_at_utc": "2026-05-23T12:38:36.912345+00:00",
+    "last_price": 0.003595437854528427,
+    "previous_close": 0.0035389999393373728,
+    "source": "yfinance",
+    "symbol": "DGB-USD"
+  },
+  "DODO-USD": {
+    "captured_at_utc": "2026-05-23T12:38:44.806164+00:00",
+    "last_price": 0.01757940463721752,
+    "previous_close": 0.01785000041127205,
+    "source": "yfinance",
+    "symbol": "DODO-USD"
+  },
+  "DOGS-USD": {
+    "captured_at_utc": "2026-05-23T12:38:43.867526+00:00",
+    "last_price": 5.081208063572754e-05,
+    "previous_close": 5.599003127641841e-05,
+    "source": "cryptocompare",
+    "symbol": "DOGS-USD"
+  },
+  "DOOD-USD": {
+    "captured_at_utc": "2026-05-23T12:38:38.252213+00:00",
+    "last_price": 0.00252072,
+    "previous_close": 0.002734393135943398,
+    "source": "coingecko",
+    "symbol": "DOOD-USD"
+  },
+  "DUSK-USD": {
+    "captured_at_utc": "2026-05-23T12:38:43.445717+00:00",
+    "last_price": 0.13197270035743713,
+    "previous_close": 0.1463100016117096,
+    "source": "yfinance",
+    "symbol": "DUSK-USD"
+  },
+  "DYDX-USD": {
+    "captured_at_utc": "2026-05-23T12:38:32.774161+00:00",
+    "last_price": 0.1420000046491623,
+    "previous_close": 0.14616699516773224,
+    "source": "yfinance",
+    "symbol": "DYDX-USD"
+  },
+  "DYM-USD": {
+    "captured_at_utc": "2026-05-23T12:38:19.985027+00:00",
+    "last_price": 0.023753872141242027,
+    "previous_close": 0.02619200013577938,
+    "source": "yfinance",
+    "symbol": "DYM-USD"
+  },
+  "EDGE-USD": {
+    "captured_at_utc": "2026-05-23T12:38:37.393866+00:00",
+    "last_price": 0.10291795432567596,
+    "previous_close": 0.11303599923849106,
+    "source": "yfinance",
+    "symbol": "EDGE-USD"
+  },
+  "EDU-USD": {
+    "captured_at_utc": "2026-05-23T12:38:57.562546+00:00",
+    "last_price": 0.04476491698929525,
+    "previous_close": 0.0477618071751705,
+    "source": "cryptocompare",
+    "symbol": "EDU-USD"
+  },
+  "EGLD-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.732875+00:00",
+    "last_price": 3.825682577703785,
+    "previous_close": 4.147110609845522,
+    "source": "cryptocompare",
+    "symbol": "EGLD-USD"
+  },
+  "EIGEN-USD": {
+    "captured_at_utc": "2026-05-23T12:38:30.875130+00:00",
+    "last_price": 0.19300000369548798,
+    "previous_close": 0.19678400456905365,
+    "source": "yfinance",
+    "symbol": "EIGEN-USD"
+  },
+  "ELIZAOS-USD": {
+    "captured_at_utc": "2026-05-23T12:39:05.225180+00:00",
+    "last_price": 0.0009531176762274392,
+    "previous_close": 0.0009474437248652341,
+    "source": "cryptocompare",
+    "symbol": "ELIZAOS-USD"
+  },
+  "ELON-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.732875+00:00",
+    "last_price": 3.640307320775213e-08,
+    "previous_close": 3.787561505686001e-08,
+    "source": "cryptocompare",
+    "symbol": "ELON-USD"
+  },
+  "ELSA-USD": {
+    "captured_at_utc": "2026-05-23T12:39:11.281969+00:00",
+    "last_price": 0.06449999660253525,
+    "previous_close": 0.0643170028924942,
+    "source": "yfinance",
+    "symbol": "ELSA-USD"
+  },
+  "ENA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.048088+00:00",
+    "last_price": 0.09489999711513519,
+    "previous_close": 0.09994900226593018,
+    "source": "yfinance",
+    "symbol": "ENA-USD"
+  },
+  "ENJ-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.202217+00:00",
+    "last_price": 0.04124813176720681,
+    "previous_close": 0.0437010412050943,
+    "source": "cryptocompare",
+    "symbol": "ENJ-USD"
+  },
+  "ENS-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.122091+00:00",
+    "last_price": 6.010000228881836,
+    "previous_close": 6.107659816741943,
+    "source": "yfinance",
+    "symbol": "ENS-USD"
+  },
+  "ENSO-USD": {
+    "captured_at_utc": "2026-05-23T12:38:37.393866+00:00",
+    "last_price": 0.7695502042770386,
+    "previous_close": 0.8026990294456482,
+    "source": "yfinance",
+    "symbol": "ENSO-USD"
+  },
+  "EPIC-USD": {
+    "captured_at_utc": "2026-05-23T12:38:44.332179+00:00",
+    "last_price": 0.23882128298282623,
+    "previous_close": 0.24016499519348145,
+    "source": "yfinance",
+    "symbol": "EPIC-USD"
+  },
+  "ERA-USD": {
+    "captured_at_utc": "2026-05-23T12:39:11.773557+00:00",
+    "last_price": 0.00010663955617928877,
+    "previous_close": 0.00010800000018207356,
+    "source": "yfinance",
+    "symbol": "ERA-USD"
+  },
+  "ES-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.005711+00:00",
+    "last_price": 0.1342793430753006,
+    "previous_close": 0.1541408332406646,
+    "source": "cryptocompare",
+    "symbol": "ES-USD"
+  },
+  "ESP-USD": {
+    "captured_at_utc": "2026-05-23T12:39:10.147761+00:00",
+    "last_price": 0.0628430499074811,
+    "previous_close": 0.06734559317697968,
+    "source": "cryptocompare",
+    "symbol": "ESP-USD"
+  },
+  "ETHFI-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.991256+00:00",
+    "last_price": 0.3499999940395355,
+    "previous_close": 0.3632349967956543,
+    "source": "yfinance",
+    "symbol": "ETHFI-USD"
+  },
+  "EURC-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.991256+00:00",
+    "last_price": 1.1597574949264526,
+    "previous_close": 1.1604089736938477,
+    "source": "yfinance",
+    "symbol": "EURC-USD"
+  },
+  "EURCV-USD": {
+    "captured_at_utc": "2026-05-23T12:38:19.570010+00:00",
+    "last_price": 1.1587107181549072,
+    "previous_close": 1.1584440469741821,
+    "source": "yfinance",
+    "symbol": "EURCV-USD"
+  },
+  "EURI-USD": {
+    "captured_at_utc": "2026-05-23T12:38:43.445717+00:00",
+    "last_price": 1.1597050428390503,
+    "previous_close": 1.1600250005722046,
+    "source": "yfinance",
+    "symbol": "EURI-USD"
+  },
+  "EURQ-USD": {
+    "captured_at_utc": "2026-05-23T12:38:58.008600+00:00",
+    "last_price": 1.158870816230774,
+    "previous_close": 1.160230040550232,
+    "source": "yfinance",
+    "symbol": "EURQ-USD"
+  },
+  "FARTCOIN-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.100226+00:00",
+    "last_price": 0.1720000058412552,
+    "previous_close": 0.1775529980659485,
+    "source": "yfinance",
+    "symbol": "FARTCOIN-USD"
+  },
+  "FB-USD": {
+    "captured_at_utc": "2026-05-23T12:39:17.476578+00:00",
+    "last_price": 0.4551837301643665,
+    "previous_close": 0.4640087382494494,
+    "source": "cryptocompare",
+    "symbol": "FB-USD"
+  },
+  "FDUSD-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.478482+00:00",
+    "last_price": 0.9971039891242981,
+    "previous_close": 0.9972209930419922,
+    "source": "yfinance",
+    "symbol": "FDUSD-USD"
+  },
+  "FF-USD": {
+    "captured_at_utc": "2026-05-23T12:38:19.988238+00:00",
+    "last_price": 0.08040885313131502,
+    "previous_close": 0.09051547084732389,
+    "source": "cryptocompare",
+    "symbol": "FF-USD"
+  },
+  "FHE-USD": {
+    "captured_at_utc": "2026-05-23T12:38:45.262902+00:00",
+    "last_price": 0.028932858258485794,
+    "previous_close": 0.028015999123454094,
+    "source": "yfinance",
+    "symbol": "FHE-USD"
+  },
+  "FIDA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.478482+00:00",
+    "last_price": 0.0340999998152256,
+    "previous_close": 0.034102000296115875,
+    "source": "yfinance",
+    "symbol": "FIDA-USD"
+  },
+  "FITFI-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.963291+00:00",
+    "last_price": 0.0004985203850083053,
+    "previous_close": 0.00047400000039488077,
+    "source": "yfinance",
+    "symbol": "FITFI-USD"
+  },
+  "FLOCK-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.732875+00:00",
+    "last_price": 0.0680740173045771,
+    "previous_close": 0.0685999931187155,
+    "source": "cryptocompare",
+    "symbol": "FLOCK-USD"
+  },
+  "FLOKI-USD": {
+    "captured_at_utc": "2026-05-23T12:38:31.374571+00:00",
+    "last_price": 2.8300000849412754e-05,
+    "previous_close": 2.9000000722589903e-05,
+    "source": "yfinance",
+    "symbol": "FLOKI-USD"
+  },
+  "FOGO-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.496096+00:00",
+    "last_price": 0.015113863162696362,
+    "previous_close": 0.015936000272631645,
+    "source": "yfinance",
+    "symbol": "FOGO-USD"
+  },
+  "FORM-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.005711+00:00",
+    "last_price": 0.2205180589606647,
+    "previous_close": 0.241218985244947,
+    "source": "cryptocompare",
+    "symbol": "FORM-USD"
+  },
+  "GALA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:19.985027+00:00",
+    "last_price": 0.0030958319548517466,
+    "previous_close": 0.003240999998524785,
+    "source": "yfinance",
+    "symbol": "GALA-USD"
+  },
+  "GAS-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.496096+00:00",
+    "last_price": 1.5072721242904663,
+    "previous_close": 1.5326100587844849,
+    "source": "yfinance",
+    "symbol": "GAS-USD"
+  },
+  "GENIUS-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.478482+00:00",
+    "last_price": 0.648288905620575,
+    "previous_close": 0.6216099858283997,
+    "source": "yfinance",
+    "symbol": "GENIUS-USD"
+  },
+  "GENSYN-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.993629+00:00",
+    "last_price": 0.03259564302873919,
+    "previous_close": 0.03215158823770588,
+    "source": "cryptocompare",
+    "symbol": "GENSYN-USD"
+  },
+  "GIGA-USD": {
+    "captured_at_utc": "2026-05-23T12:39:09.630102+00:00",
+    "last_price": 0.0040374161445254,
+    "previous_close": 0.00376653249781503,
+    "source": "cryptocompare",
+    "symbol": "GIGA-USD"
+  },
+  "GIGGLE-USD": {
+    "captured_at_utc": "2026-05-23T12:38:32.777276+00:00",
+    "last_price": 30.3746825240108,
+    "previous_close": 33.71151937063541,
+    "source": "cryptocompare",
+    "symbol": "GIGGLE-USD"
+  },
+  "GLM-USD": {
+    "captured_at_utc": "2026-05-23T12:39:11.773557+00:00",
+    "last_price": 0.13359999656677246,
+    "previous_close": 0.1362060010433197,
+    "source": "yfinance",
+    "symbol": "GLM-USD"
+  },
+  "GMTT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:37.397533+00:00",
+    "last_price": 0.2928204059862226,
+    "previous_close": 0.2922384971261223,
+    "source": "cryptocompare",
+    "symbol": "GMTT-USD"
+  },
+  "GNO-USD": {
+    "captured_at_utc": "2026-05-23T12:39:17.983727+00:00",
+    "last_price": 115.1500015258789,
+    "previous_close": 116.89661407470703,
+    "source": "yfinance",
+    "symbol": "GNO-USD"
+  },
+  "GOAT-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.499503+00:00",
+    "last_price": 0.0164320645655632,
+    "previous_close": 0.01841220907477487,
+    "source": "cryptocompare",
+    "symbol": "GOAT-USD"
+  },
+  "GRASS-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.103818+00:00",
+    "last_price": 0.4090644039503641,
+    "previous_close": 0.449606584553228,
+    "source": "cryptocompare",
+    "symbol": "GRASS-USD"
+  },
+  "GTC-USD": {
+    "captured_at_utc": "2026-05-23T12:39:10.147761+00:00",
+    "last_price": 0.112073619172128,
+    "previous_close": 0.109149796129967,
+    "source": "cryptocompare",
+    "symbol": "GTC-USD"
+  },
+  "GUA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:44.809629+00:00",
+    "last_price": 1.291205877797885,
+    "previous_close": 1.509723884180629,
+    "source": "cryptocompare",
+    "symbol": "GUA-USD"
+  },
+  "GUN-USD": {
+    "captured_at_utc": "2026-05-23T12:38:37.393866+00:00",
+    "last_price": 0.011406013742089272,
+    "previous_close": 0.011776000261306763,
+    "source": "yfinance",
+    "symbol": "GUN-USD"
+  },
+  "GWEI-USD": {
+    "captured_at_utc": "2026-05-23T12:38:45.262902+00:00",
+    "last_price": 0.11236199736595154,
+    "previous_close": 0.11652299761772156,
+    "source": "yfinance",
+    "symbol": "GWEI-USD"
+  },
+  "HANA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:43.867526+00:00",
+    "last_price": 0.04056567757072913,
+    "previous_close": 0.03444878691980876,
+    "source": "cryptocompare",
+    "symbol": "HANA-USD"
+  },
+  "HEI-USD": {
+    "captured_at_utc": "2026-05-23T12:38:38.137612+00:00",
+    "last_price": 0.066603,
+    "previous_close": 0.06516820467139091,
+    "source": "coingecko",
+    "symbol": "HEI-USD"
+  },
+  "HEMI-USD": {
+    "captured_at_utc": "2026-05-23T12:38:58.008600+00:00",
+    "last_price": 0.006948920898139477,
+    "previous_close": 0.007240000180900097,
+    "source": "yfinance",
+    "symbol": "HEMI-USD"
+  },
+  "HEX-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.972556+00:00",
+    "last_price": 0.0005090858039880344,
+    "previous_close": 0.0005215070513955128,
+    "source": "cryptocompare",
+    "symbol": "HEX-USD"
+  },
+  "HFT-USD": {
+    "captured_at_utc": "2026-05-23T12:39:10.630090+00:00",
+    "last_price": 0.0116617546352219,
+    "previous_close": 0.0120857095613833,
+    "source": "cryptocompare",
+    "symbol": "HFT-USD"
+  },
+  "HIGH-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.963291+00:00",
+    "last_price": 0.17100000381469727,
+    "previous_close": 0.17181700468063354,
+    "source": "yfinance",
+    "symbol": "HIGH-USD"
+  },
+  "HIVE-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.993629+00:00",
+    "last_price": 0.05862913162964655,
+    "previous_close": 0.06093867490567019,
+    "source": "cryptocompare",
+    "symbol": "HIVE-USD"
+  },
+  "HOLO-USD": {
+    "captured_at_utc": "2026-05-23T12:38:38.137612+00:00",
+    "last_price": 1.18e-05,
+    "previous_close": 1.217645834500674e-05,
+    "source": "coingecko",
+    "symbol": "HOLO-USD"
+  },
+  "HOME-USD": {
+    "captured_at_utc": "2026-05-23T12:38:45.266708+00:00",
+    "last_price": 0.02180484499873608,
+    "previous_close": 0.02324194517745145,
+    "source": "cryptocompare",
+    "symbol": "HOME-USD"
+  },
+  "HOOK-USD": {
+    "captured_at_utc": "2026-05-23T12:38:43.445717+00:00",
+    "last_price": 0.00858219526708126,
+    "previous_close": 0.008639000356197357,
+    "source": "yfinance",
+    "symbol": "HOOK-USD"
+  },
+  "HTX-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.048088+00:00",
+    "last_price": 2.0026122911076527e-06,
+    "previous_close": 1.9999999949504854e-06,
+    "source": "yfinance",
+    "symbol": "HTX-USD"
+  },
+  "HUMA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:37.393866+00:00",
+    "last_price": 0.02354379929602146,
+    "previous_close": 0.023461999371647835,
+    "source": "yfinance",
+    "symbol": "HUMA-USD"
+  },
+  "HYPER-USD": {
+    "captured_at_utc": "2026-05-23T12:38:36.915415+00:00",
+    "last_price": 0.1039601359520837,
+    "previous_close": 0.1179949005025683,
+    "source": "cryptocompare",
+    "symbol": "HYPER-USD"
+  },
+  "ICNT-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.499503+00:00",
+    "last_price": 0.307699952079805,
+    "previous_close": 0.308772917185016,
+    "source": "cryptocompare",
+    "symbol": "ICNT-USD"
+  },
+  "ID-USD": {
+    "captured_at_utc": "2026-05-23T12:38:59.656447+00:00",
+    "last_price": 0.0022120652720332146,
+    "previous_close": 0.0023429999127984047,
+    "source": "yfinance",
+    "symbol": "ID-USD"
+  },
+  "IMX-USD": {
+    "captured_at_utc": "2026-05-23T12:38:44.335275+00:00",
+    "last_price": 0.160987955808195,
+    "previous_close": 0.17812306692836,
+    "source": "cryptocompare",
+    "symbol": "IMX-USD"
+  },
+  "INIT-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.963291+00:00",
+    "last_price": 0.07965929806232452,
+    "previous_close": 0.08109699934720993,
+    "source": "yfinance",
+    "symbol": "INIT-USD"
+  },
+  "INX-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.005711+00:00",
+    "last_price": 0.00973295391861868,
+    "previous_close": 0.0102870483924934,
+    "source": "cryptocompare",
+    "symbol": "INX-USD"
+  },
+  "IO-USD": {
+    "captured_at_utc": "2026-05-23T12:38:37.842811+00:00",
+    "last_price": 0.139452445027491,
+    "previous_close": 0.1536510488803878,
+    "source": "cryptocompare",
+    "symbol": "IO-USD"
+  },
+  "IOST-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.483751+00:00",
+    "last_price": 0.001041563333867377,
+    "previous_close": 0.001093164380895009,
+    "source": "cryptocompare",
+    "symbol": "IOST-USD"
+  },
+  "IP-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.672103+00:00",
+    "last_price": 0.4671563030517706,
+    "previous_close": 0.5046744138691228,
+    "source": "cryptocompare",
+    "symbol": "IP-USD"
+  },
+  "IRYS-USD": {
+    "captured_at_utc": "2026-05-23T12:38:31.374571+00:00",
+    "last_price": 0.03308999910950661,
+    "previous_close": 0.03401000052690506,
+    "source": "yfinance",
+    "symbol": "IRYS-USD"
+  },
+  "JASMY-USD": {
+    "captured_at_utc": "2026-05-23T12:38:36.912345+00:00",
+    "last_price": 0.005379999987781048,
+    "previous_close": 0.005437999963760376,
+    "source": "yfinance",
+    "symbol": "JASMY-USD"
+  },
+  "JITOSOL-USD": {
+    "captured_at_utc": "2026-05-23T12:38:59.172297+00:00",
+    "last_price": 105.13999938964844,
+    "previous_close": 107.75940704345703,
+    "source": "yfinance",
+    "symbol": "JITOSOL-USD"
+  },
+  "JST-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.991256+00:00",
+    "last_price": 0.09266693145036697,
+    "previous_close": 0.09300699830055237,
+    "source": "yfinance",
+    "symbol": "JST-USD"
+  },
+  "JTO-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.672103+00:00",
+    "last_price": 0.481755119112269,
+    "previous_close": 0.535162948848112,
+    "source": "cryptocompare",
+    "symbol": "JTO-USD"
+  },
+  "JUP-USD": {
+    "captured_at_utc": "2026-05-23T12:38:31.374571+00:00",
+    "last_price": 0.00024788532755337656,
+    "previous_close": 0.0002519999979995191,
+    "source": "yfinance",
+    "symbol": "JUP-USD"
+  },
+  "KAIA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:32.774161+00:00",
+    "last_price": 0.05115300044417381,
+    "previous_close": 0.052448999136686325,
+    "source": "yfinance",
+    "symbol": "KAIA-USD"
+  },
+  "KAITO-USD": {
+    "captured_at_utc": "2026-05-23T12:38:19.570010+00:00",
+    "last_price": 0.4941999912261963,
+    "previous_close": 0.4788709878921509,
+    "source": "yfinance",
+    "symbol": "KAITO-USD"
+  },
+  "KAS-USD": {
+    "captured_at_utc": "2026-05-23T12:38:32.774161+00:00",
+    "last_price": 0.03252129256725311,
+    "previous_close": 0.03370999917387962,
+    "source": "yfinance",
+    "symbol": "KAS-USD"
+  },
+  "KAT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:57.562546+00:00",
+    "last_price": 0.00806999533786532,
+    "previous_close": 0.00862999422484203,
+    "source": "cryptocompare",
+    "symbol": "KAT-USD"
+  },
+  "KAVA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:59.656447+00:00",
+    "last_price": 0.05790000036358833,
+    "previous_close": 0.05928000062704086,
+    "source": "yfinance",
+    "symbol": "KAVA-USD"
+  },
+  "KERNEL-USD": {
+    "captured_at_utc": "2026-05-23T12:39:10.626294+00:00",
+    "last_price": 0.06289999932050705,
+    "previous_close": 0.06284800171852112,
+    "source": "yfinance",
+    "symbol": "KERNEL-USD"
+  },
+  "KNC-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.000635+00:00",
+    "last_price": 0.14169999957084656,
+    "previous_close": 0.14752399921417236,
+    "source": "yfinance",
+    "symbol": "KNC-USD"
+  },
+  "KSM-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.202217+00:00",
+    "last_price": 4.76000143132543,
+    "previous_close": 5.17565461735018,
+    "source": "cryptocompare",
+    "symbol": "KSM-USD"
+  },
+  "KTA-USD": {
+    "captured_at_utc": "2026-05-23T12:39:10.626294+00:00",
+    "last_price": 0.15299999713897705,
+    "previous_close": 0.14985999464988708,
+    "source": "yfinance",
+    "symbol": "KTA-USD"
+  },
+  "LA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:58.452234+00:00",
+    "last_price": 0.00370586896315217,
+    "previous_close": 0.0037060000468045473,
+    "source": "yfinance",
+    "symbol": "LA-USD"
+  },
+  "LAB-USD": {
+    "captured_at_utc": "2026-05-23T12:38:37.397533+00:00",
+    "last_price": 4.600969909352158,
+    "previous_close": 4.568536224556576,
+    "source": "cryptocompare",
+    "symbol": "LAB-USD"
+  },
+  "LAYER-USD": {
+    "captured_at_utc": "2026-05-23T12:38:37.839271+00:00",
+    "last_price": 0.0010339557193219662,
+    "previous_close": 0.001062000053934753,
+    "source": "yfinance",
+    "symbol": "LAYER-USD"
+  },
+  "LINEA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:43.445717+00:00",
+    "last_price": 0.0030700000934302807,
+    "previous_close": 0.0032130000181496143,
+    "source": "yfinance",
+    "symbol": "LINEA-USD"
+  },
+  "LIT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.481912+00:00",
+    "last_price": 1.15577019059799,
+    "previous_close": 1.32831123348161,
+    "source": "cryptocompare",
+    "symbol": "LIT-USD"
+  },
+  "LPT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.991256+00:00",
+    "last_price": 2.119999885559082,
+    "previous_close": 2.088473081588745,
+    "source": "yfinance",
+    "symbol": "LPT-USD"
+  },
+  "LQTY-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.483751+00:00",
+    "last_price": 0.2516873119769573,
+    "previous_close": 0.2696963329428671,
+    "source": "cryptocompare",
+    "symbol": "LQTY-USD"
+  },
+  "LSK-USD": {
+    "captured_at_utc": "2026-05-23T12:38:32.262966+00:00",
+    "last_price": 0.11443803459405899,
+    "previous_close": 0.11670999974012375,
+    "source": "yfinance",
+    "symbol": "LSK-USD"
+  },
+  "LUNA-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.972556+00:00",
+    "last_price": 0.06097822721732274,
+    "previous_close": 0.06488238396663287,
+    "source": "cryptocompare",
+    "symbol": "LUNA-USD"
+  },
+  "LUNC-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.125294+00:00",
+    "last_price": 7.955684521800413e-05,
+    "previous_close": 8.340164684445269e-05,
+    "source": "cryptocompare",
+    "symbol": "LUNC-USD"
+  },
+  "MAGIC-USD": {
+    "captured_at_utc": "2026-05-23T12:39:11.777194+00:00",
+    "last_price": 0.05935256622197553,
+    "previous_close": 0.06489933315123322,
+    "source": "cryptocompare",
+    "symbol": "MAGIC-USD"
+  },
+  "MANTA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:59.656447+00:00",
+    "last_price": 0.0755559653043747,
+    "previous_close": 0.0768510028719902,
+    "source": "yfinance",
+    "symbol": "MANTA-USD"
+  },
+  "MANTLE-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.993629+00:00",
+    "last_price": 0.6369117024558866,
+    "previous_close": 0.6670279295751058,
+    "source": "cryptocompare",
+    "symbol": "MANTLE-USD"
+  },
+  "MANTRA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:32.262966+00:00",
+    "last_price": 0.008872139267623425,
+    "previous_close": 0.009085999801754951,
+    "source": "yfinance",
+    "symbol": "MANTRA-USD"
+  },
+  "MASK-USD": {
+    "captured_at_utc": "2026-05-23T12:38:57.562546+00:00",
+    "last_price": 0.4403164061103892,
+    "previous_close": 0.4745558639777601,
+    "source": "cryptocompare",
+    "symbol": "MASK-USD"
+  },
+  "MAY-USD": {
+    "captured_at_utc": "2026-05-23T12:39:17.983727+00:00",
+    "last_price": 0.0009827243629842997,
+    "previous_close": 0.0009830000344663858,
+    "source": "yfinance",
+    "symbol": "MAY-USD"
+  },
+  "MBG-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.000635+00:00",
+    "last_price": 0.306596964597702,
+    "previous_close": 0.3085480034351349,
+    "source": "yfinance",
+    "symbol": "MBG-USD"
+  },
+  "MBOX-USD": {
+    "captured_at_utc": "2026-05-23T12:39:17.983727+00:00",
+    "last_price": 0.01122650969773531,
+    "previous_close": 0.01102100033313036,
+    "source": "yfinance",
+    "symbol": "MBOX-USD"
+  },
+  "ME-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.125294+00:00",
+    "last_price": 0.09321844552378666,
+    "previous_close": 0.0984846102933744,
+    "source": "cryptocompare",
+    "symbol": "ME-USD"
+  },
+  "MELANIA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:37.839271+00:00",
+    "last_price": 0.0014832746237516403,
+    "previous_close": 0.001550000044517219,
+    "source": "yfinance",
+    "symbol": "MELANIA-USD"
+  },
+  "MEMEFI-USD": {
+    "captured_at_utc": "2026-05-23T12:39:17.476578+00:00",
+    "last_price": 0.0001527714022311699,
+    "previous_close": 0.0001534900018787571,
+    "source": "cryptocompare",
+    "symbol": "MEMEFI-USD"
+  },
+  "MERL-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.732875+00:00",
+    "last_price": 0.0260629008262768,
+    "previous_close": 0.02968991938750197,
+    "source": "cryptocompare",
+    "symbol": "MERL-USD"
+  },
+  "MET-USD": {
+    "captured_at_utc": "2026-05-23T12:38:59.172297+00:00",
+    "last_price": 0.6697007417678833,
+    "previous_close": 0.6856840252876282,
+    "source": "yfinance",
+    "symbol": "MET-USD"
+  },
+  "METADIUM-USD": {
+    "captured_at_utc": "2026-05-23T12:39:10.147761+00:00",
+    "last_price": 0.009709661683678124,
+    "previous_close": 0.01084369143186062,
+    "source": "cryptocompare",
+    "symbol": "METADIUM-USD"
+  },
+  "METIS-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.496096+00:00",
+    "last_price": 3.309999942779541,
+    "previous_close": 3.3852620124816895,
+    "source": "yfinance",
+    "symbol": "METIS-USD"
+  },
+  "MEW-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.483751+00:00",
+    "last_price": 0.000517257801630902,
+    "previous_close": 0.000574000631033649,
+    "source": "cryptocompare",
+    "symbol": "MEW-USD"
+  },
+  "MINA-USD": {
+    "captured_at_utc": "2026-05-23T12:39:05.225180+00:00",
+    "last_price": 0.0548926242512847,
+    "previous_close": 0.0593606935431223,
+    "source": "cryptocompare",
+    "symbol": "MINA-USD"
+  },
+  "MIOTA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:32.777276+00:00",
+    "last_price": 0.05519462109542045,
+    "previous_close": 0.05831052628449573,
+    "source": "cryptocompare",
+    "symbol": "MIOTA-USD"
+  },
+  "MIRA-USD": {
+    "captured_at_utc": "2026-05-23T12:39:11.281969+00:00",
+    "last_price": 0.027766644954681396,
+    "previous_close": 0.0277670007199049,
+    "source": "yfinance",
+    "symbol": "MIRA-USD"
+  },
+  "MITO-USD": {
+    "captured_at_utc": "2026-05-23T12:39:10.147761+00:00",
+    "last_price": 0.03644061689798679,
+    "previous_close": 0.04050669732780376,
+    "source": "cryptocompare",
+    "symbol": "MITO-USD"
+  },
+  "MLK-USD": {
+    "captured_at_utc": "2026-05-23T12:39:17.473532+00:00",
+    "last_price": 0.04803906008601189,
+    "previous_close": 0.04878100007772446,
+    "source": "yfinance",
+    "symbol": "MLK-USD"
+  },
+  "MMT-USD": {
+    "captured_at_utc": "2026-05-23T12:39:11.777194+00:00",
+    "last_price": 0.1210340893849595,
+    "previous_close": 0.1307723289851714,
+    "source": "cryptocompare",
+    "symbol": "MMT-USD"
+  },
+  "MOCA-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.202217+00:00",
+    "last_price": 0.0125365003801837,
+    "previous_close": 0.01350032534394116,
+    "source": "cryptocompare",
+    "symbol": "MOCA-USD"
+  },
+  "MOG-USD": {
+    "captured_at_utc": "2026-05-23T12:38:38.137612+00:00",
+    "last_price": 1.32413e-10,
+    "previous_close": 1.4748239740955452e-10,
+    "source": "coingecko",
+    "symbol": "MOG-USD"
+  },
+  "MON-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.100226+00:00",
+    "last_price": 0.02431190013885498,
+    "previous_close": 0.026156000792980194,
+    "source": "yfinance",
+    "symbol": "MON-USD"
+  },
+  "MOODENG-USD": {
+    "captured_at_utc": "2026-05-23T12:38:38.252213+00:00",
+    "last_price": 0.048328,
+    "previous_close": 0.052804472777473965,
+    "source": "coingecko",
+    "symbol": "MOODENG-USD"
+  },
+  "MORPHO-USD": {
+    "captured_at_utc": "2026-05-23T12:38:31.850306+00:00",
+    "last_price": 1.93943044248677,
+    "previous_close": 2.04806008298548,
+    "source": "cryptocompare",
+    "symbol": "MORPHO-USD"
+  },
+  "MOVE-USD": {
+    "captured_at_utc": "2026-05-23T12:38:36.915415+00:00",
+    "last_price": 0.01570787525518426,
+    "previous_close": 0.01689885302232861,
+    "source": "cryptocompare",
+    "symbol": "MOVE-USD"
+  },
+  "MOVR-USD": {
+    "captured_at_utc": "2026-05-23T12:39:11.773557+00:00",
+    "last_price": 2.0769760608673096,
+    "previous_close": 2.0925540924072266,
+    "source": "yfinance",
+    "symbol": "MOVR-USD"
+  },
+  "MTL-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.478482+00:00",
+    "last_price": 0.32147473096847534,
+    "previous_close": 0.2896679937839508,
+    "source": "yfinance",
+    "symbol": "MTL-USD"
+  },
+  "MUBARAK-USD": {
+    "captured_at_utc": "2026-05-23T12:39:10.626294+00:00",
+    "last_price": 0.01257688645273447,
+    "previous_close": 0.01307700015604496,
+    "source": "yfinance",
+    "symbol": "MUBARAK-USD"
+  },
+  "MX-USD": {
+    "captured_at_utc": "2026-05-23T12:38:45.262902+00:00",
+    "last_price": 1.7670131921768188,
+    "previous_close": 1.7654099464416504,
+    "source": "yfinance",
+    "symbol": "MX-USD"
+  },
+  "MYX-USD": {
+    "captured_at_utc": "2026-05-23T12:38:19.988238+00:00",
+    "last_price": 0.2015250501457464,
+    "previous_close": 0.1831536504519473,
+    "source": "cryptocompare",
+    "symbol": "MYX-USD"
+  },
+  "NEIRO-USD": {
+    "captured_at_utc": "2026-05-23T12:38:38.252213+00:00",
+    "last_price": 9.086e-05,
+    "previous_close": 0.00010121270329706562,
+    "source": "coingecko",
+    "symbol": "NEIRO-USD"
+  },
+  "NEO-USD": {
+    "captured_at_utc": "2026-05-23T12:38:58.452234+00:00",
+    "last_price": 2.754065752029419,
+    "previous_close": 2.8024749755859375,
+    "source": "yfinance",
+    "symbol": "NEO-USD"
+  },
+  "NEXO-USD": {
+    "captured_at_utc": "2026-05-23T12:38:43.445717+00:00",
+    "last_price": 0.8553041815757751,
+    "previous_close": 0.8676279783248901,
+    "source": "yfinance",
+    "symbol": "NEXO-USD"
+  },
+  "NFT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:36.915415+00:00",
+    "last_price": 2.764553325209535e-07,
+    "previous_close": 2.84031970695763e-07,
+    "source": "cryptocompare",
+    "symbol": "NFT-USD"
+  },
+  "NIETZSCHEAN-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.499503+00:00",
+    "last_price": 0.002907195623313623,
+    "previous_close": 0.003312639364679769,
+    "source": "cryptocompare",
+    "symbol": "NIETZSCHEAN-USD"
+  },
+  "NIGHT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.122091+00:00",
+    "last_price": 0.03249402344226837,
+    "previous_close": 0.03318500146269798,
+    "source": "yfinance",
+    "symbol": "NIGHT-USD"
+  },
+  "NIL-USD": {
+    "captured_at_utc": "2026-05-23T12:38:31.850306+00:00",
+    "last_price": 0.054072454718306,
+    "previous_close": 0.05575003471747353,
+    "source": "cryptocompare",
+    "symbol": "NIL-USD"
+  },
+  "NKN-USD": {
+    "captured_at_utc": "2026-05-23T12:39:11.281969+00:00",
+    "last_price": 0.006599999964237213,
+    "previous_close": 0.007526000030338764,
+    "source": "yfinance",
+    "symbol": "NKN-USD"
+  },
+  "NMR-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.963291+00:00",
+    "last_price": 8.170000076293945,
+    "previous_close": 8.470333099365234,
+    "source": "yfinance",
+    "symbol": "NMR-USD"
+  },
+  "NODE-USD": {
+    "captured_at_utc": "2026-05-23T12:39:17.987241+00:00",
+    "last_price": 0.01082697097125269,
+    "previous_close": 0.01114184254771873,
+    "source": "cryptocompare",
+    "symbol": "NODE-USD"
+  },
+  "NOM-USD": {
+    "captured_at_utc": "2026-05-23T12:38:59.175834+00:00",
+    "last_price": 0.002038779780210049,
+    "previous_close": 0.002158487247629322,
+    "source": "cryptocompare",
+    "symbol": "NOM-USD"
+  },
+  "NOT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:44.806164+00:00",
+    "last_price": 0.000449344894150272,
+    "previous_close": 0.0004569999873638153,
+    "source": "yfinance",
+    "symbol": "NOT-USD"
+  },
+  "NPC-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.972556+00:00",
+    "last_price": 0.005949963851031021,
+    "previous_close": 0.006823011617267344,
+    "source": "cryptocompare",
+    "symbol": "NPC-USD"
+  },
+  "NVDAON-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.732875+00:00",
+    "last_price": 213.9260632043619,
+    "previous_close": 220.6415714726734,
+    "source": "cryptocompare",
+    "symbol": "NVDAON-USD"
+  },
+  "NVDAX-USD": {
+    "captured_at_utc": "2026-05-23T12:39:11.773557+00:00",
+    "last_price": 213.8160858154297,
+    "previous_close": 214.62136840820312,
+    "source": "yfinance",
+    "symbol": "NVDAX-USD"
+  },
+  "NXPC-USD": {
+    "captured_at_utc": "2026-05-23T12:38:30.875130+00:00",
+    "last_price": 0.3484315574169159,
+    "previous_close": 0.3327830135822296,
+    "source": "yfinance",
+    "symbol": "NXPC-USD"
+  },
+  "OFC-USD": {
+    "captured_at_utc": "2026-05-23T12:39:11.285239+00:00",
+    "last_price": 0.04325166396479321,
+    "previous_close": 0.05108438137273245,
+    "source": "cryptocompare",
+    "symbol": "OFC-USD"
+  },
+  "OG-USD": {
+    "captured_at_utc": "2026-05-23T12:38:59.172297+00:00",
+    "last_price": 2.9428560733795166,
+    "previous_close": 3.0913898944854736,
+    "source": "yfinance",
+    "symbol": "OG-USD"
+  },
+  "OKB-USD": {
+    "captured_at_utc": "2026-05-23T12:38:19.570010+00:00",
+    "last_price": 80.6139907836914,
+    "previous_close": 80.51547241210938,
+    "source": "yfinance",
+    "symbol": "OKB-USD"
+  },
+  "OMG-USD": {
+    "captured_at_utc": "2026-05-23T12:39:09.626685+00:00",
+    "last_price": 0.06729050725698471,
+    "previous_close": 0.0663049966096878,
+    "source": "yfinance",
+    "symbol": "OMG-USD"
+  },
+  "ONT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:58.008600+00:00",
+    "last_price": 0.05750741809606552,
+    "previous_close": 0.05760300159454346,
+    "source": "yfinance",
+    "symbol": "ONT-USD"
+  },
+  "OPEN-USD": {
+    "captured_at_utc": "2026-05-23T12:38:36.915415+00:00",
+    "last_price": 0.1856085794819602,
+    "previous_close": 0.1997292521538163,
+    "source": "cryptocompare",
+    "symbol": "OPEN-USD"
+  },
+  "OPG-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.672103+00:00",
+    "last_price": 0.2113385297933708,
+    "previous_close": 0.2587713325584586,
+    "source": "cryptocompare",
+    "symbol": "OPG-USD"
+  },
+  "OPN-USD": {
+    "captured_at_utc": "2026-05-23T12:38:43.449209+00:00",
+    "last_price": 0.1690882129429549,
+    "previous_close": 0.1871269827887666,
+    "source": "cryptocompare",
+    "symbol": "OPN-USD"
+  },
+  "ORBS-USD": {
+    "captured_at_utc": "2026-05-23T12:39:10.626294+00:00",
+    "last_price": 0.008170388638973236,
+    "previous_close": 0.008187999948859215,
+    "source": "yfinance",
+    "symbol": "ORBS-USD"
+  },
+  "ORCA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.993629+00:00",
+    "last_price": 1.39489993404854,
+    "previous_close": 1.41972084855233,
+    "source": "cryptocompare",
+    "symbol": "ORCA-USD"
+  },
+  "ORDER-USD": {
+    "captured_at_utc": "2026-05-23T12:38:59.656447+00:00",
+    "last_price": 0.050331488251686096,
+    "previous_close": 0.05219100043177605,
+    "source": "yfinance",
+    "symbol": "ORDER-USD"
+  },
+  "ORDI-USD": {
+    "captured_at_utc": "2026-05-23T12:38:19.985027+00:00",
+    "last_price": 3.786573648452759,
+    "previous_close": 3.9849588871002197,
+    "source": "yfinance",
+    "symbol": "ORDI-USD"
+  },
+  "OSMO-USD": {
+    "captured_at_utc": "2026-05-23T12:38:44.806164+00:00",
+    "last_price": 0.05460000038146973,
+    "previous_close": 0.056696999818086624,
+    "source": "yfinance",
+    "symbol": "OSMO-USD"
+  },
+  "PANTHER-USD": {
+    "captured_at_utc": "2026-05-23T12:39:11.285239+00:00",
+    "last_price": 0.006695057417189842,
+    "previous_close": 0.006785682096394124,
+    "source": "cryptocompare",
+    "symbol": "PANTHER-USD"
+  },
+  "PARTI-USD": {
+    "captured_at_utc": "2026-05-23T12:38:36.912345+00:00",
+    "last_price": 0.049590807408094406,
+    "previous_close": 0.052136000245809555,
+    "source": "yfinance",
+    "symbol": "PARTI-USD"
+  },
+  "PAXG-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.048088+00:00",
+    "last_price": 4494.25,
+    "previous_close": 4494.931640625,
+    "source": "yfinance",
+    "symbol": "PAXG-USD"
+  },
+  "PEAQ-USD": {
+    "captured_at_utc": "2026-05-23T12:38:45.262902+00:00",
+    "last_price": 0.029594702646136284,
+    "previous_close": 0.031585000455379486,
+    "source": "yfinance",
+    "symbol": "PEAQ-USD"
+  },
+  "PEOPLE-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.202217+00:00",
+    "last_price": 0.006323192390144967,
+    "previous_close": 0.007074302897013413,
+    "source": "cryptocompare",
+    "symbol": "PEOPLE-USD"
+  },
+  "PHA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:59.656447+00:00",
+    "last_price": 0.03191319853067398,
+    "previous_close": 0.033052001148462296,
+    "source": "yfinance",
+    "symbol": "PHA-USD"
+  },
+  "PHB-USD": {
+    "captured_at_utc": "2026-05-23T12:38:31.846976+00:00",
+    "last_price": 0.07319182902574539,
+    "previous_close": 0.06652099639177322,
+    "source": "yfinance",
+    "symbol": "PHB-USD"
+  },
+  "PI-USD": {
+    "captured_at_utc": "2026-05-23T12:38:38.137612+00:00",
+    "last_price": 0.0004795,
+    "previous_close": 0.0005105465392717296,
+    "source": "coingecko",
+    "symbol": "PI-USD"
+  },
+  "PIEVERSE-USD": {
+    "captured_at_utc": "2026-05-23T12:38:45.262902+00:00",
+    "last_price": 0.7043762803077698,
+    "previous_close": 0.7220320105552673,
+    "source": "yfinance",
+    "symbol": "PIEVERSE-USD"
+  },
+  "PING-USD": {
+    "captured_at_utc": "2026-05-23T12:39:17.476578+00:00",
+    "last_price": 0.00156578333508044,
+    "previous_close": 0.001683604554975412,
+    "source": "cryptocompare",
+    "symbol": "PING-USD"
+  },
+  "PIPPIN-USD": {
+    "captured_at_utc": "2026-05-23T12:38:58.452234+00:00",
+    "last_price": 0.02224954590201378,
+    "previous_close": 0.023006999865174294,
+    "source": "yfinance",
+    "symbol": "PIPPIN-USD"
+  },
+  "PIXEL-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.202217+00:00",
+    "last_price": 0.006544699806573742,
+    "previous_close": 0.007160049102366575,
+    "source": "cryptocompare",
+    "symbol": "PIXEL-USD"
+  },
+  "PLAY-USD": {
+    "captured_at_utc": "2026-05-23T12:39:09.630102+00:00",
+    "last_price": 0.070561,
+    "previous_close": 0.094189,
+    "source": "cryptocompare",
+    "symbol": "PLAY-USD"
+  },
+  "PLUME-USD": {
+    "captured_at_utc": "2026-05-23T12:38:31.846976+00:00",
+    "last_price": 0.012880000285804272,
+    "previous_close": 0.013279000297188759,
+    "source": "yfinance",
+    "symbol": "PLUME-USD"
+  },
+  "PNUT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:31.846976+00:00",
+    "last_price": 0.052000001072883606,
+    "previous_close": 0.05628500133752823,
+    "source": "yfinance",
+    "symbol": "PNUT-USD"
+  },
+  "POL-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.125294+00:00",
+    "last_price": 0.0878801079890083,
+    "previous_close": 0.0930802291735861,
+    "source": "cryptocompare",
+    "symbol": "POL-USD"
+  },
+  "POLS-USD": {
+    "captured_at_utc": "2026-05-23T12:38:58.452234+00:00",
+    "last_price": 0.10170000046491623,
+    "previous_close": 0.09331800043582916,
+    "source": "yfinance",
+    "symbol": "POLS-USD"
+  },
+  "POLYX-USD": {
+    "captured_at_utc": "2026-05-23T12:38:38.252213+00:00",
+    "last_price": 0.052273,
+    "previous_close": 0.05613406368933732,
+    "source": "coingecko",
+    "symbol": "POLYX-USD"
+  },
+  "PONKE-USD": {
+    "captured_at_utc": "2026-05-23T12:38:58.452234+00:00",
+    "last_price": 0.039548564702272415,
+    "previous_close": 0.0406470000743866,
+    "source": "yfinance",
+    "symbol": "PONKE-USD"
+  },
+  "POPCAT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:37.842811+00:00",
+    "last_price": 0.05205668350337857,
+    "previous_close": 0.058108415069103,
+    "source": "cryptocompare",
+    "symbol": "POPCAT-USD"
+  },
+  "POWR-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.732875+00:00",
+    "last_price": 0.06279320401372898,
+    "previous_close": 0.06566141933675017,
+    "source": "cryptocompare",
+    "symbol": "POWR-USD"
+  },
+  "PRL-USD": {
+    "captured_at_utc": "2026-05-23T12:39:05.225180+00:00",
+    "last_price": 0.189749999243347,
+    "previous_close": 0.20045000003319,
+    "source": "cryptocompare",
+    "symbol": "PRL-USD"
+  },
+  "PRO-USD": {
+    "captured_at_utc": "2026-05-23T12:39:05.225180+00:00",
+    "last_price": 0.3271387240644525,
+    "previous_close": 0.3407295132257074,
+    "source": "cryptocompare",
+    "symbol": "PRO-USD"
+  },
+  "PROM-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.496096+00:00",
+    "last_price": 1.1114304065704346,
+    "previous_close": 1.140468955039978,
+    "source": "yfinance",
+    "symbol": "PROM-USD"
+  },
+  "PROVE-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.672103+00:00",
+    "last_price": 0.267324047700745,
+    "previous_close": 0.297382237352199,
+    "source": "cryptocompare",
+    "symbol": "PROVE-USD"
+  },
+  "PSG-USD": {
+    "captured_at_utc": "2026-05-23T12:38:37.393866+00:00",
+    "last_price": 1.0004154443740845,
+    "previous_close": 1.0162240266799927,
+    "source": "yfinance",
+    "symbol": "PSG-USD"
+  },
+  "PUFFER-USD": {
+    "captured_at_utc": "2026-05-23T12:38:59.656447+00:00",
+    "last_price": 0.02346116490662098,
+    "previous_close": 0.023440999910235405,
+    "source": "yfinance",
+    "symbol": "PUFFER-USD"
+  },
+  "PUMP-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.103818+00:00",
+    "last_price": 0.00164246357440805,
+    "previous_close": 0.00185819246257122,
+    "source": "cryptocompare",
+    "symbol": "PUMP-USD"
+  },
+  "PURR-USD": {
+    "captured_at_utc": "2026-05-23T12:39:11.285239+00:00",
+    "last_price": 0.1010789601606323,
+    "previous_close": 0.1359886674081231,
+    "source": "cryptocompare",
+    "symbol": "PURR-USD"
+  },
+  "PYTH-USD": {
+    "captured_at_utc": "2026-05-23T12:38:19.985027+00:00",
+    "last_price": 0.039400000125169754,
+    "previous_close": 0.03971099853515625,
+    "source": "yfinance",
+    "symbol": "PYTH-USD"
+  },
+  "PYUSD-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.048088+00:00",
+    "last_price": 0.9996170401573181,
+    "previous_close": 0.9995869994163513,
+    "source": "yfinance",
+    "symbol": "PYUSD-USD"
+  },
+  "QNT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:19.570010+00:00",
+    "last_price": 76.61000061035156,
+    "previous_close": 77.1615982055664,
+    "source": "yfinance",
+    "symbol": "QNT-USD"
+  },
+  "QTUM-USD": {
+    "captured_at_utc": "2026-05-23T12:38:43.445717+00:00",
+    "last_price": 0.8825493454933167,
+    "previous_close": 0.9025179743766785,
+    "source": "yfinance",
+    "symbol": "QTUM-USD"
+  },
+  "RAD-USD": {
+    "captured_at_utc": "2026-05-23T12:38:31.846976+00:00",
+    "last_price": 0.29600000381469727,
+    "previous_close": 0.28696200251579285,
+    "source": "yfinance",
+    "symbol": "RAD-USD"
+  },
+  "RAIN-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.125294+00:00",
+    "last_price": 0.007237484265851912,
+    "previous_close": 0.007504904525573459,
+    "source": "cryptocompare",
+    "symbol": "RAIN-USD"
+  },
+  "RATS-USD": {
+    "captured_at_utc": "2026-05-23T12:39:09.630102+00:00",
+    "last_price": 3.309773573113701e-05,
+    "previous_close": 3.561304562600589e-05,
+    "source": "cryptocompare",
+    "symbol": "RATS-USD"
+  },
+  "RAVE-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.966669+00:00",
+    "last_price": 0.559592050689441,
+    "previous_close": 0.575452052939492,
+    "source": "cryptocompare",
+    "symbol": "RAVE-USD"
+  },
+  "RAY-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.100226+00:00",
+    "last_price": 0.7297999858856201,
+    "previous_close": 0.7528420090675354,
+    "source": "yfinance",
+    "symbol": "RAY-USD"
+  },
+  "REAL-USD": {
+    "captured_at_utc": "2026-05-23T12:38:59.172297+00:00",
+    "last_price": 0.0035360155161470175,
+    "previous_close": 0.0035069999285042286,
+    "source": "yfinance",
+    "symbol": "REAL-USD"
+  },
+  "RECALL-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.972556+00:00",
+    "last_price": 0.0559,
+    "previous_close": 0.0611,
+    "source": "cryptocompare",
+    "symbol": "RECALL-USD"
+  },
+  "RED-USD": {
+    "captured_at_utc": "2026-05-23T12:38:58.455976+00:00",
+    "last_price": 0.126800023937458,
+    "previous_close": 0.138314931543915,
+    "source": "cryptocompare",
+    "symbol": "RED-USD"
+  },
+  "RESOLV-USD": {
+    "captured_at_utc": "2026-05-23T12:39:11.281969+00:00",
+    "last_price": 0.02654384821653366,
+    "previous_close": 0.027713000774383545,
+    "source": "yfinance",
+    "symbol": "RESOLV-USD"
+  },
+  "RIF-USD": {
+    "captured_at_utc": "2026-05-23T12:38:59.172297+00:00",
+    "last_price": 0.045385103672742844,
+    "previous_close": 0.048023998737335205,
+    "source": "yfinance",
+    "symbol": "RIF-USD"
+  },
+  "RIVER-USD": {
+    "captured_at_utc": "2026-05-23T12:38:32.262966+00:00",
+    "last_price": 6.750983238220215,
+    "previous_close": 6.680463790893555,
+    "source": "yfinance",
+    "symbol": "RIVER-USD"
+  },
+  "ROBO-USD": {
+    "captured_at_utc": "2026-05-23T12:38:43.867526+00:00",
+    "last_price": 0.01989765699995273,
+    "previous_close": 0.02240826852430931,
+    "source": "cryptocompare",
+    "symbol": "ROBO-USD"
+  },
+  "RONIN-USD": {
+    "captured_at_utc": "2026-05-23T12:38:59.659630+00:00",
+    "last_price": 0.08903135776503374,
+    "previous_close": 0.09880253174657949,
+    "source": "cryptocompare",
+    "symbol": "RONIN-USD"
+  },
+  "ROSE-USD": {
+    "captured_at_utc": "2026-05-23T12:38:44.806164+00:00",
+    "last_price": 0.009349999949336052,
+    "previous_close": 0.009557999670505524,
+    "source": "yfinance",
+    "symbol": "ROSE-USD"
+  },
+  "RSR-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.732875+00:00",
+    "last_price": 0.0016239812007988,
+    "previous_close": 0.00181631104178937,
+    "source": "cryptocompare",
+    "symbol": "RSR-USD"
+  },
+  "RUNE-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.963291+00:00",
+    "last_price": 0.42509210109710693,
+    "previous_close": 0.4220399856567383,
+    "source": "yfinance",
+    "symbol": "RUNE-USD"
+  },
+  "RVN-USD": {
+    "captured_at_utc": "2026-05-23T12:39:09.626685+00:00",
+    "last_price": 0.005309227388352156,
+    "previous_close": 0.005390999838709831,
+    "source": "yfinance",
+    "symbol": "RVN-USD"
+  },
+  "SAFE-USD": {
+    "captured_at_utc": "2026-05-23T12:39:17.473532+00:00",
+    "last_price": 0.05728144943714142,
+    "previous_close": 0.057280998677015305,
+    "source": "yfinance",
+    "symbol": "SAFE-USD"
+  },
+  "SAGA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:30.878913+00:00",
+    "last_price": 0.01953874785114992,
+    "previous_close": 0.02053623640141612,
+    "source": "cryptocompare",
+    "symbol": "SAGA-USD"
+  },
+  "SANTOS-USD": {
+    "captured_at_utc": "2026-05-23T12:39:11.773557+00:00",
+    "last_price": 0.888945460319519,
+    "previous_close": 0.970291018486023,
+    "source": "yfinance",
+    "symbol": "SANTOS-USD"
+  },
+  "SAPIEN-USD": {
+    "captured_at_utc": "2026-05-23T12:39:10.147761+00:00",
+    "last_price": 0.117562412129237,
+    "previous_close": 0.124269893801674,
+    "source": "cryptocompare",
+    "symbol": "SAPIEN-USD"
+  },
+  "SC-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.732875+00:00",
+    "last_price": 0.000905000624072213,
+    "previous_close": 0.000928962921284031,
+    "source": "cryptocompare",
+    "symbol": "SC-USD"
+  },
+  "SCROLL-USD": {
+    "captured_at_utc": "2026-05-23T12:39:17.476578+00:00",
+    "last_price": 0.04275831226473557,
+    "previous_close": 0.04645159467233885,
+    "source": "cryptocompare",
+    "symbol": "SCROLL-USD"
+  },
+  "SEI-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.478482+00:00",
+    "last_price": 0.0589199997484684,
+    "previous_close": 0.06069499999284744,
+    "source": "yfinance",
+    "symbol": "SEI-USD"
+  },
+  "SENT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:44.335275+00:00",
+    "last_price": 0.0155326562820658,
+    "previous_close": 0.01659092754614587,
+    "source": "cryptocompare",
+    "symbol": "SENT-USD"
+  },
+  "SHELL-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.499503+00:00",
+    "last_price": 0.03170565515830371,
+    "previous_close": 0.03401919040413687,
+    "source": "cryptocompare",
+    "symbol": "SHELL-USD"
+  },
+  "SIGN-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.972556+00:00",
+    "last_price": 0.01254076859375862,
+    "previous_close": 0.01336583838045715,
+    "source": "cryptocompare",
+    "symbol": "SIGN-USD"
+  },
+  "SIREN-USD": {
+    "captured_at_utc": "2026-05-23T12:38:59.172297+00:00",
+    "last_price": 0.5088092684745789,
+    "previous_close": 0.5083079934120178,
+    "source": "yfinance",
+    "symbol": "SIREN-USD"
+  },
+  "SKL-USD": {
+    "captured_at_utc": "2026-05-23T12:39:17.473532+00:00",
+    "last_price": 0.006000000052154064,
+    "previous_close": 0.006025000009685755,
+    "source": "yfinance",
+    "symbol": "SKL-USD"
+  },
+  "SKR-USD": {
+    "captured_at_utc": "2026-05-23T12:38:38.137612+00:00",
+    "last_price": 6.602e-05,
+    "previous_close": 6.602e-05,
+    "source": "coingecko",
+    "symbol": "SKR-USD"
+  },
+  "SKY-USD": {
+    "captured_at_utc": "2026-05-23T12:38:38.252213+00:00",
+    "last_price": 0.06501,
+    "previous_close": 0.06501,
+    "source": "coingecko",
+    "symbol": "SKY-USD"
+  },
+  "SKYAI-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.100226+00:00",
+    "last_price": 0.3110736310482025,
+    "previous_close": 0.27957698702812195,
+    "source": "yfinance",
+    "symbol": "SKYAI-USD"
+  },
+  "SNX-USD": {
+    "captured_at_utc": "2026-05-23T12:38:58.452234+00:00",
+    "last_price": 0.29600000381469727,
+    "previous_close": 0.30263400077819824,
+    "source": "yfinance",
+    "symbol": "SNX-USD"
+  },
+  "SOLV-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.972556+00:00",
+    "last_price": 0.004057926568054748,
+    "previous_close": 0.004384823237032486,
+    "source": "cryptocompare",
+    "symbol": "SOLV-USD"
+  },
+  "SOMI-USD": {
+    "captured_at_utc": "2026-05-23T12:38:43.445717+00:00",
+    "last_price": 0.16769090294837952,
+    "previous_close": 0.1603509932756424,
+    "source": "yfinance",
+    "symbol": "SOMI-USD"
+  },
+  "SOON-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.103818+00:00",
+    "last_price": 0.15272123286741,
+    "previous_close": 0.1684338273800268,
+    "source": "cryptocompare",
+    "symbol": "SOON-USD"
+  },
+  "SOSO-USD": {
+    "captured_at_utc": "2026-05-23T12:39:17.983727+00:00",
+    "last_price": 0.366107314825058,
+    "previous_close": 0.37265700101852417,
+    "source": "yfinance",
+    "symbol": "SOSO-USD"
+  },
+  "SPK-USD": {
+    "captured_at_utc": "2026-05-23T12:38:32.777276+00:00",
+    "last_price": 0.02749229062504503,
+    "previous_close": 0.0294610447756916,
+    "source": "cryptocompare",
+    "symbol": "SPK-USD"
+  },
+  "SPX-USD": {
+    "captured_at_utc": "2026-05-23T12:38:44.335275+00:00",
+    "last_price": 0.336461278308172,
+    "previous_close": 0.400027330397973,
+    "source": "cryptocompare",
+    "symbol": "SPX-USD"
+  },
+  "SSV-USD": {
+    "captured_at_utc": "2026-05-23T12:38:43.445717+00:00",
+    "last_price": 2.512575387954712,
+    "previous_close": 2.5149619579315186,
+    "source": "yfinance",
+    "symbol": "SSV-USD"
+  },
+  "STABLE-USD": {
+    "captured_at_utc": "2026-05-23T12:38:18.993629+00:00",
+    "last_price": 0.0332345111560638,
+    "previous_close": 0.03214293469614,
+    "source": "cryptocompare",
+    "symbol": "STABLE-USD"
+  },
+  "STEEM-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.478482+00:00",
+    "last_price": 0.05281771346926689,
+    "previous_close": 0.05185399949550629,
+    "source": "yfinance",
+    "symbol": "STEEM-USD"
+  },
+  "STETH-USD": {
+    "captured_at_utc": "2026-05-23T12:38:45.262902+00:00",
+    "last_price": 2027.673583984375,
+    "previous_close": 2064.593994140625,
+    "source": "yfinance",
+    "symbol": "STETH-USD"
+  },
+  "STG-USD": {
+    "captured_at_utc": "2026-05-23T12:38:59.659630+00:00",
+    "last_price": 0.167838047548969,
+    "previous_close": 0.166508624611638,
+    "source": "cryptocompare",
+    "symbol": "STG-USD"
+  },
+  "STO-USD": {
+    "captured_at_utc": "2026-05-23T12:38:59.659630+00:00",
+    "last_price": 0.06594681664346738,
+    "previous_close": 0.07064216729447513,
+    "source": "cryptocompare",
+    "symbol": "STO-USD"
+  },
+  "STORJ-USD": {
+    "captured_at_utc": "2026-05-23T12:38:32.774161+00:00",
+    "last_price": 0.10220000147819519,
+    "previous_close": 0.10368800163269043,
+    "source": "yfinance",
+    "symbol": "STORJ-USD"
+  },
+  "STRK-USD": {
+    "captured_at_utc": "2026-05-23T12:38:30.875130+00:00",
+    "last_price": 0.038717757910490036,
+    "previous_close": 0.039990998804569244,
+    "source": "yfinance",
+    "symbol": "STRK-USD"
+  },
+  "STX-USD": {
+    "captured_at_utc": "2026-05-23T12:38:44.335275+00:00",
+    "last_price": 0.232742739905041,
+    "previous_close": 0.256164929158807,
+    "source": "cryptocompare",
+    "symbol": "STX-USD"
+  },
+  "SUNDOG-USD": {
+    "captured_at_utc": "2026-05-23T12:38:19.570010+00:00",
+    "last_price": 0.00721054058521986,
+    "previous_close": 0.007833000272512436,
+    "source": "yfinance",
+    "symbol": "SUNDOG-USD"
+  },
+  "SUSHI-USD": {
+    "captured_at_utc": "2026-05-23T12:39:10.145139+00:00",
+    "last_price": 0.20010000467300415,
+    "previous_close": 0.2030390053987503,
+    "source": "yfinance",
+    "symbol": "SUSHI-USD"
+  },
+  "SXT-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.000635+00:00",
+    "last_price": 0.01119999960064888,
+    "previous_close": 0.01153200026601553,
+    "source": "yfinance",
+    "symbol": "SXT-USD"
+  },
+  "SYRUP-USD": {
+    "captured_at_utc": "2026-05-23T12:38:19.570010+00:00",
+    "last_price": 0.19030000269412994,
+    "previous_close": 0.19978800415992737,
+    "source": "yfinance",
+    "symbol": "SYRUP-USD"
+  },
+  "TA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:36.915415+00:00",
+    "last_price": 0.06205259736166015,
+    "previous_close": 0.06285623252344438,
+    "source": "cryptocompare",
+    "symbol": "TA-USD"
+  },
+  "TAG-USD": {
+    "captured_at_utc": "2026-05-23T12:38:30.875130+00:00",
+    "last_price": 0.0023460076190531254,
+    "previous_close": 0.002345999935641885,
+    "source": "yfinance",
+    "symbol": "TAG-USD"
+  },
+  "THETA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:30.875130+00:00",
+    "last_price": 0.18950171768665314,
+    "previous_close": 0.19232599437236786,
+    "source": "yfinance",
+    "symbol": "THETA-USD"
+  },
+  "TIA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.478482+00:00",
+    "last_price": 0.4009999930858612,
+    "previous_close": 0.41504499316215515,
+    "source": "yfinance",
+    "symbol": "TIA-USD"
+  },
+  "TLM-USD": {
+    "captured_at_utc": "2026-05-23T12:38:44.332179+00:00",
+    "last_price": 0.0014745519729331136,
+    "previous_close": 0.0015300000086426735,
+    "source": "yfinance",
+    "symbol": "TLM-USD"
+  },
+  "TNSR-USD": {
+    "captured_at_utc": "2026-05-23T12:39:10.145139+00:00",
+    "last_price": 0.036809999495744705,
+    "previous_close": 0.0377499982714653,
+    "source": "yfinance",
+    "symbol": "TNSR-USD"
+  },
+  "TOSHI-USD": {
+    "captured_at_utc": "2026-05-23T12:38:57.562546+00:00",
+    "last_price": 0.000155735855858029,
+    "previous_close": 0.000171299951480479,
+    "source": "cryptocompare",
+    "symbol": "TOSHI-USD"
+  },
+  "TOWNS-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.202217+00:00",
+    "last_price": 0.003176609115969123,
+    "previous_close": 0.003431589869232618,
+    "source": "cryptocompare",
+    "symbol": "TOWNS-USD"
+  },
+  "TRAC-USD": {
+    "captured_at_utc": "2026-05-23T12:38:30.875130+00:00",
+    "last_price": 0.4383000135421753,
+    "previous_close": 0.46772798895835876,
+    "source": "yfinance",
+    "symbol": "TRAC-USD"
+  },
+  "TRB-USD": {
+    "captured_at_utc": "2026-05-23T12:38:58.452234+00:00",
+    "last_price": 16.809999465942383,
+    "previous_close": 17.24209976196289,
+    "source": "yfinance",
+    "symbol": "TRB-USD"
+  },
+  "TREE-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.483751+00:00",
+    "last_price": 0.06230021933276617,
+    "previous_close": 0.06714321005428353,
+    "source": "cryptocompare",
+    "symbol": "TREE-USD"
+  },
+  "TRIA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:30.875130+00:00",
+    "last_price": 0.04249799996614456,
+    "previous_close": 0.04162700101733208,
+    "source": "yfinance",
+    "symbol": "TRIA-USD"
+  },
+  "TROLL-USD": {
+    "captured_at_utc": "2026-05-23T12:39:10.626294+00:00",
+    "last_price": 0.0007467209361493587,
+    "previous_close": 0.000754999986384064,
+    "source": "yfinance",
+    "symbol": "TROLL-USD"
+  },
+  "TRUMP-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.051485+00:00",
+    "last_price": 2.004339324862204,
+    "previous_close": 2.128848088772901,
+    "source": "cryptocompare",
+    "symbol": "TRUMP-USD"
+  },
+  "TRUST-USD": {
+    "captured_at_utc": "2026-05-23T12:38:58.012544+00:00",
+    "last_price": 0.0653599625169075,
+    "previous_close": 0.0691100032437348,
+    "source": "cryptocompare",
+    "symbol": "TRUST-USD"
+  },
+  "TSLAX-USD": {
+    "captured_at_utc": "2026-05-23T12:39:05.225180+00:00",
+    "last_price": 421.3888114074767,
+    "previous_close": 421.2440536969583,
+    "source": "cryptocompare",
+    "symbol": "TSLAX-USD"
+  },
+  "TST-USD": {
+    "captured_at_utc": "2026-05-23T12:38:43.449209+00:00",
+    "last_price": 0.01739685825642728,
+    "previous_close": 0.01823349177877411,
+    "source": "cryptocompare",
+    "symbol": "TST-USD"
+  },
+  "TURBO-USD": {
+    "captured_at_utc": "2026-05-23T12:38:38.252213+00:00",
+    "last_price": 1.57e-06,
+    "previous_close": 1.441091616802908e-06,
+    "source": "coingecko",
+    "symbol": "TURBO-USD"
+  },
+  "TUSD-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.732875+00:00",
+    "last_price": 0.9990740864282551,
+    "previous_close": 0.9989371401361775,
+    "source": "cryptocompare",
+    "symbol": "TUSD-USD"
+  },
+  "TWT-USD": {
+    "captured_at_utc": "2026-05-23T12:39:05.225180+00:00",
+    "last_price": 0.440443427306542,
+    "previous_close": 0.4634576314862498,
+    "source": "cryptocompare",
+    "symbol": "TWT-USD"
+  },
+  "UB-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.672103+00:00",
+    "last_price": 0.1167666648801379,
+    "previous_close": 0.1118931584158251,
+    "source": "cryptocompare",
+    "symbol": "UB-USD"
+  },
+  "ULTIMA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:31.846976+00:00",
+    "last_price": 2809.92529296875,
+    "previous_close": 2701.52978515625,
+    "source": "yfinance",
+    "symbol": "ULTIMA-USD"
+  },
+  "UP-USD": {
+    "captured_at_utc": "2026-05-23T12:38:59.175834+00:00",
+    "last_price": 0.114314446116565,
+    "previous_close": 0.125690051959251,
+    "source": "cryptocompare",
+    "symbol": "UP-USD"
+  },
+  "US-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.000635+00:00",
+    "last_price": 0.0063484529964625835,
+    "previous_close": 0.005989000201225281,
+    "source": "yfinance",
+    "symbol": "US-USD"
+  },
+  "USDCV-USD": {
+    "captured_at_utc": "2026-05-23T12:38:38.137612+00:00",
+    "last_price": 0.999678,
+    "previous_close": 0.999306757539574,
+    "source": "coingecko",
+    "symbol": "USDCV-USD"
+  },
+  "USDD-USD": {
+    "captured_at_utc": "2026-05-23T12:38:43.864524+00:00",
+    "last_price": 0.9988968372344971,
+    "previous_close": 0.9982650279998779,
+    "source": "yfinance",
+    "symbol": "USDD-USD"
+  },
+  "USDE-USD": {
+    "captured_at_utc": "2026-05-23T12:38:31.850306+00:00",
+    "last_price": 0.9994691551102761,
+    "previous_close": 0.99941429765397,
+    "source": "cryptocompare",
+    "symbol": "USDE-USD"
+  },
+  "USDG-USD": {
+    "captured_at_utc": "2026-05-23T12:38:30.875130+00:00",
+    "last_price": 5.494904518127441,
+    "previous_close": 5.495163917541504,
+    "source": "yfinance",
+    "symbol": "USDG-USD"
+  },
+  "USDP-USD": {
+    "captured_at_utc": "2026-05-23T12:38:44.332179+00:00",
+    "last_price": 0.9991000294685364,
+    "previous_close": 0.999193012714386,
+    "source": "yfinance",
+    "symbol": "USDP-USD"
+  },
+  "USDQ-USD": {
+    "captured_at_utc": "2026-05-23T12:38:30.878913+00:00",
+    "last_price": 1.000322051341847,
+    "previous_close": 1.000270931742365,
+    "source": "cryptocompare",
+    "symbol": "USDQ-USD"
+  },
+  "USELESS-USD": {
+    "captured_at_utc": "2026-05-23T12:38:38.252213+00:00",
+    "last_price": 0.069355,
+    "previous_close": 0.07580855996746205,
+    "source": "coingecko",
+    "symbol": "USELESS-USD"
+  },
+  "USUAL-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.963291+00:00",
+    "last_price": 0.013431059196591377,
+    "previous_close": 0.013811999931931496,
+    "source": "yfinance",
+    "symbol": "USUAL-USD"
+  },
+  "VANA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:59.659630+00:00",
+    "last_price": 1.45303426982346,
+    "previous_close": 1.610090281253258,
+    "source": "cryptocompare",
+    "symbol": "VANA-USD"
+  },
+  "VSN-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.966669+00:00",
+    "last_price": 0.04371338752797334,
+    "previous_close": 0.04534130165535193,
+    "source": "cryptocompare",
+    "symbol": "VSN-USD"
+  },
+  "VVV-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.051485+00:00",
+    "last_price": 17.3708929386375,
+    "previous_close": 19.5142880487194,
+    "source": "cryptocompare",
+    "symbol": "VVV-USD"
+  },
+  "WAL-USD": {
+    "captured_at_utc": "2026-05-23T12:39:10.147761+00:00",
+    "last_price": 0.06099013980285578,
+    "previous_close": 0.069269685514963,
+    "source": "cryptocompare",
+    "symbol": "WAL-USD"
+  },
+  "WAN-USD": {
+    "captured_at_utc": "2026-05-23T12:39:16.963291+00:00",
+    "last_price": 0.059866953641176224,
+    "previous_close": 0.060134001076221466,
+    "source": "yfinance",
+    "symbol": "WAN-USD"
+  },
+  "WARD-USD": {
+    "captured_at_utc": "2026-05-23T12:38:57.559872+00:00",
+    "last_price": 0.011040301993489265,
+    "previous_close": 0.012335999868810177,
+    "source": "yfinance",
+    "symbol": "WARD-USD"
+  },
+  "WAVES-USD": {
+    "captured_at_utc": "2026-05-23T12:38:44.332179+00:00",
+    "last_price": 0.36906740069389343,
+    "previous_close": 0.3837380111217499,
+    "source": "yfinance",
+    "symbol": "WAVES-USD"
+  },
+  "WBTC-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.048088+00:00",
+    "last_price": 74464.625,
+    "previous_close": 75291.3671875,
+    "source": "yfinance",
+    "symbol": "WBTC-USD"
+  },
+  "WCT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:32.266472+00:00",
+    "last_price": 0.06115558833690054,
+    "previous_close": 0.06536482806172832,
+    "source": "cryptocompare",
+    "symbol": "WCT-USD"
+  },
+  "WIF-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.672103+00:00",
+    "last_price": 0.181740771404497,
+    "previous_close": 0.203394818357276,
+    "source": "cryptocompare",
+    "symbol": "WIF-USD"
+  },
+  "WIN-USD": {
+    "captured_at_utc": "2026-05-23T12:38:37.839271+00:00",
+    "last_price": 1.9278450054116547e-05,
+    "previous_close": 1.8999999156221747e-05,
+    "source": "yfinance",
+    "symbol": "WIN-USD"
+  },
+  "WLFI-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.481912+00:00",
+    "last_price": 0.0614123545340894,
+    "previous_close": 0.0611576224440302,
+    "source": "cryptocompare",
+    "symbol": "WLFI-USD"
+  },
+  "WMTX-USD": {
+    "captured_at_utc": "2026-05-23T12:38:19.985027+00:00",
+    "last_price": 0.05282999947667122,
+    "previous_close": 0.054680999368429184,
+    "source": "yfinance",
+    "symbol": "WMTX-USD"
+  },
+  "WSTUSDT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:43.864524+00:00",
+    "last_price": 1.1085387468338013,
+    "previous_close": 1.1089730262756348,
+    "source": "yfinance",
+    "symbol": "WSTUSDT-USD"
+  },
+  "XAI-USD": {
+    "captured_at_utc": "2026-05-23T12:39:10.626294+00:00",
+    "last_price": 0.08528706431388855,
+    "previous_close": 0.08598300069570541,
+    "source": "yfinance",
+    "symbol": "XAI-USD"
+  },
+  "XCH-USD": {
+    "captured_at_utc": "2026-05-23T12:38:32.774161+00:00",
+    "last_price": 3.2638070583343506,
+    "previous_close": 2.9358060359954834,
+    "source": "yfinance",
+    "symbol": "XCH-USD"
+  },
+  "XCN-USD": {
+    "captured_at_utc": "2026-05-23T12:38:44.806164+00:00",
+    "last_price": 0.0010394382989034057,
+    "previous_close": 0.0010389999952167273,
+    "source": "yfinance",
+    "symbol": "XCN-USD"
+  },
+  "XDC-USD": {
+    "captured_at_utc": "2026-05-23T12:38:19.570010+00:00",
+    "last_price": 0.031128618866205215,
+    "previous_close": 0.03205899894237518,
+    "source": "yfinance",
+    "symbol": "XDC-USD"
+  },
+  "XEC-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.972556+00:00",
+    "last_price": 6.980480101108099e-06,
+    "previous_close": 7.39387123843887e-06,
+    "source": "cryptocompare",
+    "symbol": "XEC-USD"
+  },
+  "XION-USD": {
+    "captured_at_utc": "2026-05-23T12:39:10.145139+00:00",
+    "last_price": 0.13453039526939392,
+    "previous_close": 0.1384900063276291,
+    "source": "yfinance",
+    "symbol": "XION-USD"
+  },
+  "XMN-USD": {
+    "captured_at_utc": "2026-05-23T12:39:10.147761+00:00",
+    "last_price": 0.00255,
+    "previous_close": 0.0026,
+    "source": "cryptocompare",
+    "symbol": "XMN-USD"
+  },
+  "XNY-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.972556+00:00",
+    "last_price": 0.007089,
+    "previous_close": 0.006999,
+    "source": "cryptocompare",
+    "symbol": "XNY-USD"
+  },
+  "XPL-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.048088+00:00",
+    "last_price": 0.07900000363588333,
+    "previous_close": 0.08216100186109543,
+    "source": "yfinance",
+    "symbol": "XPL-USD"
+  },
+  "XT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:31.374571+00:00",
+    "last_price": 4.00437593460083,
+    "previous_close": 4.063838958740234,
+    "source": "yfinance",
+    "symbol": "XT-USD"
+  },
+  "XTER-USD": {
+    "captured_at_utc": "2026-05-23T12:38:59.172297+00:00",
+    "last_price": 0.016588561236858368,
+    "previous_close": 0.01806499995291233,
+    "source": "yfinance",
+    "symbol": "XTER-USD"
+  },
+  "XTZ-USD": {
+    "captured_at_utc": "2026-05-23T12:38:45.262902+00:00",
+    "last_price": 0.33390000462532043,
+    "previous_close": 0.3345330059528351,
+    "source": "yfinance",
+    "symbol": "XTZ-USD"
+  },
+  "XUSD-USD": {
+    "captured_at_utc": "2026-05-23T12:38:44.809629+00:00",
+    "last_price": 0.9997889749317429,
+    "previous_close": 0.9999677723919219,
+    "source": "cryptocompare",
+    "symbol": "XUSD-USD"
+  },
+  "XVS-USD": {
+    "captured_at_utc": "2026-05-23T12:39:17.473532+00:00",
+    "last_price": 2.641000509262085,
+    "previous_close": 2.6784191131591797,
+    "source": "yfinance",
+    "symbol": "XVS-USD"
+  },
+  "XYO-USD": {
+    "captured_at_utc": "2026-05-23T12:38:19.985027+00:00",
+    "last_price": 0.00418000016361475,
+    "previous_close": 0.004736000206321478,
+    "source": "yfinance",
+    "symbol": "XYO-USD"
+  },
+  "YB-USD": {
+    "captured_at_utc": "2026-05-23T12:38:38.252213+00:00",
+    "last_price": 0.118642,
+    "previous_close": 0.12244965782482335,
+    "source": "coingecko",
+    "symbol": "YB-USD"
+  },
+  "YFI-USD": {
+    "captured_at_utc": "2026-05-23T12:39:09.626685+00:00",
+    "last_price": 2417.159912109375,
+    "previous_close": 2454.20849609375,
+    "source": "yfinance",
+    "symbol": "YFI-USD"
+  },
+  "ZAMA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:32.262966+00:00",
+    "last_price": 0.029850000515580177,
+    "previous_close": 0.03093400038778782,
+    "source": "yfinance",
+    "symbol": "ZAMA-USD"
+  },
+  "ZBCN-USD": {
+    "captured_at_utc": "2026-05-23T12:38:45.262902+00:00",
+    "last_price": 0.002852745819836855,
+    "previous_close": 0.002899999963119626,
+    "source": "yfinance",
+    "symbol": "ZBCN-USD"
+  },
+  "ZBT-USD": {
+    "captured_at_utc": "2026-05-23T12:38:17.672103+00:00",
+    "last_price": 0.1545713753199161,
+    "previous_close": 0.1511147252902085,
+    "source": "cryptocompare",
+    "symbol": "ZBT-USD"
+  },
+  "ZEN-USD": {
+    "captured_at_utc": "2026-05-23T12:38:19.570010+00:00",
+    "last_price": 5.820000171661377,
+    "previous_close": 5.921603202819824,
+    "source": "yfinance",
+    "symbol": "ZEN-USD"
+  },
+  "ZIL-USD": {
+    "captured_at_utc": "2026-05-23T12:39:05.225180+00:00",
+    "last_price": 0.003851522921197014,
+    "previous_close": 0.004066740735542712,
+    "source": "cryptocompare",
+    "symbol": "ZIL-USD"
+  },
+  "ZK-USD": {
+    "captured_at_utc": "2026-05-23T12:38:32.777276+00:00",
+    "last_price": 0.01432957370151953,
+    "previous_close": 0.01579773432352399,
+    "source": "cryptocompare",
+    "symbol": "ZK-USD"
+  },
+  "ZKC-USD": {
+    "captured_at_utc": "2026-05-23T12:39:05.225180+00:00",
+    "last_price": 0.06588000036304813,
+    "previous_close": 0.07154438310803271,
+    "source": "cryptocompare",
+    "symbol": "ZKC-USD"
+  },
+  "ZKP-USD": {
+    "captured_at_utc": "2026-05-23T12:39:04.483751+00:00",
+    "last_price": 0.07227887598445851,
+    "previous_close": 0.07861705788982648,
+    "source": "cryptocompare",
+    "symbol": "ZKP-USD"
+  },
+  "ZORA-USD": {
+    "captured_at_utc": "2026-05-23T12:38:19.988238+00:00",
+    "last_price": 0.0109662520383233,
+    "previous_close": 0.0114069819272784,
+    "source": "cryptocompare",
+    "symbol": "ZORA-USD"
+  },
+  "ZRO-USD": {
+    "captured_at_utc": "2026-05-23T12:38:31.378148+00:00",
+    "last_price": 1.24877713217061,
+    "previous_close": 1.36884285602051,
+    "source": "cryptocompare",
+    "symbol": "ZRO-USD"
+  },
+  "ZRX-USD": {
+    "captured_at_utc": "2026-05-23T12:38:57.559872+00:00",
+    "last_price": 0.10272099822759628,
+    "previous_close": 0.10505899786949158,
+    "source": "yfinance",
+    "symbol": "ZRX-USD"
+  }
+}

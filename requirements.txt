@@ -1,0 +1,30 @@
+# Market Refinement Dashboard - runtime dependencies
+#
+# This file lists ONLY direct deps; pip will resolve transitive deps
+# (charset-normalizer, idna, etc.) automatically. No Emergent-only or
+# unrelated cloud SDKs are included so `pip install -r requirements.txt`
+# works on a clean machine with public PyPI access.
+
+# --- Web framework + server ---
+fastapi==0.136.1
+uvicorn[standard]==0.47.0
+pydantic==2.13.4
+
+# --- HTTP clients ---
+httpx==0.28.1
+requests==2.34.2
+
+# --- Market data + numerical ---
+yfinance==0.2.66
+pandas==2.3.3
+numpy==2.4.5
+
+# --- Persistence ---
+aiosqlite==0.20.0
+orjson==3.11.9
+
+# --- PDF generation (downloadable metric guidebook, Phase 26.50) ---
+reportlab==4.5.1
+
+# --- Tests (optional but kept so `pytest` works out of the box) ---
+pytest==8.4.2

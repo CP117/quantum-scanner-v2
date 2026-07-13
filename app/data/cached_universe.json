@@ -1,0 +1,152 @@
+[
+  {
+    "symbol": "A",
+    "name": "Agilent Technologies, Inc. Common Stock",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "AA",
+    "name": "Alcoa Corporation Common Stock",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "AACB",
+    "name": "Artius II Acquisition Inc. Class A Ordinary Shares",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "AAL",
+    "name": "American Airlines Group, Inc. Common Stock",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "AAME",
+    "name": "Atlantic American Corporation Common Stock",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "AAPL",
+    "name": "Apple Inc. Common Stock",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "ABBV",
+    "name": "AbbVie Inc. Common Stock",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "ABNB",
+    "name": "Airbnb, Inc. Class A Common Stock",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "ABEO",
+    "name": "Abeona Therapeutics Inc. Common Stock",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "AAT",
+    "name": "American Assets Trust, Inc. Common Stock",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "ABG",
+    "name": "Asbury Automotive Group, Inc. Common Stock",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "ABM",
+    "name": "ABM Industries Incorporated Common Stock",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "ABEV",
+    "name": "Ambev S.A. American Depositary Shares",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "ABCL",
+    "name": "AbCellera Biologics Inc. Common Shares",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "AAOI",
+    "name": "Applied Optoelectronics, Inc. Common Stock",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "MSFT",
+    "name": "Microsoft Corporation Common Stock",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "NVDA",
+    "name": "NVIDIA Corporation Common Stock",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "TSLA",
+    "name": "Tesla, Inc. Common Stock",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "AMD",
+    "name": "Advanced Micro Devices, Inc. Common Stock",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "META",
+    "name": "Meta Platforms, Inc. Class A Common Stock",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "GOOGL",
+    "name": "Alphabet Inc. Class A Common Stock",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "AMZN",
+    "name": "Amazon.com, Inc. Common Stock",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "JPM",
+    "name": "JPMorgan Chase & Co. Common Stock",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "XOM",
+    "name": "Exxon Mobil Corporation Common Stock",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "BA",
+    "name": "Boeing Company Common Stock",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "KO",
+    "name": "Coca-Cola Company Common Stock",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "DIS",
+    "name": "Walt Disney Company Common Stock",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "CSCO",
+    "name": "Cisco Systems, Inc. Common Stock",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "ORCL",
+    "name": "Oracle Corporation Common Stock",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "CRM",
+    "name": "Salesforce, Inc. Common Stock",
+    "exchange": "NYSE"
+  }
+]

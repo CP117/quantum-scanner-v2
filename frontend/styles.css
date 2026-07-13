@@ -1,0 +1,856 @@
+
+:root { --bg:#171614; --surface:#1c1b19; --surface-2:#201f1d; --border:#393836; --text:#cdccca; --muted:#8d8b88; --primary:#4f98a3; --primary-2:#376b72; --space-2:.5rem; --space-3:.75rem; --space-4:1rem; --space-6:1.5rem; --space-8:2rem; --radius:.85rem; }
+*{box-sizing:border-box} html,body{height:100%;margin:0} body{overflow:hidden;font-family:Satoshi,sans-serif;background:var(--bg);color:var(--text)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.dashboard{display:grid;grid-template-columns:320px 1fr;grid-template-rows:auto 1fr;height:100vh}
+.sidebar{grid-row:1 / span 2;padding:var(--space-6);background:var(--surface);border-right:1px solid var(--border);overflow-y:auto}
+.header{padding:var(--space-3) var(--space-5);background:var(--surface);border-bottom:1px solid var(--border);gap:.65rem;display:flex;flex-direction:column;overflow:hidden}
+.header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-3);flex-wrap:wrap}
+.header h1{margin:0 0 .15rem 0;font-size:1.2rem;letter-spacing:-.01em}
+.header p{margin:0;color:var(--muted)}
+.status-line{font-size:.82rem;color:var(--muted)}
+.header-meta{display:flex;gap:.4rem;flex-wrap:wrap}
+.status-chip{background:var(--surface-2);color:var(--muted);border:1px solid var(--border);padding:.2rem .55rem;border-radius:.4rem;font-size:.72rem;font-weight:600;letter-spacing:.02em;white-space:nowrap}
+.status-chip.header-link{color:#5eead4;border-color:rgba(94,234,212,.35);background:rgba(94,234,212,.06);text-decoration:none;cursor:pointer;transition:border-color .15s, background .15s}
+.status-chip.header-link:hover{border-color:#5eead4;background:rgba(94,234,212,.12)}
+.status-chip-ok{color:#86efac;border-color:rgba(134,239,172,.35);background:rgba(134,239,172,.07)}
+.status-chip-warn{color:#fbbf24;border-color:rgba(251,191,36,.35);background:rgba(251,191,36,.08)}
+.status-chip-err{color:#f87171;border-color:rgba(248,113,113,.4);background:rgba(248,113,113,.08)}
+
+.metrics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.45rem}
+.metric-card{background:var(--surface-2);border:1px solid var(--border);border-radius:.5rem;padding:.45rem .65rem;min-width:0;display:flex;flex-direction:column;gap:.1rem}
+.metric-label{font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.metric-value{font-size:1.05rem;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.metric-sub{font-size:.7rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+.metric-mini-bars{display:flex;gap:.3rem;align-items:center;flex-wrap:nowrap;overflow:hidden}
+.rb{display:inline-flex;align-items:center;gap:.18rem;font-size:.66rem;font-weight:600;font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+.rb-dot{display:inline-block;width:.5rem;height:.5rem;border-radius:50%}
+.rb-propel .rb-dot{background:#34d399}
+.rb-reject .rb-dot{background:#f87171}
+.rb-chop   .rb-dot{background:#fbbf24}
+.rb-neut   .rb-dot{background:#94a3b8}
+.prov-row{display:flex;justify-content:space-between;gap:.4rem;font-size:.68rem;line-height:1.3}
+.prov-name{color:var(--muted);text-transform:lowercase;letter-spacing:.02em}
+.prov-counts{color:var(--text);font-variant-numeric:tabular-nums;font-weight:600}
+.prov-note{color:var(--warn,#d97706);font-weight:500;margin-left:.35rem;cursor:help}
+.reg-delta{font-weight:700;font-variant-numeric:tabular-nums}
+.reg-delta.pos{color:#34d399}.reg-delta.neg{color:#f87171}
+/* Phase 26: row-level regulatory badge shown next to ticker on main table */
+.reg-row-badge{display:inline-block;margin-left:.4rem;padding:1px 5px;border-radius:6px;font-size:.62rem;font-weight:700;letter-spacing:.04em;font-variant-numeric:tabular-nums;border:1px solid transparent;vertical-align:middle;cursor:help}
+.reg-row-up{background:rgba(34,197,94,.14);color:#34d399;border-color:rgba(34,197,94,.4)}
+.reg-row-down{background:rgba(248,113,113,.14);color:#f87171;border-color:rgba(248,113,113,.4)}
+.reg-row-flat{background:rgba(148,163,184,.14);color:#cbd5e1;border-color:rgba(148,163,184,.4)}
+/* Phase 26.17: row-level treatment for rows with an active regulatory
+   signal. Distinct from the "Low-confidence composite" ⚠ warning so the
+   two indicators do not visually blur together. Uses a subtle 3px
+   border-left accent + a barely-tinted background; the row stays fully
+   readable. The point differential is communicated by the existing
+   .reg-row-badge next to the ticker. */
+.results-table tr.reg-signal-row{position:relative}
+.results-table tr.reg-signal-row > td:first-child{border-left:3px solid transparent;padding-left:.55rem}
+.results-table tr.reg-signal-row.reg-signal-up > td:first-child{border-left-color:#34d399;background:linear-gradient(90deg, rgba(34,197,94,.085), transparent 55%)}
+.results-table tr.reg-signal-row.reg-signal-down > td:first-child{border-left-color:#f87171;background:linear-gradient(90deg, rgba(248,113,113,.085), transparent 55%)}
+.results-table tr.reg-signal-row.reg-signal-flat > td:first-child{border-left-color:#94a3b8;background:linear-gradient(90deg, rgba(148,163,184,.07), transparent 55%)}
+/* Selected-row highlight wins over the reg-signal tint */
+.results-table tr.reg-signal-row.selected > td:first-child{background:linear-gradient(90deg, rgba(96,165,250,.18), transparent 55%)}
+#mProvidersSub{display:flex;flex-direction:column;gap:.05rem;overflow:hidden;white-space:normal}
+@media (max-width:1500px){.metrics-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:1200px){.metrics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:700px){.metrics-grid{grid-template-columns:1fr}}
+.main{overflow:hidden;padding:var(--space-3) var(--space-5);display:grid;grid-template-columns:minmax(0,1.55fr) minmax(360px,1fr);grid-template-rows:1fr;gap:var(--space-3);min-height:0}
+.dashboard > .main{grid-column:2;grid-row:2}
+.dashboard > .header{grid-column:2;grid-row:1}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:var(--space-4);overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.detail-panel{overflow-y:auto}
+.panel > .panel-head{flex:0 0 auto}
+.panel > .table-wrap{flex:1 1 auto;min-height:0;overflow:auto}
+.panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:var(--space-4);flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-6);font-weight:700}
+/* Phase 26.5: Public URL banner under sidebar brand title. Surfaces the
+   cloudflared tunnel URL captured by start.bat / start.sh so the user can
+   share or copy it without needing the console window open. */
+.public-url-banner{margin:calc(var(--space-6) * -0.4) 0 var(--space-6);padding:.55rem .65rem;background:linear-gradient(135deg, rgba(79,152,163,.13), rgba(79,152,163,.04));border:1px solid rgba(79,152,163,.35);border-radius:.6rem;display:flex;flex-direction:column;gap:.35rem;font-size:.84rem}
+.public-url-banner[hidden]{display:none}
+.public-url-banner__row{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;min-width:0}
+.public-url-banner__badge{font-size:.65rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:1px 6px;border-radius:4px;background:rgba(94,234,212,.18);color:#5eead4;border:1px solid rgba(94,234,212,.45);flex-shrink:0}
+.public-url-banner__badge.is-lan{background:rgba(251,191,36,.14);color:#fbbf24;border-color:rgba(251,191,36,.4)}
+.public-url-banner__badge.is-local{background:rgba(148,163,184,.16);color:#cbd5e1;border-color:rgba(148,163,184,.4)}
+.public-url-banner__link{flex:1;min-width:0;color:var(--primary);text-decoration:none;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Source Code Pro', ui-monospace, SFMono-Regular, monospace;font-size:.78rem;padding:.2rem 0}
+.public-url-banner__link:hover, .public-url-banner__link:focus-visible{text-decoration:underline}
+.public-url-banner__copy{background:var(--surface-2);color:var(--text);border:1px solid var(--border);font-size:.7rem;padding:.25rem .55rem;border-radius:.4rem;cursor:pointer;width:auto;font-weight:600;flex-shrink:0;white-space:nowrap}
+.public-url-banner__copy:hover, .public-url-banner__copy:focus-visible{border-color:var(--primary);color:var(--primary)}
+.public-url-banner__copy.is-copied{background:rgba(34,197,94,.18);color:#34d399;border-color:rgba(34,197,94,.4)}
+.public-url-banner__sub{font-size:.7rem;color:var(--muted);line-height:1.35}
+.public-url-banner__alts{font-size:.72rem;color:var(--muted)}
+.public-url-banner__alts > summary{cursor:pointer;list-style:revert;outline:none}
+.public-url-banner__alts > summary:hover{color:var(--text)}
+.public-url-banner__alts-list{list-style:none;padding:.3rem 0 0;margin:0;display:flex;flex-direction:column;gap:.22rem}
+.public-url-banner__alts-list li{display:flex;align-items:center;gap:.4rem;min-width:0}
+.public-url-banner__alts-list a{color:var(--text);text-decoration:none;font-family:'Source Code Pro', ui-monospace, monospace;font-size:.72rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.public-url-banner__alts-list a:hover{color:var(--primary);text-decoration:underline}
+
+/* Phase 26.9: brief row highlight after jumpToSymbol() so the eye lands
+   on the right ticker after the table re-renders. */
+@keyframes mrd-row-flash {
+  0% { background:rgba(94,234,212,.35); }
+  100% { background:transparent; }
+}
+tr.row-jump-highlight td { animation: mrd-row-flash 1.6s ease-out; }
+.sidebar-block{margin-bottom:var(--space-6)} .filter-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}.action-stack{display:grid;gap:.75rem}
+.sub-block{margin-top:var(--space-3)}
+label{display:block;font-size:.9rem;color:var(--muted);margin-bottom:.3rem} input,button,select{width:100%;padding:.7rem .8rem;border-radius:.6rem;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-family:inherit;font-size:.92rem}
+button{cursor:pointer;background:var(--primary);color:#fff;border:0;font-weight:600}
+button.secondary,.secondary-button{background:var(--surface-2);color:var(--text);border:1px solid var(--border);font-weight:500}
+.secondary-button.is-active{background:rgba(79,152,163,.2);border-color:rgba(79,152,163,.6)}
+.sidebar-actions{display:grid;gap:.55rem}
+.range-meta{display:flex;justify-content:space-between;align-items:center;margin-top:.4rem;color:var(--muted);font-size:.85rem}
+.range-meta strong{color:var(--text)}
+
+.table-wrap{overflow:auto;border-radius:.5rem;border:1px solid var(--border)}
+.results-table{width:100%;border-collapse:collapse;font-size:.82rem;table-layout:fixed}
+.results-table th{position:sticky;top:0;background:var(--surface-2);text-align:left;padding:.45rem .35rem;border-bottom:1px solid var(--border);font-weight:600;color:var(--muted);white-space:nowrap;font-size:.74rem;text-transform:uppercase;letter-spacing:.04em}
+.results-table td{padding:.42rem .35rem;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.results-panel{padding:0}
+.panel-head-collapse{border-bottom:1px solid var(--border);background:var(--surface-2);border-radius:var(--radius) var(--radius) 0 0}
+.panel-head-collapse[open]{background:var(--surface-2)}
+.panel-head-summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:var(--space-3);padding:.55rem .85rem;flex-wrap:wrap;font-size:.85rem}
+.panel-head-summary::-webkit-details-marker{display:none}
+.panel-head-summary::before{content:"\25be";color:var(--muted);font-size:.7rem;transition:transform .15s ease}
+.panel-head-collapse:not([open]) .panel-head-summary::before{transform:rotate(-90deg)}
+.panel-title{font-size:.92rem;font-weight:700;color:var(--text)}
+.panel-meta{color:var(--muted);font-size:.78rem;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pagination-bar.compact{display:flex;align-items:center;gap:.3rem;flex:0 0 auto}
+.pager-btn{width:auto;padding:.2rem .55rem;font-size:.9rem;line-height:1;border-radius:.4rem;font-weight:700}
+.pager-badge{font-size:.74rem;color:var(--muted);font-variant-numeric:tabular-nums;padding:0 .35rem}
+.pagination-bar.compact .page-numbers{display:flex;gap:.2rem}
+.pagination-bar.compact .page-number{padding:.2rem .45rem;font-size:.74rem;min-width:1.6rem;border-radius:.35rem}
+.metric-pill-pending{background:transparent;color:var(--muted);border:1px dashed var(--border);font-weight:500}
+.results-table .col-symbol{width:4.4rem;font-weight:700}
+.results-table .col-name{width:auto;color:var(--muted);font-size:.76rem}
+.results-table .col-score{width:3.6rem;font-variant-numeric:tabular-nums;font-weight:600}
+.results-table .col-tier{width:1.8rem;text-align:center;font-weight:700}
+.results-table .col-dir{width:2.8rem;font-size:.74rem;color:var(--muted)}
+.results-table .col-pill{width:2.8rem;text-align:center}
+.results-table .col-src{width:5.2rem}
+.results-table .col-fresh{width:4.2rem;font-size:.74rem;color:var(--muted)}
+.results-table .col-pass{width:2.6rem;text-align:center;font-variant-numeric:tabular-nums;color:var(--muted)}
+/* Phase 26.47 — Future Mode columns. Always rendered so the user
+   knows the feature exists; cells empty when Future Mode is off. */
+.results-table .col-fm{font-variant-numeric:tabular-nums;font-size:.74rem;text-align:right;color:var(--muted)}
+.results-table .col-fm.fm-dir{width:3.4rem;text-align:center;font-weight:600}
+.results-table .col-fm.fm-pup{width:3.4rem}
+.results-table .col-fm.fm-pupctx{width:4.4rem;text-align:right;font-variant-numeric:tabular-nums}
+.results-table .col-fm.fm-pupctx .fm-pupctx-delta{font-size:.66rem;opacity:.75;margin-left:.15rem;font-weight:600;letter-spacing:.02em}
+.results-table .col-fm.fm-pupctx.col-fm-bull .fm-pupctx-delta{color:#5ec19a}
+.results-table .col-fm.fm-pupctx.col-fm-bear .fm-pupctx-delta{color:#e6788a}
+.results-table .col-fm.fm-pupctx.col-fm-flat .fm-pupctx-delta{color:rgba(255,255,255,.4)}
+.results-table .col-fm.fm-drift{width:3.8rem}
+.results-table .col-fm.fm-kelly{width:4.2rem;font-weight:600}
+.results-table .col-fm.fm-regime{width:5.8rem;text-align:center;font-size:.7rem;letter-spacing:.02em;text-transform:lowercase}
+.results-table .col-fm.fm-var{width:3.6rem}
+.results-table .col-fm.fm-on{color:var(--text)}
+.results-table .col-fm-bull{color:#34d399}
+.results-table .col-fm-bear{color:#f87171}
+.results-table .col-fm-flat{color:var(--muted)}
+.results-table thead th.col-fm{border-left:1px dashed rgba(255,255,255,.06)}
+/* Phase 26.61c — per-blend multiplier columns.  Hidden by default;
+   the JS renderResults() pass adds/removes the `is-hidden` class on
+   each <th> + each <td> matching the same blend.  When visible, the
+   column carries a slightly different border so the user can SEE the
+   blend cluster at a glance. */
+.results-table .col-fm.fm-blend.is-hidden{display:none}
+.results-table .col-fm.fm-blend{width:3rem;border-left:1px solid rgba(125,211,252,.18) !important;font-variant-numeric:tabular-nums;text-align:right}
+.results-table thead th.col-fm.fm-blend{color:#7dd3fc;font-size:.7rem;letter-spacing:.04em;text-transform:uppercase}
+.results-table td.col-fm.fm-blend{font-weight:600}
+.results-table td.col-fm.fm-blend.is-bull{color:#34d399}
+.results-table td.col-fm.fm-blend.is-bear{color:#f87171}
+.results-table td.col-fm.fm-blend.is-flat{color:var(--muted)}
+.results-table td.col-fm.fm-blend.is-experimental{color:#fca5a5}
+.results-table td.col-fm.fm-blend.is-active-strong{background:rgba(125,211,252,0.08)}
+/* Reality-breaker column gets its own warning tint when visible. */
+.results-table .col-fm.fm-rb{border-left-color:rgba(252,165,165,0.35) !important}
+.results-table thead th.col-fm.fm-rb{color:#fca5a5}
+/* Phase 26.50 — Future Mode column swap.
+   When the user enables Future Mode, hide the regular factor-pill
+   columns (Inst/Opts/DP) and the auxiliary metadata columns to free
+   up horizontal real estate for the Future-Mode-specific columns
+   (F-Dir, F-P(up), F-Drift, F-Kelly, F-Regime, F-VaR).  Critical on
+   narrow screens (handheld PCs, smaller laptops) where the FM
+   columns would otherwise scroll off to the right and the user
+   sees only empty em-dashes in the visible columns.
+   Symbol/Score/Tier/Direction stay visible so the row's identity
+   is always recognisable. */
+.results-table.fm-on thead th.col-pill,
+.results-table.fm-on tbody td.col-pill,
+.results-table.fm-on thead th.col-src,
+.results-table.fm-on tbody td.col-src,
+.results-table.fm-on thead th.col-fresh,
+.results-table.fm-on tbody td.col-fresh,
+.results-table.fm-on thead th.col-pass,
+.results-table.fm-on tbody td.col-pass,
+.results-table.fm-on thead th.col-name,
+.results-table.fm-on tbody td.col-name{display:none}
+/* When Future Mode is on, the F-* columns are full-color rather than
+   muted — they're the primary display now, not a side panel. */
+.results-table.fm-on .col-fm{color:var(--text);font-size:.78rem}
+.results-table.fm-on thead th.col-fm{border-left:none;border-right:1px dashed rgba(96,165,250,.16)}
+.results-table.fm-on .col-fm.fm-dir{font-size:.78rem}
+/* Blend indicators in the header — show the user that lab/strategy
+   multipliers are actively shaping the rank order. */
+.results-table.blend-lab thead th.col-fm.fm-kelly::after{
+  content:" · LAB×"; color:#0891b2; font-size:.62em; font-weight:600; letter-spacing:.04em;
+}
+.results-table.blend-strategy thead th.col-fm.fm-kelly::after{
+  content:" · STRAT×"; color:#16a34a; font-size:.62em; font-weight:600; letter-spacing:.04em;
+}
+.results-table.blend-lab.blend-strategy thead th.col-fm.fm-kelly::after{
+  content:" · LAB×STRAT×"; color:#a78bfa; font-size:.6em; font-weight:600; letter-spacing:.03em;
+}
+/* Future Forecast detail card */
+.future-forecast-card{background:linear-gradient(180deg,rgba(96,165,250,.05),rgba(0,0,0,0));border:1px solid rgba(96,165,250,.25);border-radius:.55rem;padding:.7rem .85rem;margin-top:var(--space-3)}
+.future-forecast-card h3{margin:0 0 .4rem 0;font-size:.84rem;text-transform:uppercase;letter-spacing:.04em;color:#93c5fd}
+.future-forecast-card .ff-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.45rem .65rem;font-size:.78rem}
+.future-forecast-card .ff-grid > div{display:flex;flex-direction:column;gap:.05rem}
+.future-forecast-card .ff-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.future-forecast-card .ff-value{font-variant-numeric:tabular-nums;font-weight:600;color:var(--text)}
+.future-forecast-card .ff-value.bull{color:#34d399}
+.universes-panel{max-height:280px;overflow-y:auto;margin-top:6px;border:1px solid rgba(148,163,184,.18);border-radius:8px;padding:6px}
+.universe-exch-head{font-size:.7em;letter-spacing:.08em;text-transform:uppercase;opacity:.6;margin:8px 0 3px;padding-left:2px}
+.universe-exch-head:first-child{margin-top:0}
+.universe-group{display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:6px;cursor:pointer;font-size:.82em;transition:background-color .12s ease}
+.universe-group:hover{background:rgba(148,163,184,.08)}
+.universe-group.is-active{background:rgba(52,211,153,.08)}
+.universe-group input{margin:0;cursor:pointer}
+.universe-group-label{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.universe-group-count{font-variant-numeric:tabular-nums;opacity:.6;font-size:.85em}
+/* Phase 26.67 — Experimental composite card */
+.exp-composite-card{margin-top:18px;border:1px solid rgba(167,139,250,.28);border-radius:12px;padding:14px 16px;background:linear-gradient(180deg,rgba(124,58,237,.08),rgba(124,58,237,.02))}
+.exp-composite-card .section-title{margin-top:0;display:flex;align-items:center;gap:10px}
+.exp-badge{font-size:.6em;letter-spacing:.12em;font-weight:700;color:#0b0b14;background:#a78bfa;border-radius:6px;padding:2px 7px}
+.exp-composite-hint{font-size:.78em;opacity:.7;margin-bottom:12px;line-height:1.5}
+.exp-tf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:8px}
+.exp-tf-btn{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:9px 11px;border-radius:9px;border:1px solid rgba(148,163,184,.22);background:rgba(15,23,42,.45);cursor:pointer;transition:border-color .14s ease,transform .14s ease,background-color .14s ease}
+.exp-tf-btn:hover{transform:translateY(-1px);background:rgba(15,23,42,.7)}
+.exp-tf-btn.is-active{border-color:#a78bfa;box-shadow:0 0 0 1px rgba(167,139,250,.4) inset}
+.exp-tf-label{font-size:.72em;letter-spacing:.04em;text-transform:uppercase;opacity:.62}
+.exp-tf-call{font-size:.96em;font-weight:700;font-variant-numeric:tabular-nums}
+.exp-tf-conf{font-size:.74em;opacity:.7;font-variant-numeric:tabular-nums}
+.exp-tf-btn.tone-bull .exp-tf-call{color:#34d399}
+.exp-tf-btn.tone-bear .exp-tf-call{color:#f87171}
+.exp-tf-btn.tone-neutral .exp-tf-call{color:#cbd5e1}
+.exp-tf-details{margin-top:10px}
+.exp-tf-detail{font-size:.8em;opacity:.85;padding:8px 10px;border-radius:8px;background:rgba(15,23,42,.5);line-height:1.5}
+/* Phase 26.67 — leaderboard 7-timeframe consensus strip */
+.results-table .col-fm.col-consensus{width:5.8rem;text-align:center;border-left:1px solid rgba(167,139,250,.22) !important}
+.results-table thead th.col-fm.col-consensus{color:#a78bfa;font-size:.7rem;letter-spacing:.04em;text-transform:uppercase}
+.cs-strip{display:inline-flex;gap:1px;align-items:center;justify-content:center;line-height:1;padding:1px 3px;border-radius:5px}
+.cs-strip.cs-strong-up{background:rgba(52,211,153,.12)}
+.cs-strip.cs-strong-down{background:rgba(248,113,113,.12)}
+.cs-cell{font-size:.62rem;width:.62rem;display:inline-block;text-align:center}
+.cs-cell.tone-bull{color:#34d399}
+.cs-cell.tone-bear{color:#f87171}
+.cs-cell.tone-neutral{color:#94a3b8}
+.cs-empty{color:var(--muted);opacity:.5}
+.results-table thead th.col-consensus.is-sorted{color:#c4b5fd;background:rgba(167,139,250,.1)}
+.cs-sort-ind{font-size:.7em}
+.cs-legend{display:flex;flex-wrap:wrap;align-items:center;gap:3px;margin-top:5px;font-size:.66rem;color:var(--muted,#94a3b8);line-height:1.4}
+.cs-legend .cs-cell{font-size:.7rem;width:auto}
+.cs-legend-txt{opacity:.85;margin-right:4px}
+.cs-legend-sep{opacity:.4;margin:0 1px}
+.future-forecast-card .ff-value.bear{color:#f87171}
+.future-forecast-card .ff-value.caution{color:#fcd34d}
+.future-forecast-card .ff-value.neutral{color:#cbd5e1}
+.future-forecast-card .ff-value.info{color:var(--text)}
+.future-forecast-card .ff-tier-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;font-size:.72rem}
+.future-forecast-card .ff-tier-badge{padding:.1rem .45rem;border-radius:.3rem;border:1px solid rgba(96,165,250,.4);background:rgba(96,165,250,.08);color:#93c5fd;text-transform:uppercase;letter-spacing:.05em;font-size:.65rem}
+.future-forecast-card .ff-tier-badge.garch{border-color:rgba(167,139,250,.4);background:rgba(167,139,250,.1);color:#c4b5fd}
+.future-forecast-card .ff-divider{border-top:1px dashed rgba(255,255,255,.08);margin:.5rem 0}
+.future-forecast-card .ff-signals{margin-top:.45rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:.25rem .6rem;font-size:.72rem;color:var(--muted)}
+.future-forecast-card .ff-signals .ff-sig-name{text-transform:lowercase;letter-spacing:.02em}
+.future-forecast-card .ff-signals .ff-sig-val{color:var(--text);font-variant-numeric:tabular-nums}
+/* Phase 26.49 — Deep Refresh button in Future Forecast header */
+.future-forecast-card .ff-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
+.future-forecast-card .ff-deep-refresh{background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.35);color:#93c5fd;padding:.18rem .55rem;border-radius:.35rem;font-size:.7rem;cursor:pointer;letter-spacing:.04em;text-transform:uppercase;transition:background-color 150ms,border-color 150ms}
+.future-forecast-card .ff-deep-refresh:hover:not(:disabled){background:rgba(96,165,250,.22);border-color:rgba(96,165,250,.6)}
+.future-forecast-card .ff-deep-refresh:disabled{opacity:.55;cursor:wait}
+.future-forecast-card .ff-deep-refresh .ff-refresh-spin{display:inline-block;animation:ff-spin .9s linear infinite}
+@keyframes ff-spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+/* Phase 26.49 — pinned metric info popover (persists across 2s live ticks) */
+.future-forecast-card .ff-grid > div,
+.future-forecast-card .ff-signals > div,
+.future-forecast-card .ff-lab-grid > div{cursor:pointer;border-radius:.3rem;padding:.18rem .25rem;transition:background-color 150ms}
+.future-forecast-card .ff-grid > div:hover,
+.future-forecast-card .ff-signals > div:hover,
+.future-forecast-card .ff-lab-grid > div:hover{background:rgba(255,255,255,.04)}
+.future-forecast-card .ff-grid > div.ff-pinned,
+.future-forecast-card .ff-signals > div.ff-pinned,
+.future-forecast-card .ff-lab-grid > div.ff-pinned{background:rgba(96,165,250,.12);outline:1px solid rgba(96,165,250,.35)}
+.ff-info-popover{grid-column:1/-1;margin-top:.4rem;padding:.5rem .65rem;background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.22);border-radius:.4rem;font-size:.72rem;line-height:1.45;color:var(--text)}
+.ff-info-popover h4{margin:0 0 .25rem 0;font-size:.74rem;color:#93c5fd;text-transform:uppercase;letter-spacing:.04em}
+.ff-info-popover p{margin:.2rem 0;color:var(--muted)}
+.ff-info-popover .ff-info-current{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
+.ff-info-popover .ff-info-meta{display:flex;gap:1rem;margin-top:.35rem;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+/* Phase 26.50 — Live reading pill at top of popover */
+.ff-info-reading{display:flex;gap:.4rem;align-items:center;margin:.2rem 0 .35rem 0;flex-wrap:wrap}
+.ff-info-reading-pill{display:inline-block;padding:.18rem .55rem;border-radius:999px;font-size:.7rem;font-weight:600;letter-spacing:.02em;border:1px solid transparent}
+.ff-info-reading-pill.tone-bull{background:rgba(34,197,94,.16);color:#86efac;border-color:rgba(34,197,94,.4)}
+.ff-info-reading-pill.tone-bear{background:rgba(248,113,113,.16);color:#fca5a5;border-color:rgba(248,113,113,.45)}
+.ff-info-reading-pill.tone-neutral{background:rgba(148,163,184,.14);color:#cbd5e1;border-color:rgba(148,163,184,.35)}
+.ff-info-reading-pill.tone-caution{background:rgba(250,204,21,.16);color:#fde68a;border-color:rgba(250,204,21,.4)}
+.ff-info-reading-pill.tone-info{background:rgba(96,165,250,.12);color:#bfdbfe;border-color:rgba(96,165,250,.35)}
+.ff-info-reading-intensity{display:inline-block;padding:.12rem .5rem;border-radius:999px;font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;background:rgba(255,255,255,.05);color:var(--muted);border:1px solid rgba(255,255,255,.1)}
+/* Phase 26.50 bugfix — intensity chip color must follow the *direction*
+   tone of the reading, not be hard-coded to red.  A red "EXTREME"
+   sitting next to a green "Bullish drift" pill is contradictory and
+   reads as a warning when it should reinforce the bullish signal.
+   The intensity escalates SATURATION/BRIGHTNESS within whatever tone
+   the metric is calling, so "bull + extreme" is bright green and
+   "bear + extreme" is bright red.  Caution/info tones keep the
+   amber/blue treatment because those genuinely flag risk regimes
+   (e.g. "Stressed regime" on vol HMM). */
+.ff-info-reading[data-tone="bull"]    .ff-info-reading-intensity.int-extreme  {color:#bbf7d0;border-color:rgba(34,197,94,.7);background:rgba(34,197,94,.22)}
+.ff-info-reading[data-tone="bull"]    .ff-info-reading-intensity.int-strong   {color:#86efac;border-color:rgba(34,197,94,.55);background:rgba(34,197,94,.15)}
+.ff-info-reading[data-tone="bull"]    .ff-info-reading-intensity.int-moderate {color:#a7f3d0;border-color:rgba(52,211,153,.4); background:rgba(52,211,153,.08)}
+.ff-info-reading[data-tone="bull"]    .ff-info-reading-intensity.int-weak     {color:#bbf7d0;border-color:rgba(34,197,94,.25);background:rgba(34,197,94,.05)}
+.ff-info-reading[data-tone="bear"]    .ff-info-reading-intensity.int-extreme  {color:#fecaca;border-color:rgba(248,113,113,.7);background:rgba(248,113,113,.22)}
+.ff-info-reading[data-tone="bear"]    .ff-info-reading-intensity.int-strong   {color:#fca5a5;border-color:rgba(248,113,113,.55);background:rgba(248,113,113,.15)}
+.ff-info-reading[data-tone="bear"]    .ff-info-reading-intensity.int-moderate {color:#fda4af;border-color:rgba(248,113,113,.4); background:rgba(248,113,113,.08)}
+.ff-info-reading[data-tone="bear"]    .ff-info-reading-intensity.int-weak     {color:#fecaca;border-color:rgba(248,113,113,.25);background:rgba(248,113,113,.05)}
+.ff-info-reading[data-tone="caution"] .ff-info-reading-intensity.int-extreme  {color:#fde68a;border-color:rgba(250,204,21,.7); background:rgba(250,204,21,.22)}
+.ff-info-reading[data-tone="caution"] .ff-info-reading-intensity.int-strong   {color:#fcd34d;border-color:rgba(250,204,21,.55);background:rgba(250,204,21,.15)}
+.ff-info-reading[data-tone="caution"] .ff-info-reading-intensity.int-moderate {color:#fde68a;border-color:rgba(250,204,21,.4); background:rgba(250,204,21,.08)}
+.ff-info-reading[data-tone="caution"] .ff-info-reading-intensity.int-weak     {color:#fef3c7;border-color:rgba(250,204,21,.25);background:rgba(250,204,21,.05)}
+.ff-info-reading[data-tone="neutral"] .ff-info-reading-intensity              {color:#cbd5e1;border-color:rgba(148,163,184,.3); background:rgba(148,163,184,.07)}
+.ff-info-reading[data-tone="info"]    .ff-info-reading-intensity.int-extreme  {color:#dbeafe;border-color:rgba(96,165,250,.7);background:rgba(96,165,250,.22)}
+.ff-info-reading[data-tone="info"]    .ff-info-reading-intensity.int-strong   {color:#bfdbfe;border-color:rgba(96,165,250,.55);background:rgba(96,165,250,.15)}
+.ff-info-reading[data-tone="info"]    .ff-info-reading-intensity.int-moderate {color:#bfdbfe;border-color:rgba(96,165,250,.4); background:rgba(96,165,250,.08)}
+.ff-info-reading[data-tone="info"]    .ff-info-reading-intensity.int-weak     {color:#bfdbfe;border-color:rgba(96,165,250,.25);background:rgba(96,165,250,.05)}
+/* Same tone-aware intensity treatment for the Lab/Strategy overall summary banners. */
+.ff-tier-summary[data-tone="bull"]    .ff-info-reading-intensity.int-extreme  {color:#bbf7d0;border-color:rgba(34,197,94,.7); background:rgba(34,197,94,.22)}
+.ff-tier-summary[data-tone="bull"]    .ff-info-reading-intensity.int-strong   {color:#86efac;border-color:rgba(34,197,94,.55);background:rgba(34,197,94,.15)}
+.ff-tier-summary[data-tone="bull"]    .ff-info-reading-intensity.int-moderate {color:#a7f3d0;border-color:rgba(52,211,153,.4); background:rgba(52,211,153,.08)}
+.ff-tier-summary[data-tone="bull"]    .ff-info-reading-intensity.int-weak     {color:#bbf7d0;border-color:rgba(34,197,94,.25);background:rgba(34,197,94,.05)}
+.ff-tier-summary[data-tone="bear"]    .ff-info-reading-intensity.int-extreme  {color:#fecaca;border-color:rgba(248,113,113,.7); background:rgba(248,113,113,.22)}
+.ff-tier-summary[data-tone="bear"]    .ff-info-reading-intensity.int-strong   {color:#fca5a5;border-color:rgba(248,113,113,.55);background:rgba(248,113,113,.15)}
+.ff-tier-summary[data-tone="bear"]    .ff-info-reading-intensity.int-moderate {color:#fda4af;border-color:rgba(248,113,113,.4); background:rgba(248,113,113,.08)}
+.ff-tier-summary[data-tone="bear"]    .ff-info-reading-intensity.int-weak     {color:#fecaca;border-color:rgba(248,113,113,.25);background:rgba(248,113,113,.05)}
+.ff-tier-summary[data-tone="neutral"] .ff-info-reading-intensity              {color:#cbd5e1;border-color:rgba(148,163,184,.3); background:rgba(148,163,184,.07)}
+/* Phase 26.49 — Lab Mode badge + experimental section */
+.lab-mode-badge{display:inline-block;font-size:.6rem;letter-spacing:.05em;text-transform:uppercase;color:#c4b5fd;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.3);border-radius:.25rem;padding:.05rem .35rem;margin-left:.25rem;vertical-align:middle}
+.future-forecast-card .ff-lab-section{margin-top:.55rem;border-top:1px solid rgba(167,139,250,.2);padding-top:.5rem}
+.future-forecast-card .ff-lab-section h4{margin:0 0 .35rem 0;font-size:.72rem;color:#c4b5fd;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;gap:.4rem}
+.future-forecast-card .ff-lab-section h4::before{content:'';display:inline-block;width:.5rem;height:.5rem;border-radius:50%;background:#c4b5fd;box-shadow:0 0 6px #c4b5fd}
+.future-forecast-card .ff-lab-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.3rem .6rem;font-size:.72rem}
+.future-forecast-card .ff-lab-grid > div{display:flex;flex-direction:column;gap:.05rem}
+.future-forecast-card .ff-lab-grid .ff-label{color:#a78bfa;font-size:.65rem}
+/* Phase 26.49 — Future Mode filter segmented control */
+.fm-filter-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.25rem;margin-top:.3rem}
+.fm-filter-btn{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--muted);padding:.3rem .5rem;border-radius:.3rem;font-size:.72rem;cursor:pointer;letter-spacing:.04em;text-transform:uppercase;transition:background-color 150ms,border-color 150ms,color 150ms}
+.fm-filter-btn:hover{background:rgba(255,255,255,.08);color:var(--text)}
+.fm-filter-btn.active{background:rgba(96,165,250,.18);border-color:rgba(96,165,250,.5);color:#93c5fd}
+.fm-filter-btn[data-fm-filter="bulls"].active{background:rgba(52,211,153,.16);border-color:rgba(52,211,153,.45);color:#34d399}
+.fm-filter-btn[data-fm-filter="bears"].active{background:rgba(248,113,113,.14);border-color:rgba(248,113,113,.4);color:#f87171}
+/* Phase 26.50 — intensity-band buttons */
+.fm-intensity-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.2rem;margin-top:.25rem}
+.fm-intensity-btn{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--muted);padding:.25rem .35rem;border-radius:.3rem;font-size:.65rem;cursor:pointer;letter-spacing:.04em;text-transform:uppercase;transition:background-color 150ms,border-color 150ms,color 150ms}
+.fm-intensity-btn:hover{background:rgba(255,255,255,.08);color:var(--text)}
+.fm-intensity-btn.active{background:rgba(96,165,250,.18);border-color:rgba(96,165,250,.5);color:#93c5fd}
+.fm-intensity-btn[data-fm-intensity="strong"].active{background:rgba(250,204,21,.16);border-color:rgba(250,204,21,.5);color:#fcd34d}
+.fm-intensity-btn[data-fm-intensity="max"].active{background:rgba(244,114,182,.16);border-color:rgba(244,114,182,.5);color:#f9a8d4}
+/* Phase 26.50 — Strategy Tier badge + section */
+.strategy-mode-badge{display:inline-block;font-size:.6rem;letter-spacing:.05em;text-transform:uppercase;color:#fcd34d;background:rgba(250,204,21,.12);border:1px solid rgba(250,204,21,.32);border-radius:.25rem;padding:.05rem .35rem;margin-left:.25rem;vertical-align:middle}
+.future-forecast-card .ff-strategy-section{margin-top:.55rem;border-top:1px solid rgba(250,204,21,.22);padding-top:.5rem}
+.future-forecast-card .ff-strategy-section h4{margin:0 0 .35rem 0;font-size:.72rem;color:#fcd34d;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;gap:.4rem}
+.future-forecast-card .ff-strategy-section h4::before{content:'';display:inline-block;width:.5rem;height:.5rem;border-radius:50%;background:#fcd34d;box-shadow:0 0 6px #fcd34d}
+.future-forecast-card .ff-strategy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.3rem .6rem;font-size:.72rem}
+.future-forecast-card .ff-strategy-grid > div{display:flex;flex-direction:column;gap:.05rem;cursor:pointer;border-radius:.3rem;padding:.18rem .25rem;transition:background-color 150ms}
+.future-forecast-card .ff-strategy-grid > div:hover{background:rgba(255,255,255,.04)}
+.future-forecast-card .ff-strategy-grid > div.ff-pinned{background:rgba(250,204,21,.12);outline:1px solid rgba(250,204,21,.4)}
+.future-forecast-card .ff-strategy-grid .ff-label{color:#fcd34d;font-size:.65rem}
+/* Phase 26.50 — Tier overall-prediction summary banner (Lab + Strategy) */
+.future-forecast-card .ff-tier-summary{margin:.2rem 0 .55rem 0;padding:.45rem .6rem;border-radius:.45rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08)}
+.future-forecast-card .ff-tier-summary[data-tone="bull"]{background:rgba(34,197,94,.07);border-color:rgba(34,197,94,.28)}
+.future-forecast-card .ff-tier-summary[data-tone="bear"]{background:rgba(248,113,113,.07);border-color:rgba(248,113,113,.28)}
+.future-forecast-card .ff-tier-summary[data-tone="neutral"]{background:rgba(148,163,184,.06);border-color:rgba(148,163,184,.22)}
+.future-forecast-card .ff-tier-summary-head{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;margin-bottom:.25rem}
+.future-forecast-card .ff-tier-summary-eyebrow{font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-right:.2rem}
+.future-forecast-card .ff-tier-summary-rationale{font-size:.7rem;color:var(--text);line-height:1.45;margin-bottom:.3rem;opacity:.92}
+.future-forecast-card .ff-tier-summary-impact{font-size:.65rem;display:flex;gap:.35rem;align-items:baseline;border-top:1px dashed rgba(255,255,255,.08);padding-top:.25rem}
+.future-forecast-card .ff-tier-summary-impact-label{color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-size:.6rem}
+.future-forecast-card .ff-tier-summary-impact-text{color:var(--text)}
+.future-forecast-card .ff-tier-summary-impact.tone-bull .ff-tier-summary-impact-text{color:#86efac}
+.future-forecast-card .ff-tier-summary-impact.tone-bear .ff-tier-summary-impact-text{color:#fca5a5}
+.future-forecast-card .ff-tier-summary-impact.tone-neutral .ff-tier-summary-impact-text{color:#cbd5e1}
+.future-forecast-card .ff-tier-summary-impact.tone-info .ff-tier-summary-impact-text{color:#bfdbfe;font-style:italic}
+/* Phase 26.51 — Overall blended forecast banner at the top of the FF card */
+.ff-overall-banner{margin:.4rem 0 .6rem 0;padding:.55rem .75rem;border-radius:.55rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1)}
+.ff-overall-banner[data-tone="bull"]{background:rgba(34,197,94,.10);border-color:rgba(34,197,94,.4)}
+.ff-overall-banner[data-tone="bear"]{background:rgba(248,113,113,.10);border-color:rgba(248,113,113,.4)}
+.ff-overall-banner[data-tone="neutral"]{background:rgba(148,163,184,.07);border-color:rgba(148,163,184,.3)}
+.ff-overall-head{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin-bottom:.25rem}
+.ff-overall-eyebrow{font-size:.66rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.ff-overall-rationale{font-size:.72rem;color:var(--text);opacity:.92}
+.ff-overall-banner[data-tone="bull"]    .ff-info-reading-intensity.int-extreme{color:#bbf7d0;border-color:rgba(34,197,94,.7);background:rgba(34,197,94,.22)}
+.ff-overall-banner[data-tone="bull"]    .ff-info-reading-intensity.int-strong {color:#86efac;border-color:rgba(34,197,94,.55);background:rgba(34,197,94,.15)}
+.ff-overall-banner[data-tone="bear"]    .ff-info-reading-intensity.int-extreme{color:#fecaca;border-color:rgba(248,113,113,.7);background:rgba(248,113,113,.22)}
+.ff-overall-banner[data-tone="bear"]    .ff-info-reading-intensity.int-strong {color:#fca5a5;border-color:rgba(248,113,113,.55);background:rgba(248,113,113,.15)}
+.ff-overall-banner    .ff-info-reading-intensity.int-moderate{color:#cbd5e1;border-color:rgba(148,163,184,.4);background:rgba(148,163,184,.07)}
+.ff-overall-banner    .ff-info-reading-intensity.int-weak    {color:#94a3b8;border-color:rgba(148,163,184,.3);background:rgba(148,163,184,.05)}
+
+/* Phase 26.49 — Soft / Hard reset controls */
+.reset-controls{margin-top:.6rem}
+.reset-controls .eyebrow{margin-bottom:.35rem}
+.reset-btn{display:block;width:100%;padding:.4rem .6rem;margin:.25rem 0;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:.35rem;color:var(--text);font-size:.78rem;cursor:pointer;letter-spacing:.03em;transition:background-color 150ms,border-color 150ms}
+.reset-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)}
+.reset-btn:disabled{opacity:.55;cursor:wait}
+.reset-btn-soft{border-color:rgba(96,165,250,.3);color:#93c5fd}
+.reset-btn-soft:hover{background:rgba(96,165,250,.12);border-color:rgba(96,165,250,.5)}
+.reset-btn-hard{border-color:rgba(248,113,113,.35);color:#fca5a5}
+.reset-btn-hard:hover{background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.55)}
+.reset-hint{margin-top:.3rem;font-size:.7rem;color:var(--muted);line-height:1.4}
+/* Phase 26.49 — confirmation modal */
+.reset-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(2px)}
+/* Phase 26.50 bugfix — the `hidden` HTML attribute must win over the
+   flex layout above.  Without this rule the modal renders on page load
+   even though `<div hidden>` is set, and clicking Cancel/Confirm
+   appears to do nothing because the user-agent `[hidden]{display:none}`
+   stylesheet is overridden by `.reset-modal{display:flex}`. */
+.reset-modal[hidden]{display:none !important}
+.reset-modal-card{background:var(--bg,#0f172a);border:1px solid rgba(255,255,255,.15);border-radius:.55rem;padding:1.2rem 1.4rem;max-width:480px;width:90%;box-shadow:0 12px 60px rgba(0,0,0,.6)}
+.reset-modal-card h2{margin:0 0 .55rem 0;font-size:1rem;color:var(--text)}
+.reset-modal-card p{margin:0 0 1rem 0;color:var(--muted);font-size:.85rem;line-height:1.5}
+.reset-modal-actions{display:flex;gap:.6rem;justify-content:flex-end}
+.reset-modal-actions .reset-btn{width:auto;min-width:100px}
+/* Phase 26.49 — transient banner after reset */
+.reset-banner{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:rgba(96,165,250,.16);border:1px solid rgba(96,165,250,.45);color:#93c5fd;padding:.55rem 1rem;border-radius:.4rem;font-size:.82rem;z-index:1001;box-shadow:0 6px 24px rgba(0,0,0,.5);transition:opacity 350ms}
+.reset-banner[hidden]{display:none !important}
+.reset-banner.fading{opacity:0}
+.reset-banner.error{background:rgba(248,113,113,.14);border-color:rgba(248,113,113,.5);color:#fca5a5}
+/* Phase 26.50 — downloadable metric guidebook button */
+.guidebook-block{margin-top:.3rem}
+.guidebook-btn{display:block;text-decoration:none;padding:.55rem .7rem;border-radius:.4rem;border:1px solid rgba(96,165,250,.42);background:rgba(96,165,250,.08);color:var(--text);transition:background 150ms ease, border-color 150ms ease, transform 150ms ease}
+.guidebook-btn:hover{background:rgba(96,165,250,.16);border-color:rgba(96,165,250,.7);transform:translateY(-1px)}
+.guidebook-btn:focus-visible{outline:2px solid rgba(96,165,250,.85);outline-offset:2px}
+.guidebook-btn-title{display:block;font-weight:600;font-size:.82rem;color:#bfdbfe;margin-bottom:.15rem}
+.guidebook-btn-sub{display:block;font-size:.68rem;color:var(--muted);line-height:1.35}
+.results-table th{padding:.32rem .3rem;font-size:.7rem}
+.results-table td{padding:.28rem .3rem;font-size:.78rem}
+.metric-pill{padding:.08rem .35rem;font-size:.72rem;min-width:1.8rem}
+.results-table .warn-dot{color:#fbbf24;font-size:.72rem;margin-left:.15rem;cursor:help}
+table:not(.results-table){width:100%;border-collapse:collapse;font-size:.9rem}
+th{text-align:left}
+tbody tr{cursor:pointer;transition:background .12s}
+tbody tr:hover{background:rgba(79,152,163,.08)} tbody tr.selected{background:rgba(79,152,163,.16)}
+
+.score-warning{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.4);border-radius:.55rem;padding:.65rem .8rem;margin-bottom:var(--space-4);color:#fcd34d;font-size:.84rem;line-height:1.5}
+.score-warning strong{color:#fbbf24;display:block;margin-bottom:.2rem;font-weight:700}
+.score-warning-text{color:var(--muted);font-size:.78rem;font-family:ui-monospace,monospace}
+
+.composite-breakdown{background:var(--surface-2);border:1px solid var(--border);border-radius:.5rem;padding:.55rem .75rem;margin-bottom:var(--space-3);display:flex;flex-direction:column;gap:.4rem}
+.cs-head{display:flex;align-items:center;flex-wrap:wrap;gap:.6rem;font-size:.78rem}
+.cs-title{font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;font-size:.7rem}
+.cs-formula{color:var(--muted);font-family:ui-monospace,monospace;font-size:.74rem;font-variant-numeric:tabular-nums}
+.cs-modifier{margin-left:auto;padding:.15rem .45rem;border-radius:.3rem;font-size:.72rem;font-weight:600;font-variant-numeric:tabular-nums}
+.cs-mod-pos{color:#86efac;background:rgba(134,239,172,.12);border:1px solid rgba(134,239,172,.35)}
+.cs-mod-neg{color:#f87171;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.4)}
+.cs-families{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.3rem .8rem}
+.cs-family{display:grid;grid-template-columns:1fr 80px 38px;align-items:center;gap:.45rem;font-size:.72rem}
+.cs-name{color:var(--muted);text-transform:lowercase;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cs-bar{height:6px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden}
+.cs-bar-fill{display:block;height:100%;background:linear-gradient(90deg,var(--primary) 0%,#86efac 100%);border-radius:3px}
+.cs-val{font-variant-numeric:tabular-nums;color:var(--text);font-weight:600;text-align:right}
+.cs-notes{margin:.2rem 0 0;padding-left:1.1rem;color:var(--muted);font-size:.72rem;display:flex;flex-direction:column;gap:.15rem}
+.cs-notes li{line-height:1.4}
+
+.search-results{margin-top:var(--space-2);display:grid;gap:.4rem;max-height:240px;overflow:auto}
+.search-results button{text-align:left;background:var(--surface-2);color:var(--text);border:1px solid var(--border);padding:.55rem .7rem;border-radius:.5rem;font-size:.85rem;font-weight:500}
+
+.detail-summary{display:grid;gap:.7rem;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin-bottom:var(--space-4)}
+.detail-card,.rating-card,.factor-card{background:var(--surface-2);border:1px solid var(--border);border-radius:.6rem;padding:.85rem}
+.eyebrow{font-size:.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.35rem;font-weight:600}
+.detail-card .value,.rating-score{font-size:1.05rem;font-weight:700}
+.detail-explainer{color:var(--muted);line-height:1.55;margin-bottom:var(--space-4)}
+.section-title{margin:var(--space-4) 0 var(--space-3);font-size:.95rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:600}
+.rating-grid,.factor-grid{display:grid;gap:.55rem;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.rating-meta{color:var(--muted);font-size:.85rem;line-height:1.45;margin-top:.3rem}
+.factor-extended .factor-headline{font-size:1.02rem;margin:.25rem 0 .35rem;font-weight:600}
+.factor-extended .factor-headline strong{color:var(--primary);font-size:1.15rem;margin-right:.35rem}
+.factor-extended .factor-meta{margin-top:.5rem;font-size:.78rem;color:var(--muted);font-family:ui-monospace,monospace;line-height:1.55;border-top:1px solid var(--border);padding-top:.5rem}
+.adj-note{font-size:.7rem;color:var(--muted);font-weight:400;margin-left:.3rem}
+.prob-grid{display:flex;flex-direction:column;gap:.32rem;margin-top:.55rem;margin-bottom:.4rem}
+.prob-row{display:flex;align-items:center;gap:.55rem;font-size:.78rem}
+.prob-label{flex:0 0 50px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.prob-bar{flex:1;height:.65rem;background:var(--surface-2);border:1px solid var(--border);border-radius:.4rem;overflow:hidden}
+.prob-fill{height:100%;background:linear-gradient(90deg,#4f98a3,#86efac);transition:width .25s ease}
+.prob-pct{flex:0 0 40px;text-align:right;color:var(--text);font-family:ui-monospace,monospace;font-weight:600}
+
+.badge{display:inline-block;padding:.18rem .5rem;border-radius:.35rem;font-size:.7rem;font-weight:700;letter-spacing:.04em;background:var(--surface-2);color:var(--muted);border:1px solid var(--border);text-transform:uppercase;line-height:1.2}
+.badge-live{background:rgba(74,222,128,.14);color:#86efac;border-color:rgba(74,222,128,.4)}
+.badge-cache{background:rgba(96,165,250,.14);color:#93c5fd;border-color:rgba(96,165,250,.4)}
+.badge-preview{background:rgba(251,191,36,.14);color:#fcd34d;border-color:rgba(251,191,36,.4)}
+.badge-stale{background:rgba(244,114,182,.14);color:#f9a8d4;border-color:rgba(244,114,182,.4)}
+.badge-inferred{background:rgba(167,139,250,.14);color:#c4b5fd;border-color:rgba(167,139,250,.4)}
+.badge-unavailable{background:rgba(148,163,184,.14);color:#cbd5e1;border-color:rgba(148,163,184,.3)}
+
+.metric-pill{display:inline-block;padding:.2rem .5rem;border-radius:.3rem;font-size:.78rem;font-weight:700;background:var(--surface-2);border:1px solid var(--border);min-width:2.2rem;text-align:center}
+.metric-pill.badge-strong{background:rgba(74,222,128,.14);color:#86efac;border-color:rgba(74,222,128,.3)}
+.metric-pill.badge-weak{background:rgba(248,113,113,.14);color:#fca5a5;border-color:rgba(248,113,113,.3)}
+.metric-pill.badge-neutral{background:rgba(148,163,184,.12);color:#cbd5e1;border-color:rgba(148,163,184,.3)}
+
+.pagination-bar{display:flex;align-items:center;gap:.55rem;flex-wrap:wrap}
+.page-numbers{display:flex;gap:.4rem;flex-wrap:wrap}
+.page-number{width:auto;min-width:2.1rem;padding:.4rem .65rem;background:var(--surface-2);border:1px solid var(--border);color:var(--text)}
+.page-number.active{background:rgba(79,152,163,.2);border-color:rgba(79,152,163,.65);color:#fff;font-weight:600}
+
+.tracker-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:var(--space-4)}
+.tracker-summary{font-size:.92rem;margin-top:var(--space-2);line-height:1.5}
+.tracker-meta{margin-top:var(--space-2);color:var(--muted);font-size:.82rem;line-height:1.5}
+
+.preset-chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.55rem}
+.preset-chip{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:var(--text);padding:.4rem .65rem;border-radius:999px;font-size:.74rem;width:auto;font-weight:500}
+.preset-chip.is-active{background:rgba(79,152,163,.18);border-color:rgba(79,152,163,.5);color:#dffcf5}
+.preset-chip-context{border-color:rgba(217,146,50,.35);background:rgba(217,146,50,.08);color:#ffe4b5}
+.preset-chip-context:hover{background:rgba(217,146,50,.18);border-color:rgba(217,146,50,.6)}
+.preset-chip-context.is-active{background:rgba(217,146,50,.28);border-color:rgba(217,146,50,.75);color:#fff2d6}
+
+/* ---------------------------------------------------------------------- */
+/* Detail-panel share widget                                              */
+/* ---------------------------------------------------------------------- */
+.share-widget{position:relative;display:inline-block}
+.share-button{background:linear-gradient(180deg,rgba(94,234,212,.12),rgba(94,234,212,.04));border:1px solid rgba(94,234,212,.35);color:#a8f0e2;padding:.42rem .8rem;border-radius:8px;font-size:.78rem;font-weight:600;letter-spacing:.02em;cursor:pointer;transition:background .15s,border-color .15s,transform .1s}
+.share-button:hover{background:rgba(94,234,212,.18);border-color:rgba(94,234,212,.55)}
+.share-button:active{transform:translateY(1px)}
+.share-menu{position:absolute;top:calc(100% + 6px);right:0;min-width:340px;max-width:440px;background:#141a24;border:1px solid rgba(255,255,255,.14);border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.55);padding:.75rem;z-index:120;display:flex;flex-direction:column;gap:.6rem}
+.share-menu[hidden]{display:none}
+.share-menu-summary{font-size:.72rem;line-height:1.35;color:#c8d0dd;background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.1);padding:.55rem .65rem;border-radius:6px;white-space:pre-wrap;word-break:break-word}
+.share-menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem}
+.share-menu-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#e6edf3;padding:.55rem .35rem;border-radius:7px;cursor:pointer;font-size:.68rem;font-weight:500;letter-spacing:.02em;transition:background .15s,border-color .15s,transform .1s;line-height:1.15}
+.share-menu-item:hover{background:rgba(94,234,212,.09);border-color:rgba(94,234,212,.35);color:#dffcf5}
+.share-menu-item.is-flash{background:rgba(94,234,212,.22);border-color:rgba(94,234,212,.55);color:#dffcf5}
+.share-menu-icon{font-size:.95rem;line-height:1;opacity:.92}
+.share-menu-footer{font-size:.62rem;color:rgba(255,255,255,.5);word-break:break-all;padding-top:.15rem;border-top:1px dashed rgba(255,255,255,.08);letter-spacing:.02em}
+.share-menu-footer code{background:rgba(255,255,255,.05);padding:1px 4px;border-radius:3px;font-size:.62rem}
+
+
+.add-row{display:flex;gap:.4rem}
+.add-row input{flex:1}
+.add-row button{flex:0 0 64px;padding:.55rem .65rem;font-size:.85rem}
+.add-status{margin-top:.45rem;font-size:.78rem;color:var(--muted)}
+.add-status.is-ok{color:#86efac}
+.add-status.is-err{color:#fca5a5}
+.user-added-list{margin-top:.45rem;display:flex;flex-wrap:wrap;gap:.3rem}
+.user-added-chip{display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .55rem;background:rgba(79,152,163,.14);border:1px solid rgba(79,152,163,.4);border-radius:999px;font-size:.74rem;font-weight:600;color:#cdccca}
+.user-added-chip button{background:transparent;border:0;color:#fca5a5;font-size:.85rem;padding:0;width:auto;font-weight:700;cursor:pointer}
+
+.zones-list{display:grid;gap:.45rem;margin-top:.55rem}
+.zone-row{display:grid;grid-template-columns:.7fr 1.4fr 1.4fr;gap:.55rem;padding:.45rem .55rem;background:var(--surface);border:1px solid var(--border);border-radius:.45rem;font-size:.78rem;align-items:center}
+.zone-tier{font-weight:700;letter-spacing:.05em;font-size:.7rem;text-transform:uppercase}
+.zone-tier-MAJOR{color:#86efac}
+.zone-tier-INTERMEDIATE{color:#fcd34d}
+.zone-tier-MINOR{color:#cbd5e1}
+.zone-mini-bars{display:flex;flex-direction:column;gap:.18rem}
+.zone-mini-bar{display:flex;align-items:center;gap:.35rem;font-size:.72rem}
+.zone-mini-label{flex:0 0 38px;color:var(--muted)}
+.zone-mini-pct{flex:0 0 32px;text-align:right;font-family:ui-monospace,monospace;color:var(--text);font-weight:600}
+.zone-mini-bar .prob-bar{height:.4rem}
+
+.detail-actions{display:flex;gap:.55rem;margin-top:.55rem;flex-wrap:wrap}
+.detail-actions button{width:auto;padding:.45rem .85rem;font-size:.82rem}
+.refresh-button{background:linear-gradient(90deg,#4f98a3,#65b3bf)}
+.refresh-button.is-stale{background:linear-gradient(90deg,#f59e0b,#fbbf24);color:#1c1b19}
+.backtest-button{background:var(--surface-2);color:var(--text);border:1px solid var(--border)}
+#backtestResults{margin-top:var(--space-3)}
+/* Phase 17: clamp the backtest card to the detail-panel width so it never
+   bleeds past the right viewport edge, and make the sample-predictions
+   table horizontally scrollable inside the card.  The card itself also
+   gets a max-height so the user can scroll the whole thing vertically. */
+.backtest-card{background:var(--surface-2);border:1px solid var(--border);border-radius:.6rem;padding:.85rem;margin-top:.55rem;width:100%;max-width:100%;box-sizing:border-box;overflow:hidden;max-height:60vh;overflow-y:auto}
+.backtest-stats{display:flex;flex-wrap:wrap;gap:.85rem;margin-top:.45rem;font-family:ui-monospace,monospace;font-size:.85rem}
+.backtest-stats span{color:var(--muted)}
+.backtest-stats strong{color:var(--text)}
+.bt-table-wrap{width:100%;overflow-x:auto;overflow-y:hidden;margin-top:.5rem;border-radius:.4rem;border:1px solid rgba(255,255,255,.04);
+  /* Visible-but-thin scrollbar so users know horizontal scroll exists */
+  scrollbar-width:thin;scrollbar-color:rgba(94,234,212,.5) transparent}
+.bt-table-wrap::-webkit-scrollbar{height:8px}
+.bt-table-wrap::-webkit-scrollbar-track{background:rgba(255,255,255,.03)}
+.bt-table-wrap::-webkit-scrollbar-thumb{background:rgba(94,234,212,.45);border-radius:8px}
+.bt-table-wrap::-webkit-scrollbar-thumb:hover{background:rgba(94,234,212,.65)}
+.bt-table{width:max-content;min-width:100%;border-collapse:collapse;font-size:.78rem}
+.bt-table th,.bt-table td{padding:.35rem .55rem;border-bottom:1px solid rgba(255,255,255,.05);text-align:left;font-family:ui-monospace,monospace;white-space:nowrap}
+.bt-table thead th{position:sticky;top:0;background:var(--surface-2);z-index:1;font-weight:600;color:var(--text);border-bottom:1px solid rgba(94,234,212,.25)}
+.bt-correct{color:#86efac}
+.bt-wrong{color:#fca5a5}
+
+/* ============================================================
+   Phase 18 - 10-day price prediction card
+   ============================================================ */
+.predict-button{background:linear-gradient(180deg,#0f766e,#0d5d56);color:#fff;border:1px solid #0f766e}
+.predict-button:hover{filter:brightness(1.15)}
+.predict-button:disabled{opacity:0.6;cursor:not-allowed}
+#predictionResults{margin-top:var(--space-3)}
+.predict-card{background:var(--surface-2);border:1px solid var(--border);border-radius:.6rem;padding:.95rem 1rem;margin-top:.55rem;width:100%;max-width:100%;box-sizing:border-box;border-left-width:4px}
+.predict-card.predict-bull{border-left-color:#5eead4}
+.predict-card.predict-bear{border-left-color:#f87171}
+.predict-card.predict-neutral{border-left-color:#94a3b8}
+.predict-card .eyebrow{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.5rem}
+.predict-target{display:flex;align-items:baseline;gap:.7rem;flex-wrap:wrap;margin-bottom:.55rem}
+.predict-arrow{font-size:1.85rem;line-height:1;font-weight:700}
+.predict-bull .predict-arrow{color:#5eead4}
+.predict-bear .predict-arrow{color:#f87171}
+.predict-neutral .predict-arrow{color:#94a3b8}
+.predict-target-price{font-family:ui-monospace,monospace;font-size:1.5rem;font-weight:700;color:var(--text)}
+.predict-move{font-family:ui-monospace,monospace;font-size:1rem;font-weight:600;color:var(--muted)}
+.predict-bull .predict-move{color:#5eead4}
+.predict-bear .predict-move{color:#f87171}
+.predict-capped{font-size:.72rem;color:#fbbf24;background:rgba(251,191,36,.1);padding:.1rem .4rem;border-radius:.3rem;border:1px solid rgba(251,191,36,.3)}
+.predict-meta{display:flex;flex-wrap:wrap;gap:.85rem;margin-top:.35rem;font-family:ui-monospace,monospace;font-size:.84rem;color:var(--muted)}
+.predict-meta span{display:inline-flex;gap:.3rem;align-items:center}
+.predict-meta strong{color:var(--text);font-weight:600}
+.predict-meta em{font-style:normal;font-size:.7rem;color:var(--muted)}
+.predict-conf{padding:.1rem .55rem;border-radius:.35rem;border:1px solid var(--border)}
+.predict-conf-high{background:rgba(94,234,212,.12);border-color:rgba(94,234,212,.4);color:#5eead4}
+.predict-conf-mid{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.35);color:#fbbf24}
+.predict-conf-low{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.35);color:#f87171}
+.predict-reg-amp{color:#5eead4;font-weight:600}
+.predict-reg-damp{color:#fbbf24;font-weight:600}
+.predict-section-title{margin-top:.85rem;font-size:.74rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;border-bottom:1px solid rgba(255,255,255,.05);padding-bottom:.25rem}
+.predict-factor-grid{display:flex;flex-direction:column;gap:.3rem;margin-top:.45rem;font-family:ui-monospace,monospace;font-size:.78rem}
+.predict-factor-row{display:grid;grid-template-columns:160px 38px 1fr 56px;align-items:center;gap:.5rem}
+.predict-factor-name{color:var(--text);text-transform:capitalize}
+.predict-factor-score{color:var(--muted);text-align:right}
+.predict-factor-bar-wrap{background:rgba(255,255,255,.04);height:6px;border-radius:3px;overflow:hidden}
+.predict-factor-bar{height:100%;border-radius:3px}
+.predict-bar-bull{background:#5eead4}
+.predict-bar-bear{background:#f87171}
+.predict-bar-flat{background:#64748b}
+.predict-factor-contrib{text-align:right;color:var(--text)}
+.predict-reasoning{margin-top:.85rem;color:var(--muted);font-size:.82rem}
+.predict-reasoning summary{cursor:pointer;color:#5eead4;font-weight:600;padding:.25rem 0}
+.predict-reasoning summary:hover{color:#7be8d0}
+.predict-reasoning ul{margin:.45rem 0 0 1.2rem;padding:0;line-height:1.6}
+.predict-reasoning li{margin-bottom:.2rem}
+@media(max-width:600px){.predict-factor-row{grid-template-columns:110px 32px 1fr 50px;font-size:.72rem}}
+
+/* Phase 22: prediction save UI inside the prediction card. */
+.predict-save-row{margin-top:.85rem;padding-top:.7rem;border-top:1px dashed var(--border);display:grid;grid-template-columns:1fr auto;gap:.5rem;align-items:start}
+.predict-notes{grid-column:1/2;width:100%;box-sizing:border-box;resize:vertical;background:var(--surface-1);color:var(--text);border:1px solid var(--border);border-radius:.4rem;padding:.45rem .55rem;font:inherit;font-size:.82rem;line-height:1.4;min-height:48px}
+.predict-notes:focus{outline:none;border-color:#5eead4;box-shadow:0 0 0 2px rgba(94,234,212,.18)}
+.predict-save-button{grid-column:2/3;background:#5eead4;color:#0f172a;border:0;border-radius:.4rem;padding:.55rem 1.1rem;font-weight:600;cursor:pointer;align-self:start;font-size:.85rem;transition:background .15s,opacity .15s}
+.predict-save-button:hover:not(:disabled){background:#7be8d0}
+.predict-save-button:disabled{opacity:.55;cursor:not-allowed}
+.predict-save-status{grid-column:1/3;font-size:.78rem;color:var(--muted);margin-top:.1rem;min-height:1em}
+.predict-save-status.is-ok{color:#5eead4}
+.predict-save-status.is-err{color:#f87171}
+
+
+.extended-filters summary{cursor:pointer;color:var(--text);font-weight:600;padding:.4rem 0;margin-bottom:var(--space-3);border-bottom:1px solid var(--border);font-size:.92rem}
+.extended-filters[open] summary{margin-bottom:var(--space-2)}
+
+@media (max-width:1100px){body{overflow:auto}.dashboard{grid-template-columns:1fr;grid-template-rows:auto auto 1fr;height:auto;min-height:100vh}.sidebar{grid-row:auto;border-right:0;border-bottom:1px solid var(--border)}.main{grid-template-columns:1fr;grid-template-rows:auto auto;height:auto}.detail-summary,.rating-grid,.factor-grid,.filter-grid{grid-template-columns:1fr}}
+
+/* ============================================================
+   Help icons + contextual tooltip popover (loaded by help.js)
+   ============================================================
+   Pattern: a small "i" button injected next to labels / column
+   headers / metric cards.  On click (or hover desktop) a single
+   shared .help-popover element is positioned + filled with the
+   element's data-help-text content.
+
+   Design intent: subtle in the resting state (muted ring, no
+   visual weight), then jumps to the accent colour on hover/focus
+   so it's clearly clickable.
+*/
+.help-icon{
+  /* layout */
+  display:inline-flex;align-items:center;justify-content:center;
+  width:16px;height:16px;margin-left:.4rem;padding:0;
+  vertical-align:middle;line-height:1;flex-shrink:0;
+  /* visual */
+  font-family:ui-sans-serif,system-ui,sans-serif;
+  font-size:11px;font-weight:700;font-style:italic;
+  color:var(--muted);background:transparent;
+  border:1px solid var(--border);border-radius:50%;
+  cursor:pointer;
+  transition:color .15s ease,border-color .15s ease,background .15s ease;
+}
+.help-icon:hover,
+.help-icon:focus-visible,
+.help-icon[aria-expanded="true"]{
+  color:#fff;border-color:#65b3bf;background:rgba(101,179,191,.15);
+  outline:none;
+}
+/* Make sure the help icon on metric cards sits inline with the label,
+   not floating below the sub-text. */
+.metric-card{position:relative}
+.metric-card .help-icon{
+  position:absolute;top:.5rem;right:.55rem;margin-left:0;
+}
+
+/* On column headers, keep the icon snug to the right of the text. */
+th.col-symbol,th.col-name,th.col-score,th.col-tier,th.col-dir,
+th.col-pill,th.col-src,th.col-fresh,th.col-pass{white-space:nowrap}
+
+/* The shared popover.  Body-level so it can escape overflow:hidden
+   containers like the sidebar / table-wrap. */
+.help-popover{
+  position:absolute;z-index:9999;
+  max-width:320px;min-width:200px;
+  background:#0f1922;color:#e7ecf2;
+  border:1px solid #65b3bf;border-radius:.55rem;
+  padding:.7rem .85rem;
+  font-size:.82rem;line-height:1.45;font-weight:400;
+  box-shadow:0 8px 32px rgba(0,0,0,.6),0 2px 8px rgba(0,0,0,.4);
+  pointer-events:none; /* clicks go through; closes via click-outside */
+}
+@media (max-width:600px){
+  .help-popover{max-width:calc(100vw - 32px);font-size:.85rem}
+}
+/* table headers: ensure icon sits next to text, not on its own line */
+th .help-icon{margin-left:.3rem;text-transform:none;letter-spacing:0;font-size:10px;width:14px;height:14px}
+/* sidebar labels: small consistent gap */
+label .help-icon{vertical-align:-2px}
+
+/* ============================================================
+   Phase 15 - Per-factor narratives (in-card text + popover)
+   ============================================================ */
+/* Narrative block embedded inside each factor card in the detail panel */
+.factor-narrative{
+  margin:.6rem 0;padding:.6rem .75rem;
+  background:rgba(101,179,191,.07);
+  border-left:3px solid #65b3bf;
+  border-radius:.45rem;
+  font-size:.86rem;line-height:1.5;
+}
+.factor-narrative-text{color:#e1e7ee}
+.factor-narrative-pred{margin-top:.35rem;color:#5eead4;font-size:.82rem}
+.factor-narrative-pred strong{color:#7be8d0;font-weight:600}
+
+/* Make table pills look interactive when they carry a narrative */
+.metric-pill.narrative-target{cursor:pointer;transition:transform .12s ease,box-shadow .12s ease}
+.metric-pill.narrative-target:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(94,234,212,.25)}
+
+/* Shared popover for narrative + help icons (sits at body level) */
+.narrative-popover{
+  position:absolute;z-index:9998;
+  max-width:380px;min-width:240px;
+  background:#0f1922;color:#e7ecf2;
+  border:1px solid #5eead4;border-radius:.55rem;
+  padding:.8rem 1rem;
+  font-size:.86rem;line-height:1.55;font-weight:400;
+  box-shadow:0 10px 32px rgba(0,0,0,.65),0 2px 8px rgba(0,0,0,.4);
+}
+.narrative-popover .narr-title{font-weight:700;color:#5eead4;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.45rem;border-bottom:1px solid rgba(94,234,212,.25);padding-bottom:.35rem}
+.narrative-popover .narr-cell{font-weight:600;color:#fff;margin-bottom:.45rem}
+.narrative-popover .narr-detail{color:#cbd5e1;margin-bottom:.45rem}
+.narrative-popover .narr-pred{padding-top:.4rem;border-top:1px solid rgba(255,255,255,.08);color:#a5f0d8}
+.narrative-popover .narr-pred-label{color:#5eead4;font-weight:600;text-transform:uppercase;font-size:.72rem;letter-spacing:.05em;margin-right:.3rem}
+@media (max-width:600px){.narrative-popover{max-width:calc(100vw - 32px);font-size:.85rem}}
+
+/* ============================================================
+   Phase 15 - API keys settings panel
+   ============================================================ */
+.api-keys-panel{margin-top:var(--space-4);padding:var(--space-3);border:1px solid var(--border);border-radius:var(--radius-md);background:rgba(15,25,34,.6)}
+.api-keys-panel h3{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 var(--space-2)}
+.api-keys-panel .api-key-row{display:grid;grid-template-columns:90px 1fr 60px;gap:.45rem;align-items:center;margin-bottom:.4rem}
+.api-keys-panel .api-key-row label{font-size:.82rem;color:var(--text);font-weight:600}
+.api-keys-panel .api-key-row input{padding:.4rem .6rem;border-radius:.4rem;border:1px solid var(--border);background:rgba(11,18,32,.7);color:var(--text);font-family:ui-monospace,monospace;font-size:.82rem}
+.api-keys-panel .api-key-row input:focus{outline:none;border-color:#5eead4}
+.api-keys-panel .api-key-row button{padding:.4rem .6rem;font-size:.78rem;border-radius:.4rem;border:1px solid var(--border);background:#0f766e;color:#fff;cursor:pointer}
+.api-keys-panel .api-key-row button:hover{background:#0d8a7f}
+.api-keys-panel .api-key-row .api-key-status{font-size:.74rem;color:var(--muted);font-family:ui-monospace,monospace}
+.api-keys-panel .api-key-row .api-key-status.configured{color:#5eead4}
+
+/* Phase 26.40 + 26.41 — trading-style dropdown + sub-daily prediction buttons */
+#tradingStyleBlock select{width:100%;padding:.45rem .55rem;border-radius:.4rem;border:1px solid var(--border);background:#0b1220;color:#e6edf3;font-size:.85rem}
+#tradingStyleBlock .trading-style-hint{margin-top:.45rem;font-size:.7rem;color:var(--muted);line-height:1.35}
+.score-style-raw{font-size:.72rem;color:var(--muted);font-weight:400;margin-left:.25rem}
+.predict-button-group{display:inline-flex;align-items:center;gap:.35rem;flex-wrap:wrap}
+.predict-button-group-label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-right:.25rem}
+.predict-button-sm{padding:.35rem .55rem !important;font-size:.78rem !important;min-width:auto !important}
+.predict-button-sm:hover{background:#0d8a7f}
+.predict-mod-intraday{display:inline-flex;align-items:center;gap:.25rem;padding:.2rem .5rem;background:rgba(94,234,212,.08);border:1px solid rgba(94,234,212,.3);border-radius:.4rem;font-size:.74rem;color:#5eead4}
+
+/* Phase 26.42 — Quant engine toggle + advanced rank + next-day open */
+#advancedEngineBlock .sidebar-sub-label{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem;display:block}
+#advancedEngineBlock .engine-toggle-row{margin-bottom:.65rem;padding-bottom:.55rem;border-bottom:1px solid rgba(255,255,255,.06)}
+#advancedEngineBlock .engine-toggle-row:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0}
+#advancedEngineBlock .engine-toggle{display:flex;align-items:center;gap:.5rem;font-size:.84rem;cursor:pointer;color:#e6edf3}
+#advancedEngineBlock .engine-toggle input[type="checkbox"]{accent-color:#5eead4;width:1rem;height:1rem;cursor:pointer}
+#advancedEngineBlock .engine-toggle-hint{margin-top:.35rem;font-size:.7rem;color:var(--muted);line-height:1.4;padding-left:1.5rem}
+.predict-button-direction{background:linear-gradient(135deg,#0f766e 0%,#0d8a7f 100%) !important;border-color:#5eead4 !important}
+.predict-button-direction:hover{background:linear-gradient(135deg,#0d8a7f 0%,#0f766e 100%) !important}
+
+/* Phase 26.43 — live-tick indicator in the detail panel header */
+.tick-indicator{display:inline-block;margin-left:.4rem;padding:.1rem .4rem;background:rgba(94,234,212,.12);border:1px solid rgba(94,234,212,.35);border-radius:.35rem;color:#5eead4;font-size:.65rem;font-weight:400;text-transform:none;letter-spacing:0;animation:tickPulse .3s ease-out}
+@keyframes tickPulse{from{background:rgba(94,234,212,.4)}to{background:rgba(94,234,212,.12)}}
+
+/* Phase 26.44 — advanced engine badge in the prediction card header */
+.predict-advanced-badge{display:inline-block;padding:.15rem .5rem;background:linear-gradient(135deg,#5eead4 0%,#0d8a7f 100%);color:#0b1220;font-size:.7rem;font-weight:600;border-radius:.35rem;letter-spacing:.05em;margin-right:.5rem}
+
+/* Phase 26.45 — live-tick failure circuit-breaker indicators */
+.retry-pill{display:inline-block;margin-left:.4rem;padding:.1rem .4rem;background:rgba(251,146,60,.15);border:1px solid rgba(251,146,60,.4);border-radius:.35rem;color:#fb923c;font-size:.65rem;font-weight:400}
+
+/* ===== Scanner-context columns (PVI / Short pressure / Expiration) ===== */
+.results-table .col-pvi{width:2.6rem}
+.results-table .col-ssp{width:2.6rem}
+.results-table .col-exp{width:2.4rem}
+.results-table .col-actions{width:5.2rem}
+.ctx-pill{display:inline-block;min-width:1.9rem;text-align:center;padding:.08rem .3rem;border-radius:999px;font-size:.72rem;font-weight:700;letter-spacing:.02em}
+.ctx-pill.pvi-low{background:rgba(148,163,184,.14);color:#94a3b8}
+.ctx-pill.pvi-moderate{background:rgba(96,165,250,.16);color:#93c5fd}
+.ctx-pill.pvi-high{background:rgba(251,191,36,.18);color:#fbbf24}
+.ctx-pill.pvi-extreme{background:rgba(248,113,113,.2);color:#fca5a5;box-shadow:0 0 0 1px rgba(248,113,113,.35) inset}
+.ctx-pill .pvi-flag{color:#fda4af;font-size:.6em;margin-left:1px}
+.ctx-pill.ssp-neutral{background:rgba(148,163,184,.12);color:#9aa7b8}
+.ctx-pill.ssp-elevated{background:rgba(251,191,36,.14);color:#fbd38d}
+.ctx-pill.ssp-squeeze{background:rgba(52,211,153,.16);color:#6ee7b7;box-shadow:0 0 0 1px rgba(52,211,153,.3) inset}
+.ctx-pill.ssp-bear{background:rgba(248,113,113,.16);color:#fca5a5}
+.ctx-exp{display:inline-block;font-size:.74rem;font-weight:600}
+.ctx-exp-none{color:#64748b}
+.ctx-exp-far{color:#94a3b8}
+.ctx-exp-near{color:#fbbf24}
+.ctx-exp-risk{color:#fca5a5}
+
+/* ===== Future Forecast Activator button + inline expansion row ===== */
+.row-forecast-btn{background:rgba(94,234,212,.1);color:#5eead4;border:1px solid rgba(94,234,212,.35);border-radius:5px;padding:.14rem .4rem;font-size:.7rem;font-weight:700;cursor:pointer;transition:background-color .15s,transform .1s;white-space:nowrap}
+.row-forecast-btn:hover{background:rgba(94,234,212,.22)}
+.row-forecast-btn:active{transform:scale(.96)}
+.row-forecast-btn:disabled{opacity:.55;cursor:wait}
+.row-forecast-btn.is-open{background:rgba(94,234,212,.25);box-shadow:0 0 0 1px rgba(94,234,212,.4) inset}
+.row-forecast-btn.is-ready{border-color:rgba(94,234,212,.6)}
+tr.forecast-inline-row > td{background:rgba(15,23,42,.72);border-bottom:1px solid rgba(94,234,212,.25);border-left:3px solid #5eead4;white-space:normal;padding:.55rem .7rem}
+.if-loading{color:#5eead4;font-size:.8rem}
+.if-error{color:#fca5a5;font-size:.8rem;display:flex;gap:.6rem;align-items:center}
+.if-body{display:flex;flex-direction:column;gap:.35rem}
+.if-head{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;color:#e2e8f0}
+.if-head .if-summary{color:#94e2d5;font-size:.8rem}
+.if-reduced{background:rgba(251,191,36,.15);color:#fbbf24;border-radius:4px;padding:.05rem .35rem;font-size:.68rem;font-weight:700}
+.if-cached{background:rgba(148,163,184,.14);color:#94a3b8;border-radius:4px;padding:.05rem .35rem;font-size:.68rem}
+.forecast-inline-close{margin-left:auto;background:transparent;color:#94a3b8;border:1px solid rgba(148,163,184,.3);border-radius:4px;cursor:pointer;font-size:.7rem;padding:.05rem .35rem}
+.forecast-inline-close:hover{color:#f1f5f9;border-color:#f1f5f9}
+.if-strip{display:flex;gap:.5rem;flex-wrap:wrap}
+.if-horizon,.if-prob{border-radius:5px;padding:.12rem .45rem;font-size:.74rem;font-weight:600;background:rgba(148,163,184,.1);color:#cbd5e1}
+.if-horizon.if-bull{background:rgba(52,211,153,.14);color:#6ee7b7}
+.if-horizon.if-bear{background:rgba(248,113,113,.14);color:#fca5a5}
+.if-prob{background:rgba(129,140,248,.14);color:#a5b4fc}
+.if-influences{display:flex;gap:.9rem;flex-wrap:wrap;font-size:.73rem;color:#94a3b8}
+.if-expl{margin:.15rem 0 0 1rem;padding:0;font-size:.72rem;color:#8fa3bd}
+.if-expl li{margin:.1rem 0}
+
+/* ===== PVI-first ordering mode indicator ===== */
+.pvi-mode-badge{margin-top:.4rem;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.35);border-radius:6px;padding:.3rem .5rem;font-size:.74rem;font-weight:700;text-align:center}
+.results-table.pvi-priority-on th.col-pvi{color:#fbbf24}
+
+/* ===== Forecast context card (detail panel) ===== */
+.forecast-context-card{margin-top:.9rem;border:1px solid rgba(94,234,212,.25);border-radius:8px;padding:.7rem .8rem;background:rgba(94,234,212,.04)}
+.fc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.6rem;margin-top:.4rem}
+.fc-cell{background:rgba(15,23,42,.5);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:.45rem .55rem}
+.fc-value{font-weight:700;color:#e2e8f0;font-size:.86rem;margin-top:.15rem}
+.fc-meta{color:#94a3b8;font-size:.72rem;margin-top:.15rem}
+.fc-expl{margin:.5rem 0 0 1rem;padding:0;font-size:.74rem;color:#9fb3cc}
+.fc-expl li{margin:.12rem 0}
+.fc-caveat{margin-top:.5rem;color:#fbbf24;font-size:.75rem;border-left:2px solid #fbbf24;padding-left:.5rem}
+
+/* ===== Context filter block ===== */
+.context-filters .toggle-row{display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:#cbd5e1;margin:.3rem 0;cursor:pointer}
+.context-filters .toggle-row input{accent-color:#5eead4}

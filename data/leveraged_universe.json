@@ -1,0 +1,1362 @@
+[
+  {
+    "symbol": "TQQQ",
+    "name": "ProShares UltraPro QQQ (3x Long Nasdaq-100)",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "SQQQ",
+    "name": "ProShares UltraPro Short QQQ (3x Short Nasdaq-100)",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "QLD",
+    "name": "ProShares Ultra QQQ (2x Long Nasdaq-100)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "QID",
+    "name": "ProShares UltraShort QQQ (2x Short Nasdaq-100)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "PSQ",
+    "name": "ProShares Short QQQ (-1x Nasdaq-100)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "UPRO",
+    "name": "ProShares UltraPro S&P 500 (3x Long S&P 500)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SPXU",
+    "name": "ProShares UltraPro Short S&P500 (3x Short S&P 500)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SPXL",
+    "name": "Direxion Daily S&P 500 Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SPXS",
+    "name": "Direxion Daily S&P 500 Bear 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SSO",
+    "name": "ProShares Ultra S&P500 (2x Long S&P 500)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SDS",
+    "name": "ProShares UltraShort S&P500 (2x Short S&P 500)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SH",
+    "name": "ProShares Short S&P500 (-1x S&P 500)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "UDOW",
+    "name": "ProShares UltraPro Dow30 (3x Long Dow)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SDOW",
+    "name": "ProShares UltraPro Short Dow30 (3x Short Dow)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "DDM",
+    "name": "ProShares Ultra Dow30 (2x Long Dow)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "DXD",
+    "name": "ProShares UltraShort Dow30 (2x Short Dow)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "DOG",
+    "name": "ProShares Short Dow30 (-1x Dow)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "TNA",
+    "name": "Direxion Daily Small Cap Bull 3X (Russell 2000)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "TZA",
+    "name": "Direxion Daily Small Cap Bear 3X (Russell 2000)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "URTY",
+    "name": "ProShares UltraPro Russell 2000 (3x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SRTY",
+    "name": "ProShares UltraPro Short Russell 2000 (3x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "UWM",
+    "name": "ProShares Ultra Russell 2000 (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "TWM",
+    "name": "ProShares UltraShort Russell 2000 (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "RWM",
+    "name": "ProShares Short Russell 2000 (-1x)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "MIDU",
+    "name": "Direxion Daily Mid Cap Bull 3X (S&P MidCap 400)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "MZZ",
+    "name": "ProShares UltraShort MidCap400 (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "MVV",
+    "name": "ProShares Ultra MidCap400 (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "MYY",
+    "name": "ProShares Short MidCap400 (-1x)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SBB",
+    "name": "ProShares Short SmallCap600 (-1x)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SAA",
+    "name": "ProShares Ultra SmallCap600 (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SDD",
+    "name": "ProShares UltraShort SmallCap600 (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "HIBL",
+    "name": "Direxion Daily S&P 500 High Beta Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "HIBS",
+    "name": "Direxion Daily S&P 500 High Beta Bear 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SOXL",
+    "name": "Direxion Daily Semiconductor Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SOXS",
+    "name": "Direxion Daily Semiconductor Bear 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "USD",
+    "name": "ProShares Ultra Semiconductors (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SSG",
+    "name": "ProShares UltraShort Semiconductors (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "TECL",
+    "name": "Direxion Daily Technology Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "TECS",
+    "name": "Direxion Daily Technology Bear 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "ROM",
+    "name": "ProShares Ultra Technology (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "REW",
+    "name": "ProShares UltraShort Technology (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "WEBL",
+    "name": "Direxion Daily Dow Jones Internet Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "WEBS",
+    "name": "Direxion Daily Dow Jones Internet Bear 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "FNGU",
+    "name": "MicroSectors FANG+ Index 3X Leveraged ETN",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "FNGD",
+    "name": "MicroSectors FANG+ Index -3X Inverse Leveraged ETN",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "BULZ",
+    "name": "MicroSectors Solactive FANG & Innovation 3X Leveraged ETN",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "BERZ",
+    "name": "MicroSectors Solactive FANG & Innovation -3X Inverse Leveraged ETN",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "FAS",
+    "name": "Direxion Daily Financial Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "FAZ",
+    "name": "Direxion Daily Financial Bear 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "UYG",
+    "name": "ProShares Ultra Financials (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SKF",
+    "name": "ProShares UltraShort Financials (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SEF",
+    "name": "ProShares Short Financials (-1x)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "DPST",
+    "name": "Direxion Daily Regional Banks Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "WDRW",
+    "name": "Direxion Daily Regional Banks Bear 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "BNKU",
+    "name": "MicroSectors U.S. Big Banks 3X Leveraged ETN",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "BNKD",
+    "name": "MicroSectors U.S. Big Banks -3X Inverse Leveraged ETN",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "KRU",
+    "name": "Direxion Daily Regional Banks Bull 2X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "LABU",
+    "name": "Direxion Daily S&P Biotech Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "LABD",
+    "name": "Direxion Daily S&P Biotech Bear 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "BIB",
+    "name": "ProShares Ultra Nasdaq Biotechnology (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "BIS",
+    "name": "ProShares UltraShort Nasdaq Biotechnology (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "CURE",
+    "name": "Direxion Daily Healthcare Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "RXL",
+    "name": "ProShares Ultra Health Care (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "RXD",
+    "name": "ProShares UltraShort Health Care (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "PILL",
+    "name": "Direxion Daily Pharmaceutical Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "DRN",
+    "name": "Direxion Daily Real Estate Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "DRV",
+    "name": "Direxion Daily Real Estate Bear 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "URE",
+    "name": "ProShares Ultra Real Estate (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SRS",
+    "name": "ProShares UltraShort Real Estate (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "REK",
+    "name": "ProShares Short Real Estate (-1x)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "NAIL",
+    "name": "Direxion Daily Homebuilders & Supplies Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "CLAW",
+    "name": "Direxion Daily Homebuilders & Supplies Bear 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "ERX",
+    "name": "Direxion Daily Energy Bull 2X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "ERY",
+    "name": "Direxion Daily Energy Bear 2X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "DIG",
+    "name": "ProShares Ultra Oil & Gas (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "DUG",
+    "name": "ProShares UltraShort Oil & Gas (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "GUSH",
+    "name": "Direxion Daily S&P Oil & Gas E&P Bull 2X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "DRIP",
+    "name": "Direxion Daily S&P Oil & Gas E&P Bear 2X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "OILU",
+    "name": "MicroSectors Oil & Gas Exp. & Prod. 3X Leveraged ETN",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "OILD",
+    "name": "MicroSectors Oil & Gas Exp. & Prod. -3X Inverse Leveraged ETN",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "UCO",
+    "name": "ProShares Ultra Bloomberg Crude Oil (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SCO",
+    "name": "ProShares UltraShort Bloomberg Crude Oil (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "BOIL",
+    "name": "ProShares Ultra Bloomberg Natural Gas (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "KOLD",
+    "name": "ProShares UltraShort Bloomberg Natural Gas (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "DBO",
+    "name": "Invesco DB Oil Fund",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "NUGT",
+    "name": "Direxion Daily Gold Miners Index Bull 2X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "DUST",
+    "name": "Direxion Daily Gold Miners Index Bear 2X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "JNUG",
+    "name": "Direxion Daily Junior Gold Miners Index Bull 2X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "JDST",
+    "name": "Direxion Daily Junior Gold Miners Index Bear 2X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "UGL",
+    "name": "ProShares Ultra Gold (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "GLL",
+    "name": "ProShares UltraShort Gold (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "AGQ",
+    "name": "ProShares Ultra Silver (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "ZSL",
+    "name": "ProShares UltraShort Silver (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "USLV",
+    "name": "VelocityShares 3x Long Silver ETN",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "DSLV",
+    "name": "VelocityShares 3x Inverse Silver ETN",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "UGLD",
+    "name": "VelocityShares 3x Long Gold ETN",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "DGLD",
+    "name": "VelocityShares 3x Inverse Gold ETN",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "RETL",
+    "name": "Direxion Daily Retail Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "WANT",
+    "name": "Direxion Daily Consumer Discretionary Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "UCC",
+    "name": "ProShares Ultra Consumer Services (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SCC",
+    "name": "ProShares UltraShort Consumer Services (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "UGE",
+    "name": "ProShares Ultra Consumer Staples (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SZK",
+    "name": "ProShares UltraShort Consumer Staples (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "UYM",
+    "name": "ProShares Ultra Basic Materials (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SMN",
+    "name": "ProShares UltraShort Basic Materials (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "UXI",
+    "name": "ProShares Ultra Industrials (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SIJ",
+    "name": "ProShares UltraShort Industrials (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "DUSL",
+    "name": "Direxion Daily Industrials Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "UTSL",
+    "name": "Direxion Daily Utilities Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "UPW",
+    "name": "ProShares Ultra Utilities (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SDP",
+    "name": "ProShares UltraShort Utilities (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "DFEN",
+    "name": "Direxion Daily Aerospace & Defense Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "TPOR",
+    "name": "Direxion Daily Transportation Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "UVXY",
+    "name": "ProShares Ultra VIX Short-Term Futures (1.5x Long VIX)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SVXY",
+    "name": "ProShares Short VIX Short-Term Futures (-0.5x VIX)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "UVIX",
+    "name": "2x Long VIX Futures ETF",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SVIX",
+    "name": "-1x Short VIX Futures ETF",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "VXX",
+    "name": "iPath Series B S&P 500 VIX Short-Term Futures ETN",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "VIXY",
+    "name": "ProShares VIX Short-Term Futures ETF",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "VIXM",
+    "name": "ProShares VIX Mid-Term Futures ETF",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "VXZ",
+    "name": "iPath Series B S&P 500 VIX Mid-Term Futures ETN",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "TMF",
+    "name": "Direxion Daily 20+ Year Treasury Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "TMV",
+    "name": "Direxion Daily 20+ Year Treasury Bear 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "UBT",
+    "name": "ProShares Ultra 20+ Year Treasury (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "TBT",
+    "name": "ProShares UltraShort 20+ Year Treasury (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "TBF",
+    "name": "ProShares Short 20+ Year Treasury (-1x)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "TTT",
+    "name": "ProShares UltraPro Short 20+ Year Treasury (3x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "TYD",
+    "name": "Direxion Daily 7-10 Year Treasury Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "TYO",
+    "name": "Direxion Daily 7-10 Year Treasury Bear 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "UST",
+    "name": "ProShares Ultra 7-10 Year Treasury (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "PST",
+    "name": "ProShares UltraShort 7-10 Year Treasury (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "TBX",
+    "name": "ProShares Short 7-10 Year Treasury (-1x)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "UJB",
+    "name": "ProShares Ultra High Yield (2x Long Junk Bonds)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SJB",
+    "name": "ProShares Short High Yield (-1x Junk Bonds)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "IGBH",
+    "name": "iShares Interest Rate Hedged Long-Term Corporate Bond ETF",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "YINN",
+    "name": "Direxion Daily FTSE China Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "YANG",
+    "name": "Direxion Daily FTSE China Bear 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "FXP",
+    "name": "ProShares UltraShort FTSE China 50 (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "XPP",
+    "name": "ProShares Ultra FTSE China 50 (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "YXI",
+    "name": "ProShares Short FTSE China 50 (-1x)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "EDC",
+    "name": "Direxion Daily MSCI Emerging Markets Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "EDZ",
+    "name": "Direxion Daily MSCI Emerging Markets Bear 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "EUM",
+    "name": "ProShares Short MSCI Emerging Markets (-1x)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "EFO",
+    "name": "ProShares Ultra MSCI EAFE (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "EFU",
+    "name": "ProShares UltraShort MSCI EAFE (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "EFZ",
+    "name": "ProShares Short MSCI EAFE (-1x)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "EURL",
+    "name": "Direxion Daily MSCI Europe Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "UPV",
+    "name": "ProShares Ultra FTSE Europe (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "EPV",
+    "name": "ProShares UltraShort FTSE Europe (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "INDL",
+    "name": "Direxion Daily MSCI India Bull 2X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "KORU",
+    "name": "Direxion Daily MSCI South Korea Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "MEXX",
+    "name": "Direxion Daily MSCI Mexico Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "BRZU",
+    "name": "Direxion Daily MSCI Brazil Bull 2X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "JPNL",
+    "name": "Direxion Daily MSCI Japan Bull 3X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "EZJ",
+    "name": "ProShares Ultra MSCI Japan (2x Long)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "EWV",
+    "name": "ProShares UltraShort MSCI Japan (2x Short)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "ULE",
+    "name": "ProShares Ultra Euro (2x Long Euro)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "EUO",
+    "name": "ProShares UltraShort Euro (2x Short Euro)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "YCL",
+    "name": "ProShares Ultra Yen (2x Long Yen)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "YCS",
+    "name": "ProShares UltraShort Yen (2x Short Yen)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "UUP",
+    "name": "Invesco DB US Dollar Index Bullish Fund",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "UDN",
+    "name": "Invesco DB US Dollar Index Bearish Fund",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "TSLL",
+    "name": "Direxion Daily TSLA Bull 2X Shares",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "TSLT",
+    "name": "T-Rex 2X Long Tesla Daily Target ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "TSLR",
+    "name": "GraniteShares 2x Long TSLA Daily ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "TSLQ",
+    "name": "AXS TSLA Bear Daily ETF (-1x Tesla)",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "TSLS",
+    "name": "Direxion Daily TSLA Bear 1X Shares",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "TSLZ",
+    "name": "T-Rex 2X Inverse Tesla Daily Target ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "TSDD",
+    "name": "GraniteShares 2x Short TSLA Daily ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "NVDL",
+    "name": "GraniteShares 2x Long NVDA Daily ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "NVDU",
+    "name": "Direxion Daily NVDA Bull 2X Shares",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "NVDX",
+    "name": "T-Rex 2X Long NVIDIA Daily Target ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "NVDS",
+    "name": "Tradr 1.5X Short NVDA Daily ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "NVDD",
+    "name": "Direxion Daily NVDA Bear 1X Shares",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "NVDQ",
+    "name": "T-Rex 2X Inverse NVIDIA Daily Target ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "AAPB",
+    "name": "GraniteShares 2x Long AAPL Daily ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "AAPU",
+    "name": "Direxion Daily AAPL Bull 2X Shares",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "AAPX",
+    "name": "T-Rex 2X Long Apple Daily Target ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "AAPD",
+    "name": "Direxion Daily AAPL Bear 1X Shares",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "MSFU",
+    "name": "Direxion Daily MSFT Bull 2X Shares",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "MSFL",
+    "name": "GraniteShares 2x Long MSFT Daily ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "MSFX",
+    "name": "T-Rex 2X Long Microsoft Daily Target ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "MSFD",
+    "name": "Direxion Daily MSFT Bear 1X Shares",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "GGLL",
+    "name": "Direxion Daily GOOGL Bull 2X Shares",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "GGLS",
+    "name": "Direxion Daily GOOGL Bear 1X Shares",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "AMZU",
+    "name": "Direxion Daily AMZN Bull 2X Shares",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "AMZD",
+    "name": "Direxion Daily AMZN Bear 1X Shares",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "AMZZ",
+    "name": "GraniteShares 2x Long AMZN Daily ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "METU",
+    "name": "Direxion Daily META Bull 2X Shares",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "METD",
+    "name": "Direxion Daily META Bear 1X Shares",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "FBL",
+    "name": "GraniteShares 2x Long META Daily ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "NFLX",
+    "name": "(reference) Netflix Inc \u2014 see NFLU/NFXS for leveraged",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "NFLU",
+    "name": "Direxion Daily NFLX Bull 2X Shares",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "NFXS",
+    "name": "Tradr 2X Short NFLX Daily ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "AMDL",
+    "name": "GraniteShares 2x Long AMD Daily ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "AMDS",
+    "name": "GraniteShares 2x Short AMD Daily ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "COIN",
+    "name": "(reference) Coinbase Global Inc \u2014 see CONL/CONX for leveraged",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "CONL",
+    "name": "GraniteShares 2x Long COIN Daily ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "CONX",
+    "name": "T-Rex 2X Long COIN Daily Target ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "CONI",
+    "name": "T-Rex 2X Inverse COIN Daily Target ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "MRNT",
+    "name": "Tradr 2X Long MRNA Daily ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "BABX",
+    "name": "GraniteShares 1x Short BABA Daily ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "PLTU",
+    "name": "GraniteShares 2x Long PLTR Daily ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "PLTD",
+    "name": "GraniteShares 2x Short PLTR Daily ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "SMCX",
+    "name": "Defiance Daily Target 2X Long SMCI ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "SMCZ",
+    "name": "Defiance Daily Target 2X Short SMCI ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "MUU",
+    "name": "Direxion Daily MU Bull 2X Shares",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "MUD",
+    "name": "Direxion Daily MU Bear 1X Shares",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "GDXU",
+    "name": "Direxion Daily Gold Miners Index Bull 2X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "GDXD",
+    "name": "Direxion Daily Gold Miners Index Bear 2X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "BITX",
+    "name": "2x Bitcoin Strategy ETF (Volatility Shares)",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "BITU",
+    "name": "ProShares Ultra Bitcoin ETF (2x Long Bitcoin)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "BITI",
+    "name": "ProShares Short Bitcoin Strategy ETF (-1x Bitcoin)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "ETHU",
+    "name": "2x Ether ETF (Volatility Shares)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "ETHD",
+    "name": "ProShares Short Ether Strategy ETF (-1x Ether)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "ETHT",
+    "name": "ProShares Ultra Ether ETF (2x Long Ether)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "ETHV",
+    "name": "VanEck Ethereum ETF",
+    "exchange": "CBOE"
+  },
+  {
+    "symbol": "MSTU",
+    "name": "T-Rex 2X Long MSTR Daily Target ETF (MicroStrategy)",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "MSTX",
+    "name": "Defiance Daily Target 2X Long MSTR ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "MSTZ",
+    "name": "T-Rex 2X Inverse MSTR Daily Target ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "MSTQ",
+    "name": "Defiance Daily Target 2X Short MSTR ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "QQQU",
+    "name": "ProShares Ultra QQQ (legacy ticker - see QLD)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "TARK",
+    "name": "Tradr 2X Long Innovation Daily ETF (ARKK)",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "SARK",
+    "name": "Tradr Short Innovation Daily ETF (-1x ARKK)",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "CWEB",
+    "name": "Direxion Daily CSI China Internet Index Bull 2X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "HMUU",
+    "name": "Direxion Daily Homebuilders & Supplies Bull 2X (historical)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "FNGS",
+    "name": "MicroSectors FANG+ ETN (1x reference)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "GBTC",
+    "name": "(reference) Grayscale Bitcoin Trust",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "ETHE",
+    "name": "(reference) Grayscale Ethereum Trust",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "QQQ",
+    "name": "(reference) Invesco QQQ Trust (Nasdaq-100)",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "SPY",
+    "name": "(reference) SPDR S&P 500 ETF Trust",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "IWM",
+    "name": "(reference) iShares Russell 2000 ETF",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "DIA",
+    "name": "(reference) SPDR Dow Jones Industrial Average ETF",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SMH",
+    "name": "(reference) VanEck Semiconductor ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "XLF",
+    "name": "(reference) Financial Select Sector SPDR",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "XLE",
+    "name": "(reference) Energy Select Sector SPDR",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "XLK",
+    "name": "(reference) Technology Select Sector SPDR",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "GLD",
+    "name": "(reference) SPDR Gold Trust",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SLV",
+    "name": "(reference) iShares Silver Trust",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "USO",
+    "name": "(reference) United States Oil Fund",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "UNG",
+    "name": "(reference) United States Natural Gas Fund",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "TLT",
+    "name": "(reference) iShares 20+ Year Treasury Bond ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "IEF",
+    "name": "(reference) iShares 7-10 Year Treasury Bond ETF",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "HYG",
+    "name": "(reference) iShares iBoxx High Yield Corporate Bond ETF",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "FXI",
+    "name": "(reference) iShares China Large-Cap ETF",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "EEM",
+    "name": "(reference) iShares MSCI Emerging Markets ETF",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "EFA",
+    "name": "(reference) iShares MSCI EAFE ETF",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "WEED",
+    "name": "AdvisorShares Pure Cannabis ETF (1x reference)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "BLOK",
+    "name": "Amplify Transformational Data Sharing ETF (1x reference)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "UCYB",
+    "name": "ProShares Ultra Nasdaq Cybersecurity (2x Long)",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "EVAV",
+    "name": "Direxion Daily Electric and Autonomous Vehicles Bull 1.5X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "EVAX",
+    "name": "Direxion Daily Electric and Autonomous Vehicles Bear 1.5X",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "FNGB",
+    "name": "MAX FANG+ 1x ETN (reference)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "FNGO",
+    "name": "MicroSectors FANG+ Index 2X Leveraged ETN",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "FNGZ",
+    "name": "MicroSectors FANG+ Index -2X Inverse Leveraged ETN",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "ISMD",
+    "name": "Inspire Small/Mid Cap Impact ETF (reference)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "SAEF",
+    "name": "Schwab Ariel ESG ETF (reference)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "USHY",
+    "name": "(reference) iShares Broad USD High Yield Corporate Bond ETF",
+    "exchange": "CBOE"
+  },
+  {
+    "symbol": "MVRL",
+    "name": "ETFMG Prime Mobile Payments ETF (reference)",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "OLD",
+    "name": "(reference) The Long-Term Care ETF",
+    "exchange": "NYSE"
+  },
+  {
+    "symbol": "WGMI",
+    "name": "Valkyrie Bitcoin Miners ETF (reference)",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "AMD",
+    "name": "(reference) Advanced Micro Devices Inc",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "NVDA",
+    "name": "(reference) NVIDIA Corp",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "TSLA",
+    "name": "(reference) Tesla Inc",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "AAPL",
+    "name": "(reference) Apple Inc",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "MSFT",
+    "name": "(reference) Microsoft Corp",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "GOOGL",
+    "name": "(reference) Alphabet Inc Class A",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "AMZN",
+    "name": "(reference) Amazon.com Inc",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "META",
+    "name": "(reference) Meta Platforms Inc",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "MSTR",
+    "name": "(reference) MicroStrategy Inc",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "SMCI",
+    "name": "(reference) Super Micro Computer Inc",
+    "exchange": "NASDAQ"
+  },
+  {
+    "symbol": "PLTR",
+    "name": "(reference) Palantir Technologies Inc",
+    "exchange": "NASDAQ"
+  }
+]

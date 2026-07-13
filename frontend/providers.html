@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Providers Health · Market Refinement Dashboard</title>
+  <link rel="icon" href="/frontend/logo.svg" />
+  <style>
+    body{font-family:Arial,sans-serif;background:#111827;color:#f9fafb;margin:0;padding:20px}
+    .wrap{max-width:1320px;margin:0 auto}
+    header.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:18px;flex-wrap:wrap}
+    header.top h1{margin:0;font-size:1.45rem;letter-spacing:.01em}
+    .muted{color:#9ca3af}
+    .header-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    a.backlink, button.refresh-btn{color:#5eead4;text-decoration:none;font-weight:600;border:1px solid #374151;padding:8px 12px;border-radius:8px;background:#1f2937;font:inherit;cursor:pointer}
+    a.backlink:hover, button.refresh-btn:hover{border-color:#5eead4}
+    .auto-toggle{display:flex;align-items:center;gap:8px;border:1px solid #374151;background:#1f2937;padding:7px 12px;border-radius:8px;color:#cbd5e1;font-size:.85rem}
+    .auto-toggle input{accent-color:#5eead4}
+    .card{background:#1f2937;border:1px solid #374151;border-radius:12px;padding:16px;margin-bottom:14px}
+    .card h2{margin:0 0 .55rem;font-size:1.04rem;letter-spacing:.01em;display:flex;align-items:center;gap:.6rem}
+    .card h2 .sub{font-size:.74rem;color:#9ca3af;font-weight:500;text-transform:uppercase;letter-spacing:.07em}
+
+    .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:16px}
+    .stat-card{background:#1f2937;border:1px solid #374151;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+    .stat-card .label{font-size:.78rem;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em}
+    .stat-card .value{font-size:1.55rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+    .stat-card .sub{font-size:.78rem;color:#cbd5e1}
+    .stat-card.green .value{color:#34d399}
+    .stat-card.red .value{color:#f87171}
+    .stat-card.amber .value{color:#fbbf24}
+    .stat-card.blue .value{color:#7dd3fc}
+    .stat-card.slate .value{color:#cbd5e1}
+
+    /* Provider table */
+    table.providers{width:100%;border-collapse:collapse;font-size:.86rem}
+    table.providers th, table.providers td{padding:10px 12px;text-align:left;border-bottom:1px solid #374151;vertical-align:middle}
+    table.providers th{background:#0b1220;color:#cbd5e1;font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}
+    table.providers tr:hover td{background:#1a2333}
+    .num{font-variant-numeric:tabular-nums;text-align:right}
+    .prov-name{font-weight:700}
+    .health-badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.7rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border:1px solid transparent}
+    .health-healthy{background:rgba(34,197,94,.15);color:#34d399;border-color:rgba(34,197,94,.4)}
+    .health-degraded{background:rgba(251,191,36,.15);color:#fbbf24;border-color:rgba(251,191,36,.4)}
+    .health-critical{background:rgba(248,113,113,.15);color:#f87171;border-color:rgba(248,113,113,.4)}
+    .health-idle{background:rgba(148,163,184,.15);color:#94a3b8;border-color:rgba(148,163,184,.4)}
+
+    /* Horizontal health bar */
+    .health-bar-wrap{position:relative;height:8px;background:#0b1220;border-radius:4px;overflow:hidden;min-width:120px}
+    .health-bar-fill{position:absolute;top:0;left:0;bottom:0;background:#34d399;transition:width .35s ease}
+    .health-bar-fill.degraded{background:#fbbf24}
+    .health-bar-fill.critical{background:#f87171}
+    .health-bar-fill.idle{background:#475569}
+
+    .err-cell{font-size:.74rem;color:#fca5a5;max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .err-cell:hover{white-space:normal;overflow:visible}
+
+    .kv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 18px;font-size:.85rem}
+    .kv-grid > div{display:flex;justify-content:space-between;gap:1rem;padding:5px 0;border-bottom:1px dashed #374151}
+    .kv-grid .k{color:#9ca3af}
+    .kv-grid .v{font-variant-numeric:tabular-nums;color:#e5e7eb;font-weight:600}
+
+    .pill{display:inline-block;font-size:.7rem;padding:2px 7px;border-radius:999px;font-weight:600;letter-spacing:.04em}
+    .pill-on{background:rgba(94,234,212,.18);color:#5eead4;border:1px solid rgba(94,234,212,.45)}
+    .pill-off{background:rgba(148,163,184,.16);color:#94a3b8;border:1px solid rgba(148,163,184,.4)}
+    .pill-warn{background:rgba(251,191,36,.16);color:#fbbf24;border:1px solid rgba(251,191,36,.4)}
+    .pill-bad{background:rgba(248,113,113,.16);color:#f87171;border:1px solid rgba(248,113,113,.4)}
+
+    .last-refresh{font-size:.74rem;color:#9ca3af}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media (max-width:980px){.grid-2{grid-template-columns:1fr}}
+    .empty-state{color:#9ca3af;font-style:italic;padding:8px 0}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Data Providers Health</h1>
+      <p class="muted" style="margin:.3rem 0 0">
+        Live provenance for the multi-provider quote, options, and history cascade.
+        Auto-refresh keeps the view in sync with the scanner without disrupting it.
+      </p>
+    </div>
+    <div class="header-actions">
+      <label class="auto-toggle" title="When enabled, this page polls /api/providers/status every 10 seconds.">
+        <input type="checkbox" id="autoRefreshToggle" checked data-testid="providers-auto-refresh-toggle" />
+        Auto-refresh (10s)
+      </label>
+      <button class="refresh-btn" type="button" id="manualRefresh" data-testid="providers-manual-refresh">Refresh now</button>
+      <a class="backlink" href="/" data-testid="providers-back-link">&larr; Back to Dashboard</a>
+    </div>
+  </header>
+
+  <div class="last-refresh" id="lastRefresh" data-testid="providers-last-refresh">Loading provider telemetry&hellip;</div>
+
+  <!-- Phase 26.7: Counter rotation status + one-click reset-all -->
+  <div class="card" data-testid="providers-rotation-card" style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:10px 14px;margin-bottom:14px">
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <div style="display:flex;align-items:center;gap:.6rem;font-size:.85rem">
+        <span style="color:#9ca3af;text-transform:uppercase;font-size:.7rem;letter-spacing:.06em;font-weight:700">Counters last rotated</span>
+        <span id="rotationAge" style="font-variant-numeric:tabular-nums;color:#e5e7eb;font-weight:600" data-testid="counter-rotation-age">&hellip;</span>
+        <span id="rotationCount" class="muted" data-testid="counter-rotation-count" style="font-size:.74rem">&nbsp;</span>
+      </div>
+      <div id="rotationNext" class="muted" data-testid="counter-rotation-next" style="font-size:.74rem">&nbsp;</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="refresh-btn" type="button" id="rotateNowBtn" data-testid="rotate-counters-btn" title="Reset call/hit/miss/error counters now (preserves timestamps + circuit-breaker state)">Rotate counters</button>
+      <button class="refresh-btn" type="button" id="resetAllBtn" data-testid="reset-all-counters-btn" title="Rotate provider counters AND reset per-market scan-pass counters">Reset all counters</button>
+    </div>
+  </div>
+
+  <!-- Top-level aggregate metrics -->
+  <div class="stat-grid" id="aggregateGrid"></div>
+
+  <!-- Quote-provider cascade -->
+  <div class="card" data-testid="providers-quote-card">
+    <h2>Quote provider cascade <span class="sub">success / error breakdown</span></h2>
+    <div id="quoteProvidersTable">
+      <div class="empty-state">Loading&hellip;</div>
+    </div>
+  </div>
+
+  <!-- Options-chain providers (Phase 26.14: CBOE primary, Yahoo fallback) -->
+  <div class="card" data-testid="providers-options-chain-providers-card">
+    <h2>Options chain providers <span class="sub">CBOE primary &raquo; Yahoo fallback</span></h2>
+    <p class="muted" style="margin:.2rem 0 .9rem;font-size:.82rem">
+      CBOE delayed quotes (15-min) return the full chain plus Greeks in a single HTTP request and are tried first.
+      Yahoo Finance handles the symbols CBOE doesn't list (warrants, OTC, micro-caps).
+      The cascade depth was bumped from 2 &rarr; 4 expirations per fetch in Phase 26.14 since CBOE pays no per-expiry HTTP cost.
+    </p>
+    <div id="optionsChainProvidersTable">
+      <div class="empty-state">Loading&hellip;</div>
+    </div>
+  </div>
+
+  <!-- Circuit breakers -->
+  <div class="card" data-testid="providers-circuit-breakers-card">
+    <h2>Circuit breakers <span class="sub">providers paused after recent failure clusters</span></h2>
+    <p class="muted" style="margin:.2rem 0 .9rem;font-size:.82rem">
+      The generic breaker auto-trips after N consecutive batch failures and stays open for the cooldown window before half-opening on the next call.
+      Stooq has its own exponential-backoff breaker with separate tunables.
+    </p>
+    <div id="circuitBreakersTable">
+      <div class="empty-state">Loading&hellip;</div>
+    </div>
+  </div>
+
+  <!-- Optional unlocked providers -->
+  <div class="card" data-testid="providers-api-keys-card">
+    <h2>Optional providers (API key unlocks) <span class="sub">configured on this host</span></h2>
+    <div id="apiKeysGrid">
+      <div class="empty-state">Loading&hellip;</div>
+    </div>
+  </div>
+
+  <!-- Secondary providers: options chain, daily history, reaction clustering -->
+  <div class="grid-2">
+    <div class="card" data-testid="providers-options-card">
+      <h2>Options chain provider</h2>
+      <div id="optionsKv" class="kv-grid"><div class="empty-state">Loading&hellip;</div></div>
+    </div>
+    <div class="card" data-testid="providers-daily-history-card">
+      <h2>Daily history provider</h2>
+      <div id="dailyHistoryKv" class="kv-grid"><div class="empty-state">Loading&hellip;</div></div>
+    </div>
+    <div class="card" data-testid="providers-reaction-card">
+      <h2>Reaction clustering</h2>
+      <div id="reactionKv" class="kv-grid"><div class="empty-state">Loading&hellip;</div></div>
+    </div>
+    <div class="card" data-testid="providers-stooq-card">
+      <h2>Stooq fallback diagnostics</h2>
+      <div id="stooqKv" class="kv-grid"><div class="empty-state">Loading&hellip;</div></div>
+    </div>
+  </div>
+
+  <!-- Cache, warmer, blacklist -->
+  <div class="grid-2">
+    <div class="card" data-testid="providers-cache-card">
+      <h2>Cache &amp; warmer</h2>
+      <div id="cacheWarmerKv" class="kv-grid"><div class="empty-state">Loading&hellip;</div></div>
+    </div>
+    <div class="card" data-testid="providers-blacklist-card">
+      <h2>Symbol blacklist</h2>
+      <div id="blacklistKv" class="kv-grid"><div class="empty-state">Loading&hellip;</div></div>
+    </div>
+  </div>
+
+  <!-- Last error / failure context -->
+  <div class="card" data-testid="providers-recent-errors-card">
+    <h2>Recent failure context</h2>
+    <div id="recentErrors" class="kv-grid"><div class="empty-state">Loading&hellip;</div></div>
+  </div>
+</div>
+<script src="/providers.js"></script>
+</body>
+</html>

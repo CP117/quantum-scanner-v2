@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prediction Tracker · Market Refinement Dashboard</title>
+  <link rel="icon" href="/frontend/logo.svg" />
+  <style>
+    body{font-family:Arial,sans-serif;background:#111827;color:#f9fafb;margin:0;padding:20px}
+    .wrap{max-width:1320px;margin:0 auto}
+    header.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:18px;flex-wrap:wrap}
+    header.top h1{margin:0;font-size:1.45rem;letter-spacing:.01em}
+    .muted{color:#9ca3af}
+    a.backlink{color:#5eead4;text-decoration:none;font-weight:600;border:1px solid #374151;padding:8px 12px;border-radius:8px;background:#1f2937}
+    a.backlink:hover{border-color:#5eead4}
+    .card{background:#1f2937;border:1px solid #374151;border-radius:12px;padding:16px;margin-bottom:14px}
+    .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:16px}
+    .stat-card{background:#1f2937;border:1px solid #374151;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+    .stat-card .label{font-size:.78rem;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em}
+    .stat-card .value{font-size:1.55rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+    .stat-card .sub{font-size:.78rem;color:#cbd5e1}
+    .stat-card.green .value{color:#34d399}
+    .stat-card.red .value{color:#f87171}
+    .stat-card.amber .value{color:#fbbf24}
+    .stat-card.blue .value{color:#7dd3fc}
+
+    .filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+    .filters select,.filters input,.filters button{background:#1f2937;color:#fff;border:1px solid #374151;border-radius:8px;padding:8px 12px;font:inherit}
+    .filters button{background:#0f766e;cursor:pointer}
+    .filters button.danger{background:#7f1d1d}
+    .filters button:hover{filter:brightness(1.1)}
+    .source-compare{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+    .source-card{flex:1;min-width:260px;border-radius:10px;padding:12px 16px;border:1px solid #374151}
+    .source-card.unbiased{background:#0f2f2b;border-color:#0f766e}
+    .source-card.biased{background:#2f1f14;border-color:#7c4a1e}
+    .source-card h4{margin:0 0 4px 0;font-size:.9rem}
+    .source-card .big{font-size:1.4rem;font-weight:600}
+    .source-card .note{font-size:.78rem;color:#9ca3af;margin-top:4px}
+
+    table.tracker{width:100%;border-collapse:collapse;font-size:.84rem}
+    table.tracker th,table.tracker td{padding:9px 10px;text-align:left;border-bottom:1px solid #374151;vertical-align:middle}
+    table.tracker th{background:#0b1220;cursor:pointer;user-select:none;color:#cbd5e1;font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;position:sticky;top:0;z-index:2}
+    table.tracker th:hover{color:#5eead4}
+    table.tracker th .sort-arrow{margin-left:4px;font-size:.7rem;opacity:.7}
+    table.tracker tr:hover td{background:#1a2333}
+    .num{font-variant-numeric:tabular-nums;text-align:right}
+    .sym{font-weight:700}
+    .dir-bull{color:#34d399}.dir-bear{color:#f87171}.dir-neutral{color:#94a3b8}
+    .status-open{color:#fbbf24}
+    .status-evaluated{color:#5eead4}
+    .status-unresolved{color:#94a3b8}
+    .hit-yes{color:#34d399;font-weight:700}
+    .hit-no{color:#f87171;font-weight:700}
+    .hit-na{color:#6b7280}
+    .row-actions{text-align:right}
+    .row-actions button{background:transparent;border:1px solid #374151;color:#cbd5e1;border-radius:6px;padding:3px 8px;font-size:.72rem;cursor:pointer}
+    .row-actions button:hover{border-color:#f87171;color:#f87171}
+
+    .table-wrap{background:#1f2937;border:1px solid #374151;border-radius:12px;padding:0;overflow:hidden}
+    .table-scroll{max-height:62vh;overflow-y:auto}
+
+    .chart-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-top:14px}
+    .chart-card{background:#1f2937;border:1px solid #374151;border-radius:12px;padding:16px}
+    .chart-card h3{margin:0 0 10px;font-size:.95rem;color:#e5e7eb}
+    canvas{width:100%!important;height:280px!important;display:block}
+    .empty{padding:36px 12px;text-align:center;color:#9ca3af;font-size:.95rem}
+    @media(max-width:900px){.chart-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>⊹ Prediction Tracker</h1>
+      <div>
+        <a href="/" class="backlink" data-testid="back-to-dashboard">← Dashboard</a>
+        <a href="/regulatory.html" class="backlink" data-testid="open-regulatory-monitor">⚑ Regulatory monitor</a>
+      </div>
+    </header>
+
+    <p class="muted" style="margin:-8px 0 14px 0;font-size:.88rem;">
+      Saved 10-day forward predictions persist locally in
+      <code>data/saved_predictions.db</code>. When a prediction's expiration
+      date passes, the system auto-fetches the actual close from the
+      daily-history cache and computes hit/miss + magnitude accuracy.
+      Refresh every ~60s while running for fresh evaluations.
+    </p>
+
+    <div id="sourceCompare" class="source-compare" data-testid="source-compare">
+      <!-- Populated by JS: always-visible auto_scan vs user accuracy comparison,
+           regardless of which filter is selected below, so the honest number
+           is never hidden behind a filter someone forgot to set. -->
+    </div>
+
+    <div id="statGrid" class="stat-grid">
+      <!-- Stat cards populated by JS -->
+    </div>
+
+    <div class="filters" data-testid="tracker-filters">
+      <label class="muted" style="font-size:.85rem">Market</label>
+      <select id="filterMarket" data-testid="filter-market">
+        <option value="">All</option>
+        <option value="stocks">Stocks</option>
+        <option value="crypto">Crypto</option>
+      </select>
+      <label class="muted" style="font-size:.85rem">Status</label>
+      <select id="filterStatus" data-testid="filter-status">
+        <option value="">All</option>
+        <option value="open">Open</option>
+        <option value="evaluated">Evaluated</option>
+        <option value="unresolved">Unresolved</option>
+      </select>
+      <label class="muted" style="font-size:.85rem">Source</label>
+      <select id="filterSource" data-testid="filter-source" title="Auto (scanner) = every symbol the scanner scores, logged automatically with no human picking favorites -- the honest accuracy read. My saved picks = whatever you've manually clicked Save on, which skews toward forecasts that already looked good.">
+        <option value="">All (blended)</option>
+        <option value="auto_scan">Auto (scanner) -- unbiased</option>
+        <option value="user">My saved picks -- biased sample</option>
+      </select>
+      <button id="refreshBtn" data-testid="refresh-list">Refresh</button>
+      <button id="evaluateNowBtn" data-testid="evaluate-now">Evaluate expired now</button>
+      <span id="evalStatus" class="muted" style="font-size:.82rem"></span>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table class="tracker" data-testid="tracker-table">
+          <thead id="trackerHead"></thead>
+          <tbody id="trackerBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>Predicted vs actual (evaluated)</h3>
+        <canvas id="scatterCanvas" data-testid="chart-scatter"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Accuracy by direction</h3>
+        <canvas id="barCanvas" data-testid="chart-bar"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script src="/frontend/predictions.js"></script>
+</body>
+</html>

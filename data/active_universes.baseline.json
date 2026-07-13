@@ -1,0 +1,13 @@
+{
+  "schema_version": 2,
+  "stocks": [
+    "leveraged",
+    "nasdaq_1_10",
+    "nasdaq_2_10",
+    "nasdaq_3_10",
+    "nasdaq_4_10",
+    "nasdaq_5_10"
+  ],
+  "crypto": [],
+  "captured_at_utc": "2026-07-09T22:41:02.335895+00:00"
+}

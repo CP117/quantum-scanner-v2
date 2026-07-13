@@ -1,0 +1,254 @@
+{
+  "direction_cf": {
+    "label": "Direction (CF)",
+    "summary": "The trade direction picked by the Cornish-Fisher fat-tail-adjusted P(up).  When CF disagrees with the Gaussian drift, the rank is dampened automatically.",
+    "interpretation": "Bullish (P(up)CF > 0.55), Bearish (< 0.45), Neutral otherwise.",
+    "impact": "Controls the SIGN of the effective Kelly rank.  Bulls Only / Bears Only filters use this field."
+  },
+  "p_up_cf": {
+    "label": "P(up) CF",
+    "summary": "Cornish-Fisher fat-tail-adjusted probability that the return over the horizon is positive.  Accounts for realized skew and excess kurtosis of daily returns.",
+    "interpretation": "> 0.55 = strongly bullish, 0.45\u20130.55 = neutral, < 0.45 = bearish.  Reduces to plain Gaussian \u03a6(drift/\u03c3) when higher moments are negligible.",
+    "impact": "Drives directional certainty and the effective Kelly rank \u2014 this is the canonical Future Mode ranking input."
+  },
+  "p_up_gauss": {
+    "label": "P(up) Gaussian",
+    "summary": "Naive Gaussian probability of upside \u2014 assumes normally distributed returns.  Shown for comparison against the CF-adjusted estimate.",
+    "interpretation": "For fat-tailed distributions this typically over- or under-estimates P(up).  Watch the gap vs P(up) CF to spot left-tail risk.",
+    "impact": "Not used in ranking \u2014 informational only."
+  },
+  "drift_pct": {
+    "label": "Drift %",
+    "summary": "Bayesian-blended expected return over the horizon.  Combines factor scores with horizon-scaled weights via posterior precision.",
+    "interpretation": "Positive = bullish drift; magnitude in % of price.  Add jump-drift contribution for the full expected move.",
+    "impact": "Primary input to effective Kelly rank; signed."
+  },
+  "sigma_pct": {
+    "label": "Sigma %",
+    "summary": "Conditional volatility over the horizon.  Fast tier uses ATR-derived \u03c3; GARCH tier uses fitted GARCH(1,1).",
+    "interpretation": "Higher \u03c3 = wider expected outcome range.  Used to scale VaR/CVaR and Kelly fraction.",
+    "impact": "Reduces effective Kelly rank quadratically through the Kelly fraction."
+  },
+  "jump_drift_pct": {
+    "label": "+ Jump drift",
+    "summary": "Expected drift contribution from rare large moves, derived from the jump-diffusion proxy (\u03bb \u00b7 \u03bc_j \u00b7 horizon).",
+    "interpretation": "Positive when historical jumps tilt upward; negative for chronic downward shocks.",
+    "impact": "Added directly to the drift before computing the effective Kelly rank."
+  },
+  "var95_pct": {
+    "label": "VaR 95%",
+    "summary": "Cornish-Fisher Value-at-Risk: the magnitude of the worst expected loss at 95% confidence over the horizon.",
+    "interpretation": "A VaR95 of 2.1% means \"we expect to lose \u2264 2.1% with 95% confidence.\"",
+    "impact": "Risk-management context.  Not used in ranking but flags asymmetric downside."
+  },
+  "cvar95_pct": {
+    "label": "CVaR 95%",
+    "summary": "Conditional VaR / Expected Shortfall: the average loss in the worst 5% of outcomes.",
+    "interpretation": "Always \u2265 VaR.  Wider CVaR-VaR gap \u2192 fatter left tail.",
+    "impact": "Risk diagnostic; supplements VaR with tail-mean info."
+  },
+  "directional_certainty_cf": {
+    "label": "Certainty CF",
+    "summary": "Cornish-Fisher directional certainty = 2 \u00b7 |P(up)CF \u2212 0.5|.  Range [0, 1].",
+    "interpretation": "0 = coin flip, 1 = absolute certainty in the direction implied by P(up)CF.",
+    "impact": "Multiplied into the effective Kelly rank.  This is the magnitude of conviction Future Mode places on the trade."
+  },
+  "kelly_fraction": {
+    "label": "Kelly Fraction",
+    "summary": "Half-Kelly (Thorp 2006) position-sizing recommendation: half of drift/\u03c3\u00b2 per the log-utility optimum.",
+    "interpretation": "Positive = long; negative = short.  Clamped to \u00b11 (no infinite leverage).",
+    "impact": "Actionable \u2014 tells you what fraction of capital to allocate per the model."
+  },
+  "effective_kelly_rank": {
+    "label": "Effective Kelly Rank",
+    "summary": "Final Future Mode sort key: sign(CF direction) \u00b7 |drift+jump_drift| \u00b7 \u221aprecision \u00b7 certainty_cf \u00b7 regime_weight \u00b7 agreement.",
+    "interpretation": "Positive = long opportunity, negative = short opportunity.  Magnitude = conviction \u00d7 expected move.",
+    "impact": "The leaderboard sorts by this when Future Mode is on.  Bulls Only / Bears Only filter by sign."
+  },
+  "regime_label": {
+    "label": "Regime",
+    "summary": "Hurst-derived market regime: trending (H \u2265 0.55), mean-reverting (H \u2264 0.45), or random-walk (0.45\u20130.55).",
+    "interpretation": "Trending regimes boost rank when direction agrees with the trend; mean-reverting regimes do the opposite.",
+    "impact": "Modulates the effective Kelly rank via `regime_weight`."
+  },
+  "hurst_exponent": {
+    "label": "Hurst Exponent",
+    "summary": "R/S Hurst exponent measuring long-memory in the return series.  Range (0, 1).",
+    "interpretation": "> 0.5 = trending (persistent); < 0.5 = mean-reverting (anti-persistent); \u2248 0.5 = random walk.",
+    "impact": "Drives the regime classification and the regime weight applied to ranking."
+  },
+  "realized_skew": {
+    "label": "Realized Skew",
+    "summary": "Sample skewness of daily log returns (Fisher-Pearson, sample-bias corrected).",
+    "interpretation": "Negative = left tail dominates (rare big losses); positive = right tail dominates.",
+    "impact": "Feeds the Cornish-Fisher expansion \u2192 directly shapes P(up) CF."
+  },
+  "realized_excess_kurt": {
+    "label": "Excess Kurtosis",
+    "summary": "Sample excess kurtosis (Fisher form, normal = 0).  Measures tail thickness.",
+    "interpretation": "> 1 = fatter-than-normal tails (typical for equities); > 5 = extremely fat-tailed.",
+    "impact": "Feeds the Cornish-Fisher expansion \u2192 tightens VaR and shifts P(up) CF."
+  },
+  "jump_intensity_per_day": {
+    "label": "Jump \u03bb / day",
+    "summary": "Estimated daily jump intensity from the threshold-jump detector (3.5 \u00b7 MAD).",
+    "interpretation": "0 = no jumps in window; 0.05 = roughly one jump every 20 trading days.",
+    "impact": "Multiplied by mean jump return to produce the jump-drift overlay on each horizon."
+  },
+  "jump_mean_return_pct": {
+    "label": "Jump Mean \u03bc",
+    "summary": "Average return magnitude on jump days (%).",
+    "interpretation": "Negative = jumps tend to be crashes; positive = jumps tend to be rallies.",
+    "impact": "Sets the sign and scale of the jump-drift overlay."
+  },
+  "ou_half_life_days": {
+    "label": "OU Half-Life",
+    "summary": "Ornstein-Uhlenbeck mean-reversion half-life fitted on log prices.  Days for a deviation to revert halfway.",
+    "interpretation": "0 = no mean reversion (random walk); short half-life = strong mean reversion.",
+    "impact": "Informational \u2014 not currently fed into ranking but useful for short-horizon trade timing."
+  },
+  "rv_har_sigma_pct": {
+    "label": "HAR-RV \u03c3",
+    "summary": "Corsi (2009) Heterogeneous AR realized-vol forecast for the next day, in %.",
+    "interpretation": "Combines daily / weekly / monthly realized variance components.",
+    "impact": "Reference \u03c3 shown for comparison against GARCH.  Not yet ranked-on directly."
+  },
+  "rsv_upside_share": {
+    "label": "RSV+ Share",
+    "summary": "Realized semi-variance ratio (Barndorff-Nielsen 2010): RSV+ / (RSV+ + RSV\u2212).",
+    "interpretation": "> 0.55 = volatility driven mostly by gains; < 0.45 = driven mostly by losses.",
+    "impact": "Component of the Lab composite multiplier."
+  },
+  "egarch_leverage_gamma": {
+    "label": "EGARCH \u03b3",
+    "summary": "Asymmetry coefficient in the EGARCH(1,1) log-variance equation.  Captures whether negative shocks raise vol more than positive ones.",
+    "interpretation": "\u03b3 < 0 = classic leverage effect (most equities).  \u03b3 \u2248 0 = symmetric.  \u03b3 > 0 = anti-leverage (rare).",
+    "impact": "Diagnostic; not blended into rank."
+  },
+  "garch_m_premium_bps_per_sigma": {
+    "label": "GARCH-M Premium",
+    "summary": "Expected return premium per unit of \u03c3 from a GARCH-in-Mean fit, in basis points per sigma.",
+    "interpretation": "Positive = market demands a positive risk premium on this asset.",
+    "impact": "Diagnostic; not blended into rank."
+  },
+  "permutation_entropy": {
+    "label": "Permutation Entropy",
+    "summary": "Bandt-Pompe (2002) ordinal-pattern entropy of the return series, normalized to [0, 1].",
+    "interpretation": "\u2248 1.0 = random / unpredictable; lower = more recurring patterns.",
+    "impact": "Component of the Lab composite multiplier (low entropy boosts rank)."
+  },
+  "mahalanobis_outlier_z": {
+    "label": "Mahalanobis z",
+    "summary": "Multivariate distance of the latest trading day from the centroid of the prior days, in std units.",
+    "interpretation": "> 2 = regime-anomalous day (95%+ confidence outlier).",
+    "impact": "Component of the Lab composite multiplier (anomalous days dampen rank)."
+  },
+  "approximate_entropy": {
+    "label": "ApEn",
+    "summary": "Pincus (1991) Approximate Entropy ApEn(2, 0.2\u03c3).  Measures regularity / self-similarity.",
+    "interpretation": "Low ApEn = regular, predictable.  High ApEn = irregular.",
+    "impact": "Component of the Lab composite multiplier."
+  },
+  "lab_qi_certainty": {
+    "label": "QI Certainty",
+    "summary": "Quantum-inspired interference fusion of fast-tier and GARCH-tier P(up) values.  Constructive interference when tiers agree, destructive when they disagree.",
+    "interpretation": "0 = total tier disagreement; 1 = perfect agreement at high conviction.",
+    "impact": "Currently informational; not blended into the composite multiplier (it operates per-horizon)."
+  },
+  "lab_rank_multiplier": {
+    "label": "Lab Rank Multiplier",
+    "summary": "Composite multiplier in [0.6, 1.4] derived from RSV share, permutation entropy, ApEn, Mahalanobis outlier, DFA \u03b1, SSA trend slope, and 2-state Vol HMM.",
+    "interpretation": "> 1 = lab signals favor this trade; < 1 = lab signals counsel caution.",
+    "impact": "When \"Blend Lab into ranking\" is ON, this multiplies the effective Kelly rank."
+  },
+  "dfa_alpha": {
+    "label": "DFA \u03b1",
+    "summary": "Detrended Fluctuation Analysis exponent (Peng et al. 1994).  Robust Hurst alternative that handles non-stationary trends.",
+    "interpretation": "\u03b1 \u2248 0.5 = random walk; \u03b1 > 0.5 = persistent / trending; \u03b1 < 0.5 = anti-persistent / mean-reverting.",
+    "impact": "Contributes to the Lab composite multiplier."
+  },
+  "ssa_trend_slope_pct_per_day": {
+    "label": "SSA Trend Slope",
+    "summary": "Slope of the leading Singular Spectrum Analysis component (smoothed trend) over the last 5 days, in %/day.",
+    "interpretation": "Positive = trend up; negative = trend down.  Robust to short-term noise.",
+    "impact": "Signed contributor to the Lab composite multiplier."
+  },
+  "vol_hmm_p_stressed": {
+    "label": "Vol HMM P(stressed)",
+    "summary": "2-state Hidden Markov Model probability that the LATEST day is in the stressed (high-vol) regime.",
+    "interpretation": "0 = clearly in calm regime; 1 = clearly in stressed regime.",
+    "impact": "Stressed + sticky regime dampens the Lab composite multiplier."
+  },
+  "vol_hmm_p_stay_stressed": {
+    "label": "Vol HMM P(stay stressed)",
+    "summary": "Empirical transition probability that the stressed regime persists tomorrow.",
+    "interpretation": "> 0.7 = sticky stressed regime; < 0.3 = quick mean-reversion to calm.",
+    "impact": "Combined with P(stressed) drives the HMM contribution to the Lab multiplier."
+  },
+  "strategy_vr5": {
+    "label": "Variance Ratio (5-day)",
+    "summary": "Lo\u2013MacKinlay (1988) variance ratio at q=5 days.  VR(q) = Var(q-sum) / [q \u00b7 Var(1)].",
+    "interpretation": "= 1 random walk; > 1.1 = positive autocorrelation (momentum); < 0.9 = mean reversion.",
+    "impact": "Signed contributor to the Strategy composite multiplier."
+  },
+  "strategy_vr22": {
+    "label": "Variance Ratio (22-day)",
+    "summary": "Lo\u2013MacKinlay variance ratio at q=22 days \u2014 captures monthly autocorrelation structure.",
+    "interpretation": "Same scale as VR(5); equity literature commonly finds VR(22) near 1 with modest momentum/MR depending on regime.",
+    "impact": "Signed contributor to the Strategy composite multiplier."
+  },
+  "strategy_ar1": {
+    "label": "AR(1) Coefficient",
+    "summary": "Lag-1 OLS regression coefficient.  Direct tomorrow-prediction slope.",
+    "interpretation": "Bounded [-1, 1].  Positive = momentum; negative = mean reversion.  Magnitudes > 0.05 are unusual.",
+    "impact": "Signed contributor to the Strategy composite multiplier."
+  },
+  "strategy_mi_lag1": {
+    "label": "Mutual Info (lag-1)",
+    "summary": "Shannon mutual information I(r_t; r_{t-1}) in bits, using 10-bin discretisation.",
+    "interpretation": "0 = independent; 0.05+ bits = meaningful nonlinear dependence.  Captures structure AR(1) misses.",
+    "impact": "Predictability contributor to the Strategy composite multiplier."
+  },
+  "strategy_spectral_beta": {
+    "label": "Spectral Slope \u03b2",
+    "summary": "Power-spectrum slope from the FFT periodogram.  Power \u221d 1/f\u1d5d.",
+    "interpretation": "\u03b2 \u2248 0 white noise; \u2248 1 pink noise (typical); \u03b2 > 1.5 = strong long-memory structure.",
+    "impact": "Predictability contributor to the Strategy composite multiplier."
+  },
+  "strategy_welch_cycle_days": {
+    "label": "Welch Cycle (days)",
+    "summary": "Period of the LARGEST Welch-periodogram peak that exceeds the noise floor by 2\u03c3.",
+    "interpretation": "0 = no dominant cycle detected; otherwise the dominant oscillation length in days.",
+    "impact": "Informational \u2014 useful for timing entries when a clear cycle exists."
+  },
+  "strategy_rqa_determinism": {
+    "label": "RQA Determinism %",
+    "summary": "Recurrence-plot fraction of points on diagonal lines of length \u2265 2.  Computed on a 64-day window.",
+    "interpretation": "> 0.5 = deterministic / predictable trajectory; < 0.2 = chaotic.",
+    "impact": "Predictability contributor to the Strategy composite multiplier."
+  },
+  "strategy_lz_complexity": {
+    "label": "LZ Complexity",
+    "summary": "Lempel-Ziv 1976 complexity of the sign-discretised return sequence, normalised to [0, 1].",
+    "interpretation": "\u2248 1 = maximally random (unpredictable); \u2248 0 = highly structured patterns.",
+    "impact": "Inverse predictability contributor \u2014 high LZ dampens the Strategy multiplier."
+  },
+  "strategy_emd_slope_pct": {
+    "label": "EMD IMF1 Slope",
+    "summary": "Slope of the first intrinsic-mode oscillation (high-freq component after stripping the rolling-mean trend), in %/day over the last 5 days.",
+    "interpretation": "Signed.  Positive = short-term momentum up; negative = short-term momentum down.",
+    "impact": "Signed contributor to the Strategy composite multiplier."
+  },
+  "strategy_vol_regime_mom": {
+    "label": "Vol-Regime Momentum",
+    "summary": "log(\u03c3_recent_5d / \u03c3_long_30d).  Positive = volatility is rising relative to long-term; negative = cooling.",
+    "interpretation": "> 0.3 = stress entering; < -0.3 = stress exiting; near 0 = stable regime.",
+    "impact": "Cooling-vol regime contributes positively to the Strategy multiplier."
+  },
+  "strategy_rank_multiplier": {
+    "label": "Strategy Rank Multiplier",
+    "summary": "Composite multiplier in [0.6, 1.4] derived from VR(5), VR(22), AR(1), MI, spectral \u03b2, RQA determinism, LZ complexity, EMD slope, and vol-regime momentum.",
+    "interpretation": "> 1 = strategy signals favor this trade; < 1 = strategy signals counsel caution.",
+    "impact": "When \"Blend Strategy into ranking\" is ON, this multiplies the effective Kelly rank."
+  }
+}

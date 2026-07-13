@@ -1,0 +1,802 @@
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Market Refinement Dashboard - Ultra Scanner V1</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/frontend/styles.css">
+</head>
+<body>
+  <a class="sr-only" href="#main">Skip to content</a>
+  <div class="dashboard">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="/frontend/logo.svg" alt="Market Refinement logo" width="28" height="28">
+        <span>Market Refinement</span>
+      </div>
+
+      <!-- Phase 26.5: Public URL banner. Populated by /api/public-url which
+           reads the URL captured by start.bat / start.sh into
+           app/data/public_url.txt. Hidden until a usable URL is loaded. -->
+      <div id="publicUrlBanner" class="public-url-banner" hidden data-testid="public-url-banner">
+        <div class="public-url-banner__row">
+          <span id="publicUrlBadge" class="public-url-banner__badge" data-testid="public-url-kind">PUBLIC</span>
+          <a id="publicUrlLink"
+             class="public-url-banner__link"
+             href="#"
+             target="_blank"
+             rel="noopener"
+             title="Open this dashboard in a new tab"
+             data-testid="public-url-link">share link</a>
+          <button id="publicUrlCopy"
+                  type="button"
+                  class="public-url-banner__copy"
+                  title="Copy link to clipboard"
+                  aria-label="Copy public URL"
+                  data-testid="public-url-copy">Copy</button>
+          <button id="publicUrlRegen"
+                  type="button"
+                  class="public-url-banner__copy"
+                  title="Spawn a fresh Cloudflare Quick Tunnel and replace the URL"
+                  aria-label="Regenerate public URL"
+                  data-testid="public-url-regen">Regenerate</button>
+        </div>
+        <div id="publicUrlSubtext" class="public-url-banner__sub" data-testid="public-url-sub">
+          Share this address to open the dashboard from any device.
+        </div>
+        <details id="publicUrlAltsWrap" class="public-url-banner__alts" hidden>
+          <summary>Other URLs</summary>
+          <ul id="publicUrlAlts" class="public-url-banner__alts-list" data-testid="public-url-alts"></ul>
+        </details>
+      </div>
+
+      <div class="sidebar-block">
+        <label for="symbolSearch">Search symbols</label>
+        <input id="symbolSearch" type="text" placeholder="AA, AAPL, ABBV...">
+        <div id="searchResults" class="search-results"></div>
+      </div>
+
+      <!-- Phase 26.40: Trading-style re-weight (visible only when the
+           leveraged-variant /api/system/variant flag flips on).  The
+           dropdown lives in a `hidden` block by default; app.js makes
+           it visible after the variant probe completes if the build
+           is leveraged. -->
+      <div class="sidebar-block" id="tradingStyleBlock" hidden>
+        <label for="tradingStyleSelect">Trading style</label>
+        <select id="tradingStyleSelect" data-testid="trading-style-select">
+          <option value="default">Default (composite as-is)</option>
+          <option value="short">Short-term (15m / 1h chart, 1-2 day hold)</option>
+          <option value="swing">Swing (3-10 day hold)</option>
+          <option value="long">Long (10+ day hold)</option>
+        </select>
+        <div class="trading-style-hint">Re-blends the composite score for ranking.  Click any row to see the per-style adjusted score in the detail panel.</div>
+      </div>
+
+      <!-- Phase 26.42: Prediction-engine + ranking-engine toggles.
+           Visible whenever the leveraged variant is active (the
+           Bayesian/GARCH math needs the full factor depth the
+           priority lane guarantees).  Two independent toggles:
+            1. Prediction engine: which backend route the detail-panel
+               prediction buttons call (legacy vs advanced quant model).
+            2. Ranking engine: which scalar the leaderboard sorts by
+               (raw composite vs client-side Bayesian Kelly score). -->
+      <div class="sidebar-block" id="advancedEngineBlock" hidden>
+        <label class="sidebar-sub-label">Quant engine</label>
+        <div class="engine-toggle-row">
+          <label class="engine-toggle">
+            <input type="checkbox" id="useAdvancedPredictionEngine" data-testid="use-advanced-prediction-engine">
+            Use advanced predictions
+          </label>
+          <div class="engine-toggle-hint">Routes detail-panel buttons to the GARCH(1,1) + Bayesian factor-blend engine instead of the legacy ATR×√t model.</div>
+        </div>
+        <div class="engine-toggle-row">
+          <label class="engine-toggle">
+            <input type="checkbox" id="useAdvancedRanking" data-testid="use-advanced-ranking">
+            Use advanced ranking
+          </label>
+          <div class="engine-toggle-hint">Re-sorts the leaderboard by expected_return × √precision × directional_certainty (Kelly-style).  Falls back to composite rank for any row without sufficient factor coverage.</div>
+        </div>
+        <!-- Phase 26.47 — Future Mode toggle + horizon selector.
+             Future Mode overlays the SERVER-SIDE advanced predictive
+             stack (GARCH(1,1) + Bayesian factor blend + Cornish-Fisher
+             p_up + jump-diffusion drift + Hurst regime weight) on
+             every row, then re-sorts the leaderboard by the resulting
+             `effective_kelly_rank`.  The top-25 carry the full GARCH
+             tier; the rest carry the cheaper ATR-tier overlay.  Both
+             tiers expose the same set of forward-metric fields, so
+             the table renders identically regardless of which tier
+             attached the block. -->
+        <div class="engine-toggle-row" style="border-top: 1px dashed var(--muted, #444); padding-top: 8px; margin-top: 8px;">
+          <label class="engine-toggle">
+            <input type="checkbox" id="useFutureMode" data-testid="use-future-mode">
+            <strong>Future Mode</strong>
+          </label>
+          <div class="engine-toggle-hint">Ranks the scanner by the server-side hybrid predictive stack (GARCH(1,1) + Bayesian blend + Cornish-Fisher p_up + jump-diffusion drift + Hurst regime weight). Top-25 get full GARCH; the rest get the fast ATR-tier overlay.</div>
+          <label class="engine-toggle" style="margin-top: 6px;" id="futureHorizonRow">
+            <span style="font-size: 0.85em; opacity: 0.85;">Trading horizon</span>
+          </label>
+          <select id="futureHorizonSelect" data-testid="future-horizon-select" style="width: 100%;">
+            <option value="1h_hold">1-hour hold</option>
+            <option value="5h_hold">5-hour hold</option>
+            <option value="overnight_hold">Overnight (close → next open)</option>
+            <option value="weekend_hold">Weekend (Fri close → Mon open)</option>
+            <option value="short">Short (1-2 day hold)</option>
+            <option value="swing">Swing (3-10 day hold)</option>
+            <option value="long">Long (10+ day hold)</option>
+          </select>
+          <!-- Phase 26.49 — Future Mode filter (All / Bulls / Bears). -->
+          <label class="engine-toggle" style="margin-top: 6px;">
+            <span style="font-size: 0.85em; opacity: 0.85;">Filter</span>
+          </label>
+          <div class="fm-filter-row" data-testid="future-mode-filter-row">
+            <button type="button" class="fm-filter-btn active" data-fm-filter="all" data-testid="fm-filter-all">All</button>
+            <button type="button" class="fm-filter-btn" data-fm-filter="bulls" data-testid="fm-filter-bulls">Bulls</button>
+            <button type="button" class="fm-filter-btn" data-fm-filter="bears" data-testid="fm-filter-bears">Bears</button>
+          </div>
+          <!-- Phase 26.50 — intensity-band preset buckets.  Combines
+               multiplicatively with the direction filter above:
+               e.g. (Bulls × Strong) shows only bullish rows with
+               directional certainty ≥ 55%. -->
+          <label class="engine-toggle" style="margin-top: 6px;">
+            <span style="font-size: 0.8em; opacity: 0.7;">Intensity (min directional certainty)</span>
+          </label>
+          <div class="fm-intensity-row" data-testid="future-mode-intensity-row">
+            <button type="button" class="fm-intensity-btn active" data-fm-intensity="all" data-testid="fm-intensity-all">All</button>
+            <button type="button" class="fm-intensity-btn" data-fm-intensity="moderate" data-testid="fm-intensity-moderate" title="Filter: directional certainty CF > 30%">Moderate</button>
+            <button type="button" class="fm-intensity-btn" data-fm-intensity="strong" data-testid="fm-intensity-strong" title="Filter: directional certainty CF > 55%">Strong</button>
+            <button type="button" class="fm-intensity-btn" data-fm-intensity="max" data-testid="fm-intensity-max" title="Filter: directional certainty CF > 75%">Max</button>
+          </div>
+          <!-- Phase 26.65 — Bull × Bull priority sort.  Floats rows with a
+               Bullish classical Direction AND a Bullish forward F-DIR to
+               the top (priority sort, not a hard filter). -->
+          <label class="engine-toggle" style="margin-top: 6px;">
+            <span style="font-size: 0.8em; opacity: 0.7;">Priority sort</span>
+          </label>
+          <div class="fm-filter-row" data-testid="bull-bull-priority-row">
+            <button type="button" class="fm-filter-btn" id="bullBullPriorityBtn" data-testid="bull-bull-priority-btn" title="Float rows with Bullish Direction AND Bullish F-DIR to the top">▲▲ Bull × Bull → top</button>
+          </div>
+          <!-- Phase 26.68 — 7-timeframe experimental consensus quick-filter. -->
+          <label class="engine-toggle" style="margin-top: 6px;">
+            <span style="font-size: 0.8em; opacity: 0.7;">7-TF consensus filter</span>
+          </label>
+          <div class="fm-filter-row" data-testid="consensus-filter-row">
+            <button type="button" class="fm-filter-btn active" data-consensus-filter="all" data-testid="consensus-filter-all">All</button>
+            <button type="button" class="fm-filter-btn" data-consensus-filter="up6" data-testid="consensus-filter-up6" title="≥6 of 7 timeframes agree Up">≥6 ▲</button>
+            <button type="button" class="fm-filter-btn" data-consensus-filter="up7" data-testid="consensus-filter-up7" title="All 7 timeframes agree Up">7 ▲</button>
+            <button type="button" class="fm-filter-btn" data-consensus-filter="down6" data-testid="consensus-filter-down6" title="≥6 of 7 timeframes agree Down">≥6 ▼</button>
+            <button type="button" class="fm-filter-btn" data-consensus-filter="down7" data-testid="consensus-filter-down7" title="All 7 timeframes agree Down">7 ▼</button>
+          </div>
+          <!-- Phase 26.69 — legend so the 7-TF strip glyphs are self-explanatory. -->
+          <div class="cs-legend" data-testid="consensus-legend" title="The 7-TF leaderboard column shows the experimental composite call for 15m · 1h · 4h · 10h · Overnight · Week · Month. Brighter glyph = higher confidence.">
+            <span class="cs-cell tone-bull">▲</span><span class="cs-legend-txt">Up</span>
+            <span class="cs-cell tone-bear">▼</span><span class="cs-legend-txt">Down</span>
+            <span class="cs-cell tone-neutral">·</span><span class="cs-legend-txt">Flat</span>
+            <span class="cs-legend-sep">·</span><span class="cs-legend-txt">opacity = confidence</span>
+          </div>
+        </div>
+        <!-- Phase 26.49 — Lab Mode (experimental algorithm bundle). -->
+        <div class="engine-toggle-row" style="border-top: 1px dashed var(--muted, #444); padding-top: 8px; margin-top: 8px;">
+          <label class="engine-toggle">
+            <input type="checkbox" id="useLabMode" data-testid="use-lab-mode">
+            <strong>Lab Mode</strong> <span class="lab-mode-badge">experimental</span>
+          </label>
+          <div class="engine-toggle-hint">10 experimental signals (RSV, EGARCH γ, GARCH-M, perm-entropy, ApEn, Mahalanobis, QI, DFA, SSA trend, 2-state Vol HMM). Adds Experimental Signals section to Future Forecast.</div>
+          <label class="engine-toggle" style="margin-top: 6px;">
+            <input type="checkbox" id="blendLabIntoRanking" data-testid="blend-lab-into-ranking">
+            Blend Lab into ranking
+          </label>
+          <div class="engine-toggle-hint">When on, ranking multiplies <code>effective_kelly_rank</code> by the composite <code>lab_rank_multiplier</code> in [0.6, 1.4]. Off by default.</div>
+        </div>
+        <!-- Phase 26.50 — Strategy Tier (10 predictive algos). -->
+        <div class="engine-toggle-row" style="border-top: 1px dashed var(--muted, #444); padding-top: 8px; margin-top: 8px;">
+          <label class="engine-toggle">
+            <input type="checkbox" id="useStrategyMode" data-testid="use-strategy-mode">
+            <strong>Strategy Tier</strong> <span class="strategy-mode-badge">predictive</span>
+          </label>
+          <div class="engine-toggle-hint">10 predictive algorithms a quant would use: VR(5), VR(22), AR(1), MI lag-1, spectral β, Welch dominant cycle, RQA determinism, LZ complexity, EMD IMF1 slope, vol-regime momentum.</div>
+          <label class="engine-toggle" style="margin-top: 6px;">
+            <input type="checkbox" id="blendStrategyIntoRanking" data-testid="blend-strategy-into-ranking">
+            Blend Strategy into ranking
+          </label>
+          <div class="engine-toggle-hint">When on, ranking multiplies <code>effective_kelly_rank</code> by <code>strategy_rank_multiplier</code> in [0.6, 1.4]. Combines multiplicatively with Lab when both blends are on.</div>
+        </div>
+        <!-- Phase 26.60 — Strategy V2 (nonlinear dependence + curvature + lead-lag + multiscale + drawdown memory). -->
+        <div class="engine-toggle-row" style="border-top: 1px dashed var(--muted, #444); padding-top: 8px; margin-top: 8px;">
+          <label class="engine-toggle">
+            <input type="checkbox" id="useStrategyV2Mode" data-testid="use-strategy-v2-mode">
+            <strong>Strategy V2</strong> <span class="strategy-mode-badge">predictive+</span>
+          </label>
+          <div class="engine-toggle-hint">Nonlinear dependence lift, trend curvature, lead-lag influence, multi-scale consistency, drawdown memory. Adds Strategy V2 section to Future Forecast.</div>
+          <label class="engine-toggle" style="margin-top: 6px;">
+            <input type="checkbox" id="blendStrategyV2IntoRanking" data-testid="blend-strategy-v2-into-ranking">
+            Blend Strategy V2 into ranking
+          </label>
+          <div class="engine-toggle-hint">When on, ranking multiplies by <code>strategy_v2_rank_multiplier</code> in [0.6, 1.4].</div>
+        </div>
+        <!-- Phase 26.60 — Regime Risk (MSM drift premium + vol-of-vol + entropy stability). -->
+        <div class="engine-toggle-row" style="border-top: 1px dashed var(--muted, #444); padding-top: 8px; margin-top: 8px;">
+          <label class="engine-toggle">
+            <input type="checkbox" id="useRegimeRiskMode" data-testid="use-regime-risk-mode">
+            <strong>Regime Risk</strong> <span class="lab-mode-badge">regime</span>
+          </label>
+          <div class="engine-toggle-hint">Markov drift premium, vol-of-vol regime probability, entropy regime stability. Shrinks position sizing when regimes are unstable.</div>
+          <label class="engine-toggle" style="margin-top: 6px;">
+            <input type="checkbox" id="blendRegimeRiskIntoRanking" data-testid="blend-regime-risk-into-ranking">
+            Blend Regime Risk into ranking
+          </label>
+          <div class="engine-toggle-hint">When on, ranking multiplies by <code>regime_risk_multiplier</code> in [0.6, 1.4].</div>
+        </div>
+        <!-- Phase 26.60 — ML Overlay (residual edge over linear baseline). -->
+        <div class="engine-toggle-row" style="border-top: 1px dashed var(--muted, #444); padding-top: 8px; margin-top: 8px;">
+          <label class="engine-toggle">
+            <input type="checkbox" id="useMlOverlayMode" data-testid="use-ml-overlay-mode">
+            <strong>ML Overlay</strong> <span class="strategy-mode-badge">ml</span>
+          </label>
+          <div class="engine-toggle-hint">Lightweight in-sample ridge baseline vs saturating nonlinear blend. Surfaces residual ML edge as a controlled multiplier.</div>
+          <label class="engine-toggle" style="margin-top: 6px;">
+            <input type="checkbox" id="blendMlOverlayIntoRanking" data-testid="blend-ml-overlay-into-ranking">
+            Blend ML into ranking
+          </label>
+          <div class="engine-toggle-hint">When on, ranking multiplies by <code>ml_rank_multiplier</code> in [0.8, 1.2] (conservative range — nudge, not override).</div>
+          <label class="engine-toggle" style="margin-top: 6px;">
+            <input type="checkbox" id="blendLiqKellyFactor" data-testid="blend-liq-kelly-factor">
+            Apply Liquidity Kelly Factor
+          </label>
+          <div class="engine-toggle-hint">When on, multiplies by <code>liq_kelly_factor = 0.7 + 0.6·liq_adjusted_signal</code> in [0.7, 1.3].</div>
+        </div>
+        <!-- Phase 26.60 — Advanced Experimental Mode (reality_breaker overlays, DEFAULT OFF). -->
+        <div class="engine-toggle-row" style="border-top: 2px solid var(--reality-breaker-border, #b32a37); padding-top: 8px; margin-top: 12px; background: rgba(179, 42, 55, 0.05); border-radius: 6px; padding: 8px;">
+          <label class="engine-toggle">
+            <input type="checkbox" id="advancedExperimentalMode" data-testid="advanced-experimental-mode">
+            <strong>Advanced Experimental Mode</strong>
+            <span class="rb-badge" style="background:#7c1d28;color:#ffd9dd;padding:1px 6px;border-radius:4px;font-size:.75em;margin-left:4px;letter-spacing:.05em">reality-breaker</span>
+          </label>
+          <div id="advExpWarning" class="engine-toggle-hint hidden" style="color:#ffb4bc;font-weight:500">
+            ⚠ Reality-breaker overlays are EXPERIMENTAL. Outputs are clamped and opt-in. Never use as the sole signal for live trading until paper-trade validated.
+          </div>
+          <div class="engine-toggle-hint">Unlocks the 4 advanced reality-breaker overlays + their composite multiplier. All overlays default OFF — must be turned on individually.</div>
+          <label class="engine-toggle" style="margin-top: 6px;">
+            <input type="checkbox" id="showLocalCausalCone" data-testid="show-local-causal-cone">
+            Local Causal Cone (LCC) <span class="rb-badge" style="background:#7c1d28;color:#ffd9dd;padding:1px 5px;border-radius:4px;font-size:.7em;margin-left:2px">experimental+</span>
+          </label>
+          <label class="engine-toggle" style="margin-top: 4px;">
+            <input type="checkbox" id="showQuantumPathInterference" data-testid="show-quantum-path-interference">
+            Quantum Path Interference (QPII) <span class="rb-badge" style="background:#7c1d28;color:#ffd9dd;padding:1px 5px;border-radius:4px;font-size:.7em;margin-left:2px">experimental+</span>
+          </label>
+          <label class="engine-toggle" style="margin-top: 4px;">
+            <input type="checkbox" id="showLocalLyapunov" data-testid="show-local-lyapunov">
+            Local Lyapunov Exponent (LLVE) <span class="rb-badge" style="background:#7c1d28;color:#ffd9dd;padding:1px 5px;border-radius:4px;font-size:.7em;margin-left:2px">experimental+</span>
+          </label>
+          <label class="engine-toggle" style="margin-top: 4px;">
+            <input type="checkbox" id="showTemporalRenormalization" data-testid="show-temporal-renormalization">
+            Temporal Renormalization Score (TRS) <span class="rb-badge" style="background:#7c1d28;color:#ffd9dd;padding:1px 5px;border-radius:4px;font-size:.7em;margin-left:2px">experimental+</span>
+          </label>
+          <label class="engine-toggle" style="margin-top: 6px;">
+            <input type="checkbox" id="blendRealityBreakerIntoRanking" data-testid="blend-reality-breaker-into-ranking">
+            <strong>Blend Reality-Breaker into ranking</strong>
+          </label>
+          <div class="engine-toggle-hint" style="color:#ffb4bc">When on, multiplies by <code>reality_breaker_multiplier</code> in [0.5, 1.5]. Triple-guarded (master + per-blend + finite value). Never flips direction by itself.</div>
+          <!-- Phase 26.65 — Reality-Breaker overall-rating list filter. -->
+          <label class="engine-toggle" style="margin-top: 8px;">
+            <span style="font-size: 0.8em; opacity: 0.7;">Reality-Breaker × rating filter</span>
+          </label>
+          <div class="fm-filter-row" data-testid="rb-filter-row">
+            <button type="button" class="fm-filter-btn active" data-rb-filter="all" data-testid="rb-filter-all">All</button>
+            <button type="button" class="fm-filter-btn" data-rb-filter="endorse" data-testid="rb-filter-endorse" title="reality_breaker_multiplier &gt; 1.03 — overlays reinforce">Endorse</button>
+            <button type="button" class="fm-filter-btn" data-rb-filter="neutral" data-testid="rb-filter-neutral" title="0.97 ≤ multiplier ≤ 1.03">Neutral</button>
+            <button type="button" class="fm-filter-btn" data-rb-filter="caution" data-testid="rb-filter-caution" title="reality_breaker_multiplier &lt; 0.97 — overlays push back">Caution</button>
+          </div>
+          <!-- Phase 26.61c — Unlocked mode (NO GUARDRAILS). -->
+          <label class="engine-toggle" style="margin-top: 10px;border-top:1px dashed #7c1d28;padding-top:8px">
+            <input type="checkbox" id="advancedExperimentalUnlocked" data-testid="advanced-experimental-unlocked">
+            <strong>Unlocked Experimental Mode</strong>
+            <span class="rb-badge" style="background:#7c1d28;color:#ffd9dd;padding:1px 6px;border-radius:4px;font-size:.7em;margin-left:4px;letter-spacing:.05em">NO GUARDRAILS</span>
+          </label>
+          <div class="engine-toggle-hint" style="color:#fca5a5">
+            ⚠ Removes the [0.5, 1.5] clamp on <code>reality_breaker_multiplier</code> (multiplier is SQUARED), removes the 5% deadband on direction, and allows reality-breaker overlays to FLIP a Bullish row to Bearish (and vice versa) when the composite multiplier crosses 1.0. Requires Advanced Experimental Mode. Default OFF.
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-block">
+        <label for="presetFilter">Preset filter</label>
+        <select id="presetFilter">
+          <option value="">All stocks</option>
+          <option value="leaders">Leaders</option>
+          <option value="bullish">Bullish bias</option>
+          <option value="all">All ranked</option>
+          <option value="value-safe">Stable / quality</option>
+          <option value="degraded-view">Fallback monitor</option>
+          <option value="low-exit-risk">Low exit risk</option>
+          <option value="reversal-watch">Reversal watch</option>
+          <option value="institutional-bullish">Institutional bullish</option>
+          <option value="options-bullish">Options bullish</option>
+          <option value="volume-confirmed">Volume confirmed</option>
+          <option value="pin-risk">Pin risk monitor</option>
+          <option value="squeeze-watch">Squeeze watch</option>
+          <option value="volume-storm">Volume storm</option>
+          <option value="bearish-pressure">Bearish pressure</option>
+          <option value="expiration-pin">Expiration pin</option>
+        </select>
+        <div class="preset-chips" id="presetChips">
+          <button type="button" class="preset-chip" data-preset="leaders">Leaders</button>
+          <button type="button" class="preset-chip" data-preset="bullish">Bullish</button>
+          <button type="button" class="preset-chip" data-preset="low-exit-risk">Low exit risk</button>
+          <button type="button" class="preset-chip" data-preset="reversal-watch">Reversal watch</button>
+          <button type="button" class="preset-chip" data-preset="institutional-bullish">Inst. bullish</button>
+          <button type="button" class="preset-chip" data-preset="options-bullish">Options bullish</button>
+          <button type="button" class="preset-chip preset-chip-context" data-preset="squeeze-watch" data-testid="preset-squeeze-watch" title="High short-selling pressure + high predicted volume intensity + near-term options expiration (≤14d). One-click short-squeeze scan.">⚡ Squeeze watch</button>
+          <button type="button" class="preset-chip preset-chip-context" data-preset="volume-storm" data-testid="preset-volume-storm" title="Predicted volume intensity in high/extreme bucket — event-driven activity, direction agnostic.">☈ Volume storm</button>
+          <button type="button" class="preset-chip preset-chip-context" data-preset="bearish-pressure" data-testid="preset-bearish-pressure" title="Elevated short-selling pressure with a bearish label — persistent downside conviction.">▼ Bearish pressure</button>
+          <button type="button" class="preset-chip preset-chip-context" data-preset="expiration-pin" data-testid="preset-expiration-pin" title="Rows inside a high-sensitivity options expiration window (≤7d) with pin-risk elevated — pinning / hedging flow watch.">◈ Expiration pin</button>
+        </div>
+      </div>
+
+      <!-- Phase 26.66 — Toggleable universe groups.  Each toggle activates a
+           bounded slice (exchange shard / crypto set) so the scanner isn't
+           bogged down by the whole listing at once.  Default: leveraged ETFs
+           ON, everything else OFF (in the leveraged build). -->
+      <div class="sidebar-block" data-testid="universes-block">
+        <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" id="universesHeader">
+          <span>Scan universes</span>
+          <span id="universesSummary" style="font-size:.72em;opacity:.7;font-weight:400">…</span>
+        </label>
+        <div class="engine-toggle-hint">Activate bounded slices to scan. Defaults to leveraged ETFs only; turn exchange shards or crypto sets on as needed. Toggling clears &amp; re-sweeps that market.</div>
+        <div id="universesPanel" data-testid="universes-panel" class="universes-panel"></div>
+      </div>
+
+      <div class="sidebar-block filter-grid">
+        <div>
+          <label for="directionFilter">Direction</label>
+          <select id="directionFilter">
+            <option value="">Any</option>
+            <option value="Bullish">Bullish</option>
+            <option value="Neutral">Neutral</option>
+            <option value="Bearish">Bearish</option>
+          </select>
+        </div>
+        <div>
+          <label for="tierFilter">Tier</label>
+          <select id="tierFilter">
+            <option value="">Any</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="sidebar-block">
+        <label for="minScoreFilter">Minimum score</label>
+        <input id="minScoreFilter" type="range" min="0" max="100" step="5" value="0">
+        <div class="range-meta"><span>0</span><strong id="minScoreValue">0</strong><span>100</span></div>
+      </div>
+
+      <details class="sidebar-block extended-filters" open>
+        <summary>Extended factor filters</summary>
+        <div class="sub-block">
+          <label for="minInstitutionalConfluenceFilter">Min institutional confluence</label>
+          <input id="minInstitutionalConfluenceFilter" type="range" min="0" max="100" step="5" value="0">
+          <div class="range-meta"><span>0</span><strong id="minInstitutionalConfluenceValue">0</strong><span>100</span></div>
+        </div>
+        <div class="sub-block">
+          <label for="minOptionsPositioningFilter">Min options positioning</label>
+          <input id="minOptionsPositioningFilter" type="range" min="0" max="100" step="5" value="0">
+          <div class="range-meta"><span>0</span><strong id="minOptionsPositioningValue">0</strong><span>100</span></div>
+        </div>
+        <div class="sub-block filter-grid">
+          <div>
+            <label for="institutionalBiasFilter">Inst. bias</label>
+            <select id="institutionalBiasFilter">
+              <option value="">Any</option>
+              <option value="STRONG_BULL">Strong bull</option>
+              <option value="BULLISH">Bullish</option>
+              <option value="bullish">Bullish (alt)</option>
+              <option value="NEUTRAL">Neutral</option>
+              <option value="BEARISH">Bearish</option>
+              <option value="STRONG_BEAR">Strong bear</option>
+            </select>
+          </div>
+          <div>
+            <label for="optionsBiasFilter">Options bias</label>
+            <select id="optionsBiasFilter">
+              <option value="">Any</option>
+              <option value="bullish">Bullish</option>
+              <option value="neutral">Neutral</option>
+              <option value="bearish">Bearish</option>
+            </select>
+          </div>
+        </div>
+        <div class="sub-block filter-grid">
+          <div>
+            <label for="iobStateFilter">Order block state</label>
+            <select id="iobStateFilter">
+              <option value="">Any</option>
+              <option value="fresh">Fresh</option>
+              <option value="holding">Holding</option>
+              <option value="tested">Tested</option>
+              <option value="stale">Stale</option>
+            </select>
+          </div>
+          <div>
+            <label for="darkPoolAttractionFilter">Dark pool attraction</label>
+            <select id="darkPoolAttractionFilter">
+              <option value="">Any</option>
+              <option value="attracting">Attracting</option>
+              <option value="repelling">Repelling</option>
+              <option value="neutral">Neutral</option>
+            </select>
+          </div>
+        </div>
+        <div class="sub-block">
+          <label for="optionsGammaFilter">Options gamma level</label>
+          <select id="optionsGammaFilter">
+            <option value="">Any</option>
+            <option value="high_call_pressure">High call pressure</option>
+            <option value="mild_call_pressure">Mild call pressure</option>
+            <option value="moderate">Moderate</option>
+            <option value="mild_put_pressure">Mild put pressure</option>
+            <option value="high_put_pressure">High put pressure</option>
+          </select>
+        </div>
+        <div class="sub-block filter-grid">
+          <div>
+            <label for="reactionClassificationFilter">Reaction outcome</label>
+            <select id="reactionClassificationFilter">
+              <option value="">Any</option>
+              <option value="PROPEL">Propel</option>
+              <option value="REJECT">Reject</option>
+              <option value="CHOP">Chop</option>
+              <option value="NEUTRAL">Neutral</option>
+            </select>
+          </div>
+          <div>
+            <label for="dominantZoneTierFilter">Dominant zone tier</label>
+            <select id="dominantZoneTierFilter">
+              <option value="">Any</option>
+              <option value="MAJOR">Major</option>
+              <option value="INTERMEDIATE">Intermediate</option>
+              <option value="MINOR">Minor</option>
+            </select>
+          </div>
+        </div>
+        <div class="sub-block filter-grid">
+          <div>
+            <label for="volumeSentimentBiasFilter">Volume sentiment bias</label>
+            <select id="volumeSentimentBiasFilter">
+              <option value="">Any</option>
+              <option value="bullish">Bullish</option>
+              <option value="neutral">Neutral</option>
+              <option value="bearish">Bearish</option>
+            </select>
+          </div>
+          <div>
+            <label for="effortVsResultFilter">Effort vs result</label>
+            <select id="effortVsResultFilter">
+              <option value="">Any</option>
+              <option value="absorbing">Absorbing</option>
+              <option value="capitulating">Capitulating</option>
+              <option value="efficient">Efficient</option>
+              <option value="neutral">Neutral</option>
+            </select>
+          </div>
+        </div>
+        <div class="sub-block">
+          <label for="minVolumeSentimentConvictionFilter">Min volume sentiment conviction</label>
+          <input id="minVolumeSentimentConvictionFilter" type="range" min="0" max="100" step="5" value="0">
+          <div class="range-meta"><span>0</span><strong id="minVolumeSentimentConvictionValue">0</strong><span>100</span></div>
+        </div>
+        <div class="sub-block context-filters" data-testid="context-filter-block">
+          <div class="eyebrow">Volume &amp; short-pressure scanning</div>
+          <label class="toggle-row" title="Dedicated pre-filter sort mode: rows with the strongest predicted volume intensity rise to the top BEFORE other filters refine the set.">
+            <input id="pviPriorityToggle" type="checkbox" data-testid="pvi-priority-toggle"> Predicted-volume-first ordering
+          </label>
+          <label for="minPviFilter">Min predicted volume intensity</label>
+          <input id="minPviFilter" type="range" min="0" max="100" step="5" value="0" data-testid="min-pvi-filter">
+          <div class="range-meta"><span>0</span><strong id="minPviValue">0</strong><span>100</span></div>
+          <div class="filter-grid">
+            <div>
+              <label for="pviBucketFilter">Intensity bucket</label>
+              <select id="pviBucketFilter" data-testid="pvi-bucket-filter">
+                <option value="">Any</option>
+                <option value="extreme">Extreme</option>
+                <option value="high,extreme">High +</option>
+                <option value="high">High</option>
+                <option value="moderate">Moderate</option>
+                <option value="low">Low</option>
+              </select>
+            </div>
+            <div>
+              <label for="shortPressureLabelFilter">Short pressure label</label>
+              <select id="shortPressureLabelFilter" data-testid="short-pressure-label-filter">
+                <option value="">Any</option>
+                <option value="squeeze_risk_bullish">Squeeze risk (bullish)</option>
+                <option value="squeeze_risk_bullish,elevated_squeeze_watch">Squeeze watch +</option>
+                <option value="bearish_pressure">Bearish pressure</option>
+                <option value="elevated">Elevated</option>
+                <option value="neutral">Neutral</option>
+                <option value="low">Low</option>
+              </select>
+            </div>
+          </div>
+          <label for="minShortPressureFilter">Min short selling pressure</label>
+          <input id="minShortPressureFilter" type="range" min="0" max="100" step="5" value="0" data-testid="min-short-pressure-filter">
+          <div class="range-meta"><span>0</span><strong id="minShortPressureValue">0</strong><span>100</span></div>
+          <div class="filter-grid">
+            <div>
+              <label for="maxDteFilter">Max days to options expiration</label>
+              <input id="maxDteFilter" type="number" min="0" max="365" placeholder="any" data-testid="max-dte-filter">
+            </div>
+            <div>
+              <label class="toggle-row" title="Only rows flagged inside a high-sensitivity expiration window">
+                <input id="expirationRiskOnly" type="checkbox" data-testid="expiration-risk-only"> Expiration-risk only
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="sub-block">
+          <label for="sortByFilter">Sort by</label>
+          <select id="sortByFilter">
+            <option value="">Final score (default)</option>
+            <option value="predicted_volume_intensity">Predicted volume intensity</option>
+            <option value="short_selling_pressure">Short selling pressure</option>
+            <option value="days_to_options_expiration">Nearest options expiration</option>
+            <option value="institutional_confluence">Institutional confluence</option>
+            <option value="options_positioning">Options positioning</option>
+            <option value="trend_volume_delta">Trend / volume delta</option>
+            <option value="institutional_order_block">Order block strength</option>
+            <option value="dark_pool_proxy">Dark pool proxy</option>
+            <option value="exit_risk">Exit risk</option>
+            <option value="volume_sentiment_directional">Volume sentiment (directional)</option>
+            <option value="volume_sentiment_conviction">Volume sentiment (conviction)</option>
+            <option value="reaction_propel_probability">Reaction: propel probability</option>
+            <option value="reaction_reject_probability">Reaction: reject probability</option>
+            <option value="dominant_zone_evidence">Reaction: zone evidence</option>
+            <option value="iob_volume_alignment_score">IOB volume alignment</option>
+            <option value="options_pressure_score_adjusted">Options pressure (vol-adjusted)</option>
+          </select>
+        </div>
+      </details>
+
+      <div class="sidebar-block universe-add">
+        <label for="addSymbolInput">Add symbol to universe</label>
+        <div class="add-row">
+          <input id="addSymbolInput" type="text" placeholder="TSLA, NVDA, ...">
+          <button id="addSymbolButton" type="button">Add</button>
+        </div>
+        <div id="addSymbolStatus" class="add-status"></div>
+        <div id="userAddedList" class="user-added-list"></div>
+      </div>
+
+      <div class="sidebar-block sidebar-actions">
+        <button id="viewMainButton" type="button" class="secondary-button is-active">Stock market</button>
+        <button id="viewCryptoButton" type="button" class="secondary-button">Crypto market</button>
+        <button id="viewTrackedButton" type="button" class="secondary-button">Tracked top 25</button>
+        <button id="applyFilters" type="button">Apply filters</button>
+        <button id="clearFilters" type="button" class="secondary-button">Clear filters</button>
+        <button id="manualRefresh" type="button">Refresh now</button>
+        <div id="pviModeBadge" class="pvi-mode-badge" style="display:none" data-testid="pvi-mode-badge">&#9889; PVI-first ordering active</div>
+      </div>
+
+      <!-- Phase 26.49 — system reset controls.  Soft = in-memory only,
+           Hard = also wipes shard caches on disk.  Both kick a fresh
+           scan iteration immediately so cached snapshot data continues
+           to serve the UI while live providers repopulate. -->
+      <div class="sidebar-block reset-controls">
+        <div class="eyebrow">System reset</div>
+        <button id="softResetBtn" type="button" class="reset-btn reset-btn-soft" data-testid="soft-reset-btn">Soft reset (in-memory)</button>
+        <button id="hardResetBtn" type="button" class="reset-btn reset-btn-hard" data-testid="hard-reset-btn">Hard reset (wipe disk caches)</button>
+        <div class="reset-hint">Cached data keeps serving the dashboard while a fresh scan repopulates. Use Soft first; Hard only if a stuck disk cache is suspected.</div>
+      </div>
+
+      <!-- Phase 26.50 — downloadable metric guidebook. -->
+      <div class="sidebar-block guidebook-block">
+        <div class="eyebrow">Guidebook</div>
+        <a id="guidebookPdfBtn" class="guidebook-btn" href="/api/guidebook/pdf" download data-testid="guidebook-pdf-btn">
+          <span class="guidebook-btn-title">Download PDF guidebook</span>
+          <span class="guidebook-btn-sub">Every metric · how they interact · tips &amp; tricks</span>
+        </a>
+      </div>
+
+      <div class="sidebar-block tracker-card">
+        <div class="eyebrow">Persistence tracker</div>
+        <div id="trackerSummary" class="tracker-summary">No survivors tracked yet.</div>
+        <div id="trackerMeta" class="tracker-meta">A stock is tracked after it appears in the live top 25 on at least two scan passes.</div>
+        <div id="activeScanMeta" class="tracker-meta">Active scan pool: waiting for first top-10-page snapshot.</div>
+      </div>
+
+      <!-- Phase 15: User-supplied API keys for unlocking optional providers -->
+      <details class="sidebar-block api-keys-panel" id="apiKeysPanel">
+        <summary style="cursor:pointer;font-weight:600;font-size:.82rem;color:var(--text);padding:.2rem 0">Provider API keys</summary>
+        <h3 style="margin-top:.6rem">Personal keys (stored locally)</h3>
+        <p class="tracker-meta" style="margin:.25rem 0 .6rem">Optional. Add a key to unlock that provider in the live-quote cascade. Keys are saved to <code>data/user_api_keys.json</code> on this machine and never shared.</p>
+        <div id="apiKeysList">
+          <div class="api-key-row">
+            <label for="apiKeyFinnhub" title="60 req/min free tier — finnhub.io/dashboard">Finnhub</label>
+            <input id="apiKeyFinnhub" type="password" placeholder="paste key…" data-provider="finnhub" data-testid="api-key-input-finnhub" />
+            <button type="button" data-action="save-api-key" data-provider="finnhub" data-testid="api-key-save-finnhub">Save</button>
+            <span class="api-key-status" id="apiKeyStatusFinnhub" data-testid="api-key-status-finnhub">not set</span>
+          </div>
+          <div class="api-key-row">
+            <label for="apiKeyPolygon" title="5 req/min free tier — polygon.io">Polygon</label>
+            <input id="apiKeyPolygon" type="password" placeholder="paste key…" data-provider="polygon" data-testid="api-key-input-polygon" />
+            <button type="button" data-action="save-api-key" data-provider="polygon" data-testid="api-key-save-polygon">Save</button>
+            <span class="api-key-status" id="apiKeyStatusPolygon" data-testid="api-key-status-polygon">not set</span>
+          </div>
+          <div class="api-key-row">
+            <label for="apiKeyTwelveData" title="800 req/day free tier — twelvedata.com">Twelve Data</label>
+            <input id="apiKeyTwelveData" type="password" placeholder="paste key…" data-provider="twelvedata" data-testid="api-key-input-twelvedata" />
+            <button type="button" data-action="save-api-key" data-provider="twelvedata" data-testid="api-key-save-twelvedata">Save</button>
+            <span class="api-key-status" id="apiKeyStatusTwelveData" data-testid="api-key-status-twelvedata">not set</span>
+          </div>
+          <div class="api-key-row">
+            <label for="apiKeyAlphaVantage" title="500 req/day free tier — alphavantage.co">AlphaVantage</label>
+            <input id="apiKeyAlphaVantage" type="password" placeholder="paste key…" data-provider="alphavantage" data-testid="api-key-input-alphavantage" />
+            <button type="button" data-action="save-api-key" data-provider="alphavantage" data-testid="api-key-save-alphavantage">Save</button>
+            <span class="api-key-status" id="apiKeyStatusAlphaVantage" data-testid="api-key-status-alphavantage">not set</span>
+          </div>
+        </div>
+        <p class="tracker-meta" style="margin-top:.5rem;font-size:.72rem">Currently active: Finnhub. Other slots are reserved for future cascade layers.</p>
+      </details>
+    </aside>
+
+    <header class="header">
+      <div class="header-top">
+        <div>
+          <h1 id="viewTitle">Market refinement dashboard</h1>
+          <p id="statusLine" class="status-line">Starting</p>
+        </div>
+        <div class="header-meta">
+          <a href="/regulatory.html" target="_blank" rel="noopener" class="status-chip header-link" data-testid="open-regulatory-monitor" title="SEC insider filings + USAspending awards. Opens in a new tab.">⚑ Regulatory monitor</a>
+          <a href="/predictions.html" target="_blank" rel="noopener" class="status-chip header-link" data-testid="open-prediction-tracker" title="Saved 10-day forward predictions with auto-evaluated hit/miss accuracy. Opens in a new tab.">⊹ Prediction tracker</a>
+          <a href="/metrics-hub.html" target="_blank" rel="noopener" class="status-chip header-link" data-testid="open-metrics-hub" title="Metrics Hub — algorithm catalog, data-flow health, weight tuner. Opens in a new tab.">⌬ Metrics hub</a>
+          <a href="/frontend/shared-analyses.html" target="_blank" rel="noopener" class="status-chip header-link" data-testid="open-shared-analyses" title="Shared Analyses gallery — every symbol shared out to social platforms, with metric snapshots. Also the source-download link. Opens in a new tab.">⇗ Shared analyses</a>
+          <a href="/cross-market-squeeze.html" target="_blank" rel="noopener" class="status-chip header-link" data-testid="open-cross-market-radar" title="Cross-Market Squeeze Radar — scans stocks + crypto simultaneously, cross-ranks by SSP × PVI × cross-market-correlation.">◎ Cross-market radar</a>
+          <a href="/providers.html" target="_blank" rel="noopener" id="providerBadge" class="status-chip header-link" data-testid="open-provider-status" title="Live provider health, success rates, and API-key unlock status. Opens in a new tab.">Provider unknown</a>
+          <span id="batchBadge" class="status-chip">Batch 0</span>
+        </div>
+      </div>
+      <div class="metrics-grid" id="metricsGrid">
+        <div class="metric-card" data-card="scan">
+          <div class="metric-label">Scan progress</div>
+          <div class="metric-value" id="mScanProgress">&mdash;</div>
+          <div class="metric-sub" id="mScanSub">Waiting for first batch</div>
+        </div>
+        <div class="metric-card" data-card="universe">
+          <div class="metric-label">Universe</div>
+          <div class="metric-value" id="mUniverseVisible">&mdash;</div>
+          <div class="metric-sub" id="mUniverseSub">visible / normalized</div>
+        </div>
+        <div class="metric-card" data-card="pool">
+          <div class="metric-label">Active pool &amp; tracked</div>
+          <div class="metric-value" id="mPool">&mdash;</div>
+          <div class="metric-sub" id="mPoolSub">tracked top-25 leaders</div>
+        </div>
+        <div class="metric-card" data-card="reactions">
+          <div class="metric-label">Reaction clustering</div>
+          <div class="metric-value" id="mReactions">&mdash;</div>
+          <div class="metric-sub metric-mini-bars" id="mReactionsSub">no zones classified yet</div>
+        </div>
+        <div class="metric-card" data-card="providers">
+          <div class="metric-label">Quote providers</div>
+          <div class="metric-value" id="mProvidersHead">&mdash;</div>
+          <div class="metric-sub" id="mProvidersSub">first batch pending</div>
+        </div>
+        <div class="metric-card" data-card="options">
+          <div class="metric-label">Options chain</div>
+          <div class="metric-value" id="mOptions">&mdash;</div>
+          <div class="metric-sub" id="mOptionsSub">no requests yet</div>
+        </div>
+        <div class="metric-card" data-card="history">
+          <div class="metric-label">Daily history</div>
+          <div class="metric-value" id="mHistory">&mdash;</div>
+          <div class="metric-sub" id="mHistorySub">cache warming</div>
+        </div>
+        <div class="metric-card" data-card="coverage">
+          <div class="metric-label">Factor coverage</div>
+          <div class="metric-value" id="mCoverage">&mdash;</div>
+          <div class="metric-sub" id="mCoverageSub">rows scored</div>
+        </div>
+      </div>
+    </header>
+
+    <main id="main" class="main">
+      <section class="panel results-panel">
+        <details class="panel-head-collapse" open>
+          <summary class="panel-head-summary">
+            <span class="panel-title">Ranked results</span>
+            <span id="resultsMeta" class="panel-meta">Waiting for data</span>
+            <div class="pagination-bar compact">
+              <button id="prevPage" type="button" class="secondary-button pager-btn">&#x2039;</button>
+              <span id="pageBadge" class="pager-badge">1 / 1</span>
+              <div id="pageNumbers" class="page-numbers"></div>
+              <button id="nextPage" type="button" class="secondary-button pager-btn">&#x203a;</button>
+            </div>
+          </summary>
+        </details>
+        <div class="table-wrap">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th class="col-symbol">Symbol</th>
+                <th class="col-name">Name</th>
+                <th class="col-score" title="Composite score">Score</th>
+                <th class="col-tier">Tier</th>
+                <th class="col-dir">Direction</th>
+                <th class="col-pill" title="Institutional confluence">Inst</th>
+                <th class="col-pill" title="Options positioning">Opts</th>
+                <th class="col-pill" title="Dark pool proxy">DP</th>
+                <th class="col-src">Source</th>
+                <th class="col-fresh">Freshness</th>
+                <th class="col-pass" id="passHeader">Passes</th>
+                <th class="col-pill col-pvi" title="Predicted volume intensity — forward-looking likelihood of an upcoming high-volume event (0-100). '!' = event flagged.">PVI</th>
+                <th class="col-pill col-ssp" title="Short selling pressure (0-100). ▲ = squeeze-risk bullish, ▼ = bearish pressure dominant.">Short</th>
+                <th class="col-exp" title="Days to the nearest options expiration. ⚡ = high-sensitivity expiration window (pinning/hedging risk).">Exp</th>
+                <!-- Phase 26.47 — Future Mode columns.  When Future
+                     Mode is ON, the per-row forward_metrics block
+                     populates these cells AND the table sorts by
+                     effective_kelly_rank_abs.  When OFF, only the
+                     headers remain visible (cells empty) so the
+                     user can see the feature is available. -->
+                <th class="col-fm fm-dir" title="Future-mode direction (Cornish-Fisher adjusted P(up))">F-Dir</th>
+                <th class="col-fm fm-pup" title="Future-mode CF-adjusted probability of upside">F-P(up)</th>
+                <th class="col-fm fm-pupctx" title="Context-adjusted probability of upside — applies short-selling pressure + volume-intensity + expiration-proximity overlay to F-P(up). Arrow shows Δ vs base.">F-P(ctx)</th>
+                <th class="col-fm fm-drift" title="Bayesian + jump drift over selected horizon (%)">F-Drift</th>
+                <th class="col-fm fm-kelly" title="Effective Kelly rank: drift × √precision × certainty × regime">F-Kelly</th>
+                <th class="col-fm fm-regime" title="Hurst regime classification">F-Regime</th>
+                <th class="col-fm fm-var" title="95% VaR — magnitude of worst expected loss at 95% confidence">F-VaR</th>
+                <!-- Phase 26.61c — Per-blend multiplier columns.  Each
+                     column is HIDDEN by default and shown via JS only
+                     when the matching blend toggle is active.  This
+                     gives users immediate visual feedback that the
+                     toggle is taking effect.  The class `is-hidden` is
+                     applied via JS on every renderResults() call. -->
+                <th class="col-fm fm-blend fm-lab"      data-blend="lab"          title="Lab Mode rank multiplier (active blend)">Lab×</th>
+                <th class="col-fm fm-blend fm-strategy" data-blend="strategy"     title="Strategy Tier rank multiplier (active blend)">Strat×</th>
+                <th class="col-fm fm-blend fm-sv2"      data-blend="strategy_v2"  title="Strategy V2 rank multiplier (active blend)">SV2×</th>
+                <th class="col-fm fm-blend fm-rr"       data-blend="regime_risk"  title="Regime Risk rank multiplier (active blend)">Reg×</th>
+                <th class="col-fm fm-blend fm-liq"      data-blend="liq_kelly"    title="Liquidity Kelly factor (active blend)">Liq×</th>
+                <th class="col-fm fm-blend fm-ml"       data-blend="ml"           title="ML overlay rank multiplier (active blend)">ML×</th>
+                <th class="col-fm fm-blend fm-rb"       data-blend="reality_breaker" title="Reality-Breaker multiplier (Advanced Experimental Mode + blend)">RB×</th>
+                <th class="col-fm col-consensus" id="consensusSortHeader" data-testid="consensus-sort-header" style="cursor:pointer" title="Experimental 7-timeframe consensus: 15m · 1h · 4h · 10h · Overnight · Week · Month (▲ up / ▼ down). Opacity = confidence. Click to sort by net consensus.">7-TF<span id="consensusSortIndicator" class="cs-sort-ind"></span></th>
+                <th class="col-actions" title="Details — run the future forecast for this row (short pressure / volume intensity / expiration aware)">Details</th>
+              </tr>
+            </thead>
+            <tbody id="resultsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel detail-panel">
+        <div class="panel-head">
+          <div>
+            <h2>Detail</h2>
+            <p id="detailMeta">No symbol selected</p>
+          </div>
+        </div>
+        <div id="detailBody">Choose a row or search result.</div>
+      </section>
+    </main>
+  </div>
+  <!-- Phase 26.49 — confirmation modal for Soft / Hard reset. -->
+  <div id="resetConfirmModal" class="reset-modal" hidden role="dialog" aria-modal="true" data-testid="reset-confirm-modal">
+    <div class="reset-modal-card">
+      <h2 id="resetModalTitle">Confirm reset</h2>
+      <p id="resetModalBody">This will reset all in-memory state. Cached data continues to serve the dashboard while a fresh scan repopulates. Continue?</p>
+      <div class="reset-modal-actions">
+        <button type="button" id="resetModalCancel" class="reset-btn" data-testid="reset-modal-cancel">Cancel</button>
+        <button type="button" id="resetModalConfirm" class="reset-btn reset-btn-hard" data-testid="reset-modal-confirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+  <!-- Phase 26.49 — transient banner after reset (auto-fades after 8s). -->
+  <div id="resetBanner" class="reset-banner" hidden data-testid="reset-banner"></div>
+
+  <script src="/frontend/state.js" defer></script>
+  <script src="/frontend/app.js" defer></script>
+  <script src="/frontend/help.js" defer></script>
+</body>
+</html>

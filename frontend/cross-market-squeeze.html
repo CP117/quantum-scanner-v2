@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Cross-Market Squeeze Radar — Quantum Market Scanner</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/frontend/styles.css">
+  <style>
+    body.cmr{background:#0d1117;color:#e6edf3;margin:0;font-family:'Satoshi','Segoe UI',system-ui,sans-serif;min-height:100vh;overflow-x:hidden}
+    .cmr-header{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding:32px 40px 20px;border-bottom:1px solid rgba(255,255,255,.08);flex-wrap:wrap}
+    .cmr-header h1{margin:0;font-size:clamp(1.2rem,2.4vw,1.7rem);font-weight:700;letter-spacing:-.01em;background:linear-gradient(90deg,#5eead4 0%,#f0b3bd 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .cmr-sub{color:#c8d0dd;font-size:.85rem;margin-top:6px;max-width:640px;line-height:1.5}
+    .cmr-nav{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .cmr-nav a,.cmr-nav button{display:inline-block;color:#e6edf3;text-decoration:none;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);padding:8px 14px;border-radius:8px;font-size:.78rem;letter-spacing:.02em;font-weight:500;cursor:pointer}
+    .cmr-nav a:hover,.cmr-nav button:hover{background:rgba(94,234,212,.12);border-color:rgba(94,234,212,.4);color:#dffcf5}
+    .cmr-toolbar{display:flex;align-items:center;justify-content:space-between;padding:16px 40px;font-size:.72rem;color:#c8d0dd;flex-wrap:wrap;gap:12px}
+    .cmr-meta-chip{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);padding:5px 10px;border-radius:100px;letter-spacing:.05em}
+    .cmr-meta-chip strong{color:#5eead4;font-weight:700}
+    .cmr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:20px;padding:12px clamp(16px,3vw,40px) 60px}
+    .cmr-col{background:#141a24;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;min-width:0}
+    .cmr-col.stocks{border-color:rgba(94,234,212,.28)}
+    .cmr-col.crypto{border-color:rgba(240,179,189,.28)}
+    .cmr-col-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.08);flex-wrap:wrap}
+    .cmr-col-title{font-size:1.05rem;font-weight:700;letter-spacing:-.01em}
+    .cmr-col.stocks .cmr-col-title{color:#a8f0e2}
+    .cmr-col.crypto .cmr-col-title{color:#f0b3bd}
+    .cmr-col-driver{font-size:.62rem;color:rgba(255,255,255,.4);letter-spacing:.08em;text-transform:uppercase}
+    .cmr-row{display:grid;grid-template-columns:1.7rem 3.4rem minmax(0,1fr) auto;gap:10px;padding:10px 8px;border-radius:8px;align-items:center;transition:background .12s;min-width:0}
+    .cmr-row:hover{background:rgba(94,234,212,.05)}
+    .cmr-row+.cmr-row{border-top:1px dashed rgba(255,255,255,.05)}
+    .cmr-rank{font-size:.68rem;color:rgba(255,255,255,.35);font-variant-numeric:tabular-nums;text-align:center;font-weight:600}
+    .cmr-symbol{font-size:.95rem;font-weight:700;letter-spacing:-.005em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+    .cmr-symbol a{color:#e6edf3;text-decoration:none}
+    .cmr-symbol a:hover{color:#5eead4}
+    .cmr-meta{display:flex;flex-direction:column;gap:2px;min-width:0}
+    .cmr-meta-line{display:flex;gap:8px;font-size:.66rem;color:#c8d0dd;letter-spacing:.02em;flex-wrap:wrap}
+    .cmr-meta-line strong{color:#e6edf3;font-weight:600}
+    .cmr-tag{display:inline-block;padding:1px 6px;border-radius:100px;font-size:.6rem;letter-spacing:.05em}
+    .cmr-tag.up{background:rgba(94,193,154,.14);color:#7ce0b3;border:1px solid rgba(94,193,154,.4)}
+    .cmr-tag.down{background:rgba(230,120,138,.14);color:#f0b3bd;border:1px solid rgba(230,120,138,.4)}
+    .cmr-tag.neutral{background:rgba(255,255,255,.04);color:#8b95a6;border:1px solid rgba(255,255,255,.1)}
+    .cmr-conv{display:flex;flex-direction:column;align-items:flex-end;gap:2px;min-width:76px}
+    .cmr-conv-val{font-size:1.1rem;font-weight:700;color:#5eead4;font-variant-numeric:tabular-nums;line-height:1}
+    .cmr-col.crypto .cmr-conv-val{color:#f0b3bd}
+    .cmr-conv-bar{width:76px;height:4px;background:rgba(255,255,255,.06);border-radius:100px;overflow:hidden}
+    .cmr-conv-bar-fill{height:100%;background:linear-gradient(90deg,#5eead4 0%,#f0b3bd 100%);border-radius:100px}
+    .cmr-empty{padding:60px 20px;text-align:center;color:#8b95a6;font-size:.85rem}
+    .cmr-method{background:rgba(94,234,212,.06);border:1px solid rgba(94,234,212,.2);border-radius:12px;padding:16px 20px;margin:0 clamp(16px,3vw,40px) 20px;font-size:.75rem;color:#c8d0dd;line-height:1.55}
+    .cmr-method strong{color:#5eead4}
+    .cmr-method code{background:rgba(0,0,0,.3);padding:2px 6px;border-radius:4px;font-size:.72rem;word-break:break-word}
+    .cmr-combined{background:linear-gradient(180deg,rgba(240,179,189,.08),rgba(94,234,212,.06));border:1px solid rgba(94,234,212,.28);border-radius:14px;padding:20px 22px;margin:0 clamp(16px,3vw,40px) 20px;display:flex;flex-direction:column;gap:12px}
+    .cmr-combined h2{margin:0;font-size:1rem;font-weight:700;background:linear-gradient(90deg,#5eead4,#f0b3bd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .cmr-combined-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));gap:8px}
+    .cmr-combined-item{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.06);border-radius:8px;font-size:.75rem;gap:8px;min-width:0}
+    .cmr-combined-item span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+    .cmr-combined-item strong{color:#e6edf3;font-weight:700}
+    .cmr-combined-item small{color:#5eead4;font-weight:600;flex:0 0 auto}
+    @media (max-width:640px){
+      .cmr-header{padding:20px 16px 14px}
+      .cmr-toolbar{padding:12px 16px}
+      .cmr-col{padding:14px 14px}
+      .cmr-row{grid-template-columns:1.4rem 2.6rem minmax(0,1fr) auto;gap:6px;padding:8px 4px}
+      .cmr-conv{min-width:56px}
+      .cmr-conv-bar{width:56px}
+    }
+  </style>
+</head>
+<body class="cmr">
+
+  <header class="cmr-header">
+    <div>
+      <h1>Cross-Market Squeeze Radar</h1>
+      <p class="cmr-sub">
+        Live scan of the top squeeze-conviction candidates across <strong style="color:#a8f0e2">stocks</strong> AND <strong style="color:#f0b3bd">crypto</strong>.
+        Each side is cross-correlated against the OTHER market's driver basket, surfacing high-pressure names that ride cross-market risk flows.
+      </p>
+    </div>
+    <nav class="cmr-nav">
+      <a href="/frontend/market-refinement-dashboard.html" data-testid="back-to-dashboard">← Dashboard</a>
+      <a href="/frontend/shared-analyses.html">Shared analyses</a>
+      <a href="/metrics-hub.html">Metrics hub</a>
+      <button type="button" id="cmrRefresh" data-testid="cmr-refresh">⟳ Refresh</button>
+    </nav>
+  </header>
+
+  <div class="cmr-toolbar" data-testid="cmr-toolbar">
+    <span class="cmr-meta-chip" id="cmrScanned">— scanned</span>
+    <span class="cmr-meta-chip" id="cmrDrivers">drivers: —</span>
+    <span class="cmr-meta-chip" id="cmrGen">—</span>
+  </div>
+
+  <section class="cmr-method">
+    <strong>How this ranks:</strong> <code>conviction = 0.45·|SSP-50|/50 + 0.35·PVI/100 + 0.20·|corr|</code>.
+    Stock candidates are scored using their correlation to <strong>BTC-USD</strong> (the crypto driver),
+    while crypto candidates are scored against <strong>SPY</strong> (the stock driver).
+    Only rows with a populated short-selling-pressure + predicted-volume-intensity signal enter the ranker.
+  </section>
+
+  <section class="cmr-combined" id="cmrCombined" data-testid="cmr-combined">
+    <h2>Top combined conviction — cross-market</h2>
+    <div class="cmr-combined-list" id="cmrCombinedList"><div class="cmr-empty">Loading…</div></div>
+  </section>
+
+  <main class="cmr-grid">
+    <section class="cmr-col stocks" data-testid="cmr-col-stocks">
+      <div class="cmr-col-head">
+        <div class="cmr-col-title">Stocks · squeeze radar</div>
+        <div class="cmr-col-driver">driver: BTC-USD</div>
+      </div>
+      <div id="cmrStocks"><div class="cmr-empty">Loading…</div></div>
+    </section>
+    <section class="cmr-col crypto" data-testid="cmr-col-crypto">
+      <div class="cmr-col-head">
+        <div class="cmr-col-title">Crypto · squeeze radar</div>
+        <div class="cmr-col-driver">driver: SPY</div>
+      </div>
+      <div id="cmrCrypto"><div class="cmr-empty">Loading…</div></div>
+    </section>
+  </main>
+
+  <script>
+    const $ = (s) => document.querySelector(s);
+    const esc = (s) => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    const fmtRel = (iso) => {
+      if (!iso) return '—';
+      try {
+        const t = new Date(iso).getTime();
+        const s = Math.max(0, Math.floor((Date.now() - t) / 1000));
+        if (s < 60) return `${s}s ago`;
+        if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+        return `${Math.floor(s / 3600)}h ago`;
+      } catch (_) { return '—'; }
+    };
+
+    function renderRow(item, idx) {
+      const dir = item.squeeze_direction === 'up' ? 'up' : item.squeeze_direction === 'down' ? 'down' : 'neutral';
+      const symbol = esc(item.symbol);
+      const marketPrefix = item.market === 'crypto' ? 'crypto' : 'stocks';
+      const detailLink = `/frontend/market-refinement-dashboard.html?symbol=${encodeURIComponent(item.symbol)}${item.market === 'crypto' ? '&market=crypto' : ''}`;
+      return `
+        <div class="cmr-row" data-testid="cmr-row-${symbol}">
+          <div class="cmr-rank">#${idx + 1}</div>
+          <div class="cmr-symbol"><a href="${detailLink}" title="Open detail panel">${symbol}</a></div>
+          <div class="cmr-meta">
+            <div class="cmr-meta-line">
+              <span class="cmr-tag ${dir}">${esc(item.final_direction || 'Neutral')}</span>
+              <span>Score <strong>${item.final_score.toFixed(1)}</strong> · Tier ${esc(item.tier)}</span>
+            </div>
+            <div class="cmr-meta-line">
+              <span>SSP <strong>${item.ssp.toFixed(0)}</strong> ${esc(String(item.ssp_label || 'neutral').replace(/_/g, ' '))}</span>
+              <span>PVI <strong>${item.pvi.toFixed(0)}</strong> ${esc(item.pvi_bucket)}</span>
+              <span>corr <strong>${item.correlation.toFixed(2)}</strong></span>
+            </div>
+          </div>
+          <div class="cmr-conv" title="Squeeze conviction score (0-100)">
+            <div class="cmr-conv-val">${item.conviction_pct.toFixed(0)}</div>
+            <div class="cmr-conv-bar"><div class="cmr-conv-bar-fill" style="width:${Math.min(100, item.conviction_pct)}%"></div></div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderCombinedItem(item) {
+      const mkt = item.market === 'crypto' ? 'C' : 'S';
+      return `
+        <div class="cmr-combined-item" data-testid="cmr-combined-${esc(item.symbol)}">
+          <span><strong>[${mkt}] ${esc(item.symbol)}</strong> · ${esc(item.final_direction)}</span>
+          <small>${item.conviction_pct.toFixed(0)}</small>
+        </div>
+      `;
+    }
+
+    async function loadRadar() {
+      $('#cmrStocks').innerHTML = '<div class="cmr-empty">Loading…</div>';
+      $('#cmrCrypto').innerHTML = '<div class="cmr-empty">Loading…</div>';
+      $('#cmrCombinedList').innerHTML = '<div class="cmr-empty">Loading…</div>';
+      let data = null;
+      try {
+        const r = await fetch('/api/scan/cross-market-squeeze?limit_per_market=20');
+        if (r.ok) data = await r.json();
+      } catch (_) { /* fall through */ }
+      if (!data) {
+        $('#cmrStocks').innerHTML = '<div class="cmr-empty">Radar unavailable — try Refresh in a few seconds.</div>';
+        $('#cmrCrypto').innerHTML = '';
+        return;
+      }
+      const stocks = data.stocks || [];
+      const crypto = data.crypto || [];
+      const combined = data.top_combined || [];
+      $('#cmrScanned').innerHTML = `<strong>${(data.meta?.scanned_stocks) || 0}</strong> stocks · <strong>${(data.meta?.scanned_crypto) || 0}</strong> crypto scanned`;
+      $('#cmrDrivers').innerHTML = `drivers: <strong>${data.meta?.driver_basket_stocks || 'BTC-USD'}</strong> / <strong>${data.meta?.driver_basket_crypto || 'SPY'}</strong>`;
+      $('#cmrGen').textContent = `generated ${fmtRel(data.generated_utc)}`;
+      $('#cmrStocks').innerHTML = stocks.length
+        ? stocks.map(renderRow).join('')
+        : '<div class="cmr-empty">No stock candidates cleared the populated-signal gate.</div>';
+      $('#cmrCrypto').innerHTML = crypto.length
+        ? crypto.map(renderRow).join('')
+        : '<div class="cmr-empty">No crypto candidates cleared the populated-signal gate.</div>';
+      $('#cmrCombinedList').innerHTML = combined.length
+        ? combined.map(renderCombinedItem).join('')
+        : '<div class="cmr-empty">No cross-market candidates yet.</div>';
+    }
+
+    document.getElementById('cmrRefresh').addEventListener('click', loadRadar);
+    loadRadar();
+    // Auto-refresh every 30s to stay live but avoid hammering the endpoint.
+    setInterval(loadRadar, 30000);
+  </script>
+</body>
+</html>

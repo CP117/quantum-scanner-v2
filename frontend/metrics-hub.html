@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Metrics Hub — Market Refinement Dashboard</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/frontend/styles.css">
+  <link rel="stylesheet" href="/frontend/metrics-hub.css">
+</head>
+<body class="metrics-hub-body">
+
+  <header class="mh-header" data-testid="metrics-hub-header">
+    <div class="mh-header-left">
+      <h1>Metrics Hub</h1>
+      <p class="mh-subtitle">
+        Algorithm catalog, data-flow health, and tunable weights for every
+        ranking input across the dashboard.
+      </p>
+    </div>
+    <div class="mh-header-right">
+      <a class="mh-nav-link" href="/market-refinement-dashboard.html" data-testid="back-to-dashboard">← Back to dashboard</a>
+      <button id="mhRefresh" class="mh-btn" data-testid="metrics-hub-refresh" title="Refresh all sections from the backend">⟳ Refresh</button>
+      <span id="mhFreshness" class="mh-freshness" data-testid="metrics-hub-freshness">—</span>
+    </div>
+  </header>
+
+  <main class="mh-main">
+
+    <!-- ============================================================== -->
+    <!-- Tab strip                                                       -->
+    <!-- ============================================================== -->
+    <nav class="mh-tabs" role="tablist" data-testid="metrics-hub-tabs">
+      <button class="mh-tab is-active" data-tab="algorithms" data-testid="tab-algorithms" role="tab">Algorithms</button>
+      <button class="mh-tab" data-tab="metrics" data-testid="tab-metrics" role="tab">Metrics</button>
+      <button class="mh-tab" data-tab="data-flows" data-testid="tab-data-flows" role="tab">Data Flows</button>
+      <button class="mh-tab" data-tab="weights" data-testid="tab-weights" role="tab">Weight Tuner</button>
+    </nav>
+
+    <!-- ============================================================== -->
+    <!-- 1. Algorithms                                                   -->
+    <!-- ============================================================== -->
+    <section class="mh-section is-active" data-section="algorithms" data-testid="section-algorithms">
+      <header class="mh-section-header">
+        <h2>Active algorithms</h2>
+        <p class="mh-section-sub">
+          Every quantitative tier the dashboard runs, with its data
+          sources, ranking role, and current cache health.
+        </p>
+      </header>
+      <div id="mhAlgorithmsGrid" class="mh-grid" data-testid="algorithms-grid">
+        <div class="mh-empty">Loading…</div>
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- 2. Metrics catalog                                              -->
+    <!-- ============================================================== -->
+    <section class="mh-section" data-section="metrics" data-testid="section-metrics">
+      <header class="mh-section-header">
+        <h2>Metric registry</h2>
+        <p class="mh-section-sub">
+          All 19 Phase 26.60 fields plus the upstream Lab/Strategy
+          metrics.  Click a row to see the same popover the leaderboard
+          uses.
+        </p>
+      </header>
+      <div id="mhMetricsTable" class="mh-table-wrap" data-testid="metrics-table">
+        <div class="mh-empty">Loading…</div>
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- 3. Data flows / provider health                                 -->
+    <!-- ============================================================== -->
+    <section class="mh-section" data-section="data-flows" data-testid="section-data-flows">
+      <header class="mh-section-header">
+        <h2>Data flow status</h2>
+        <p class="mh-section-sub">
+          Per-provider health + per-tier cache hit-rate.  Stale flows
+          show an amber chip; broken flows show a red chip.
+        </p>
+      </header>
+      <div class="mh-twocol">
+        <div>
+          <h3>Providers</h3>
+          <div id="mhProvidersList" data-testid="providers-list">
+            <div class="mh-empty">Loading…</div>
+          </div>
+        </div>
+        <div>
+          <h3>Cache tiers</h3>
+          <div id="mhCachesList" data-testid="caches-list">
+            <div class="mh-empty">Loading…</div>
+          </div>
+          <h3 style="margin-top:18px">Priority lane</h3>
+          <div id="mhLaneList" data-testid="lane-list">
+            <div class="mh-empty">Loading…</div>
+          </div>
+          <h3 style="margin-top:18px; display:flex; align-items:center; justify-content:space-between; gap:8px">
+            <span>Cache dedupe</span>
+            <button id="mhDedupeRun" class="mh-btn" data-testid="dedupe-run" title="Trigger a full three-domain cache dedupe pass (daily history / options chains / reaction zones).">⟲ Run dedupe</button>
+          </h3>
+          <div id="mhDedupeList" data-testid="dedupe-list">
+            <div class="mh-empty">Loading…</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- 4. Weight Tuner                                                 -->
+    <!-- ============================================================== -->
+    <section class="mh-section" data-section="weights" data-testid="section-weights">
+      <header class="mh-section-header">
+        <h2>Weight tuner</h2>
+        <p class="mh-section-sub">
+          Adjust pillar weights, multiplier exponents, and per-metric
+          enable masks.  All changes persist locally and feed back into
+          the live ranking pipeline on the next scoring pass.  Sane
+          ranges are clamped server-side; defaults are restored with
+          one click.
+        </p>
+      </header>
+      <div class="mh-weights-toolbar">
+        <button id="mhSaveWeights" class="mh-btn mh-btn-primary" data-testid="save-weights">⌷ Save changes</button>
+        <button id="mhResetWeights" class="mh-btn" data-testid="reset-weights">↺ Reset to defaults</button>
+        <button id="mhExportWeights" class="mh-btn" data-testid="export-weights" title="Download the current (possibly-unsaved) weight matrix as JSON">⇩ Export JSON</button>
+        <label class="mh-btn" data-testid="import-weights-label" title="Upload a previously-exported JSON to restore a weight matrix" style="cursor:pointer">
+          ⇧ Import JSON
+          <input id="mhImportWeights" type="file" accept=".json,application/json" style="display:none" data-testid="import-weights-input">
+        </label>
+        <span id="mhDiffBadge" class="mh-diff-badge" data-testid="diff-badge" title="How many weights differ from defaults">0 modified</span>
+        <span id="mhWeightsStatus" class="mh-weights-status" data-testid="weights-status"></span>
+      </div>
+
+      <div class="mh-weights-grid">
+        <div class="mh-weights-col">
+          <h3>Pillar weights</h3>
+          <p class="mh-weights-hint">
+            Multiplicative scalers (0.0 = exclude pillar, 1.0 = unchanged,
+            2.0 = double weight) applied to the 12 ranking pillars before
+            the composite is normalised.
+          </p>
+          <div id="mhFactorWeightsList" data-testid="factor-weights-list">
+            <div class="mh-empty">Loading…</div>
+          </div>
+        </div>
+
+        <div class="mh-weights-col">
+          <h3>Multiplier exponents</h3>
+          <p class="mh-weights-hint">
+            Per-multiplier gain (exponent in [0.0, 2.0]).  0 neutralises the
+            multiplier (m^0 = 1).  1 = unchanged.  2 = amplify the
+            multiplier's effect.  Clamps protect against degenerate compound
+            multipliers.
+          </p>
+          <div id="mhExponentsList" data-testid="exponents-list">
+            <div class="mh-empty">Loading…</div>
+          </div>
+
+          <h3 style="margin-top:18px">Pipeline tuning</h3>
+          <div id="mhPipelineTuningList" data-testid="pipeline-tuning-list">
+            <div class="mh-empty">Loading…</div>
+          </div>
+        </div>
+
+        <div class="mh-weights-col">
+          <h3>Per-metric enable mask</h3>
+          <p class="mh-weights-hint">
+            Quarantine an individual metric without disabling the whole
+            tier.  Reality-breaker metrics ship OFF by default; turn them
+            on here AND enable Advanced Experimental Mode on the
+            dashboard for them to contribute.
+          </p>
+          <div id="mhEnableMaskList" data-testid="enable-mask-list">
+            <div class="mh-empty">Loading…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- Live preview — projects how the current snapshot would       -->
+      <!-- re-rank with the UNSAVED weight changes applied locally.     -->
+      <!-- Recomputes on every slider drag (debounced 80ms).            -->
+      <!-- ============================================================ -->
+      <section class="mh-preview-panel" data-testid="live-preview-panel">
+        <header class="mh-preview-header">
+          <div>
+            <h3>Live ranking preview</h3>
+            <p class="mh-weights-hint">
+              Re-ranks the current top-50 leaderboard with your unsaved
+              weight changes applied client-side.  Backend ranking is
+              untouched until you click Save.  Δ columns show the
+              projected change in position.
+            </p>
+          </div>
+          <div class="mh-preview-actions">
+            <label class="mh-preview-control">
+              <input type="checkbox" id="mhPreviewDirectional" data-testid="preview-directional" checked>
+              Sort by |effective_kelly_rank|
+            </label>
+            <button id="mhPreviewRefresh" class="mh-btn" data-testid="preview-refresh" title="Re-fetch the current snapshot top-50">⟳ Refresh snapshot</button>
+            <span id="mhPreviewMeta" class="mh-freshness" data-testid="preview-meta">—</span>
+          </div>
+        </header>
+        <div id="mhPreviewTable" class="mh-table-wrap" data-testid="preview-table">
+          <div class="mh-empty">Click "Refresh snapshot" to load the current leaderboard.</div>
+        </div>
+      </section>
+    </section>
+
+  </main>
+
+  <script src="/frontend/metrics-hub.js"></script>
+</body>
+</html>

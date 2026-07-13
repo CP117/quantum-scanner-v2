@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Regulatory Monitor · Market Refinement Dashboard</title>
+  <link rel="icon" href="/frontend/logo.svg" />
+  <style>
+    body{font-family:Arial,sans-serif;background:#111827;color:#f9fafb;margin:0;padding:20px}
+    .wrap{max-width:1320px;margin:0 auto}.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px}
+    input,button,select{padding:12px;border-radius:8px;border:1px solid #374151}
+    input,select{background:#1f2937;color:#fff}
+    .card{background:#1f2937;border:1px solid #374151;border-radius:12px;padding:16px;margin-bottom:12px}
+    .muted{color:#9ca3af}
+    button{background:#0f766e;color:white;cursor:pointer}
+    h1,h2,h3{margin:0 0 12px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;align-items:start}
+    .grid4{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+    .panel{background:#111827;border:1px solid #374151;border-radius:14px;padding:14px;min-height:560px;display:flex;flex-direction:column}
+    .panel-head{position:sticky;top:0;background:#111827;padding-bottom:10px;z-index:1}
+    .panel-body{overflow-y:auto;max-height:520px;padding-right:6px}
+    .panel-body::-webkit-scrollbar{width:10px}.panel-body::-webkit-scrollbar-thumb{background:#374151;border-radius:999px}.panel-body::-webkit-scrollbar-track{background:#111827}
+    .clickable{cursor:pointer;transition:transform .15s ease,border-color .15s ease,background .15s ease}
+    .clickable:hover{transform:translateY(-1px);border-color:#5eead4;background:#243042}
+    .drawer{position:fixed;top:0;right:-520px;width:520px;max-width:92vw;height:100vh;background:#0b1220;border-left:1px solid #374151;box-shadow:-10px 0 30px rgba(0,0,0,.35);z-index:50;transition:right .22s ease;display:flex;flex-direction:column}
+    .drawer.open{right:0}.drawer-head{display:flex;justify-content:space-between;align-items:center;padding:16px;border-bottom:1px solid #374151;position:sticky;top:0;background:#0b1220}
+    .drawer-body{padding:16px;overflow-y:auto}
+    .kv{display:grid;grid-template-columns:140px 1fr;gap:8px 12px;margin-bottom:14px}
+    .overlay{position:fixed;inset:0;background:rgba(2,6,23,.55);z-index:40;display:none}.overlay.open{display:block}
+    header.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:18px;flex-wrap:wrap}
+    header.top h1{margin:0}
+    a.backlink{color:#5eead4;text-decoration:none;font-weight:600;border:1px solid #374151;padding:8px 12px;border-radius:8px;background:#1f2937}
+    a.backlink:hover{border-color:#5eead4}
+    .signal-row{display:grid;grid-template-columns:80px 1fr 90px;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid #1f2937}
+    .signal-row:last-child{border-bottom:none}
+    .signal-row .delta{font-variant-numeric:tabular-nums;font-weight:700}
+    .signal-row .delta.up{color:#34d399}.signal-row .delta.dn{color:#f87171}
+    .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.72rem;background:#0b1220;border:1px solid #374151;color:#cbd5e1;margin-right:6px}
+    .pill.green{border-color:#34d399;color:#34d399}.pill.red{border-color:#f87171;color:#f87171}
+    .pill.fresh{border-color:#fbbf24;color:#fbbf24}
+    .auto-row{display:grid;grid-template-columns:90px 110px 1fr 100px;align-items:center;gap:14px;padding:10px 14px;border-bottom:1px solid #1f2937;transition:background .12s}
+    .auto-row:hover{background:#1a2333}
+    .auto-row:last-child{border-bottom:none}
+    .auto-row .sym{font-weight:700;font-size:1.05rem;font-variant-numeric:tabular-nums}
+    .auto-row .delta{font-weight:700;font-variant-numeric:tabular-nums;font-size:1.05rem}
+    .auto-row .delta.up{color:#34d399}.auto-row .delta.dn{color:#f87171}.auto-row .delta.zero{color:#9ca3af}
+    .auto-row .meta{color:#cbd5e1;font-size:.85rem;line-height:1.4}
+    .auto-row .meta .muted{display:block;margin-top:2px;font-size:.74rem;color:#6b7280}
+    .auto-row .badges{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end}
+    .auto-row .badge{display:inline-block;padding:2px 7px;border-radius:6px;font-size:.7rem;font-weight:600;background:#0b1220;border:1px solid #374151;color:#cbd5e1}
+    .auto-row .badge.ins{border-color:#60a5fa;color:#60a5fa}
+    .auto-row .badge.aw{border-color:#a78bfa;color:#a78bfa}
+    @media(max-width:1100px){.grid,.grid3,.grid4{grid-template-columns:1fr}.panel{min-height:auto}.panel-body{max-height:360px}.auto-row{grid-template-columns:70px 80px 1fr;gap:8px}.auto-row .badges{grid-column:1/-1;justify-content:flex-start}}
+    /* ----- contextual help icons + popover (injected by /frontend/help.js) ----- */
+    .help-icon{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-left:.4rem;padding:0;vertical-align:middle;line-height:1;flex-shrink:0;font-family:ui-sans-serif,system-ui,sans-serif;font-size:11px;font-weight:700;font-style:italic;color:#9ca3af;background:transparent;border:1px solid #374151;border-radius:50%;cursor:pointer;transition:color .15s ease,border-color .15s ease,background .15s ease}
+    .help-icon:hover,.help-icon:focus-visible,.help-icon[aria-expanded="true"]{color:#fff;border-color:#5eead4;background:rgba(94,234,212,.15);outline:none}
+    .help-popover{position:absolute;z-index:9999;max-width:320px;min-width:200px;background:#0f1922;color:#e7ecf2;border:1px solid #5eead4;border-radius:.55rem;padding:.7rem .85rem;font-size:.82rem;line-height:1.45;font-weight:400;box-shadow:0 8px 32px rgba(0,0,0,.6),0 2px 8px rgba(0,0,0,.4);pointer-events:none}
+    @media (max-width:600px){.help-popover{max-width:calc(100vw - 32px);font-size:.85rem}}
+    /* keep header / panel-head help icons inline with the title */
+    .panel-head h2 .help-icon,.card h3 .help-icon{vertical-align:middle}
+    /* stat cards put the icon top-right so it doesn't displace the big number */
+    .grid4 .card{position:relative}
+    .grid4 .card > .help-icon{position:absolute;top:.6rem;right:.6rem;margin-left:0}
+    /* small buttons - keep icon snug */
+    button .help-icon{margin-left:.3rem;border-color:rgba(255,255,255,.4);color:rgba(255,255,255,.85)}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Regulatory Interest &amp; Contract Monitor</h1>
+      <p class="muted">SEC insider filings + USAspending awards · auto-scanning the scanner universe · per-ticker signals fed into the main scanner ranking.</p>
+    </div>
+    <a class="backlink" href="/ui" data-testid="back-to-scanner">← Back to scanner</a>
+  </header>
+
+  <!-- =====================================================================
+       AUTO-POPULATING SORTED RESULT LIST — the primary landing experience.
+       Every ticker in the scanner universe that has insider activity OR a
+       recent contract win, ranked by impact on the composite score.
+       ===================================================================== -->
+  <section class="panel" style="min-height:auto;margin-bottom:24px">
+    <div class="panel-head">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <div>
+          <h2 style="margin:0">Auto-scan results · insider activity &amp; contract wins</h2>
+          <span class="muted" style="font-size:.82rem">Auto-populates as the universe is scanned. Sorted by absolute impact on the scanner's composite score.</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <span class="pill" id="autoscanPill" data-testid="reg-autoscan-pill">autoscan: loading…</span>
+          <button id="triggerAutoscan" data-testid="reg-trigger-autoscan" style="padding:8px 14px;font-size:.82rem">Run sweep now</button>
+          <button id="cancelAutoscan" data-testid="reg-cancel-autoscan" style="padding:8px 14px;font-size:.82rem;display:none">Cancel sweep</button>
+        </div>
+      </div>
+    </div>
+    <div id="autoResults" data-testid="reg-auto-results">
+      <div class="card">Loading auto-scan results…</div>
+    </div>
+  </section>
+
+  <div class="row">
+    <input id="cik" placeholder="Issuer CIK" value="320193" data-testid="reg-input-cik" />
+    <input id="recipient" placeholder="Recipient/company name" value="Apple" data-testid="reg-input-recipient" />
+    <input id="limit" type="number" value="8" min="1" max="50" data-testid="reg-input-limit" />
+    <button id="run" data-testid="reg-run-scan">Run scan</button>
+    <button id="saveWatch" data-testid="reg-save-watchlist">Save watchlist</button>
+    <button id="pollWatch" data-testid="reg-poll-watchlists">Poll watchlists</button>
+    <button id="discoverTracked" data-testid="reg-discover">Discover companies</button>
+    <button id="scanTracked" data-testid="reg-scan-tracked">Scan tracked</button>
+  </div>
+
+  <div class="grid4">
+    <div class="card"><h3>Watchlists</h3><div id="statWatch" data-testid="reg-stat-watch">0</div></div>
+    <div class="card"><h3>Tracked</h3><div id="statTracked" data-testid="reg-stat-tracked">0</div></div>
+    <div class="card"><h3>Filings</h3><div id="statFilings" data-testid="reg-stat-filings">0</div></div>
+    <div class="card"><h3>Awards</h3><div id="statAwards" data-testid="reg-stat-awards">0</div></div>
+    <div class="card"><h3>Alerts</h3><div id="statAlerts" data-testid="reg-stat-alerts">0</div></div>
+  </div>
+
+  <div class="grid3">
+    <section class="panel">
+      <div class="panel-head"><h2>Insider / interest events</h2></div>
+      <div id="insider" class="panel-body" data-testid="reg-insider-panel"></div>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><h2>Contract awards</h2></div>
+      <div id="awards" class="panel-body" data-testid="reg-awards-panel"></div>
+    </section>
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Active signal index</h2>
+        <span class="muted" style="font-size:.78rem">Tickers currently nudging composite scores in the scanner. Refreshes every 60s.</span>
+        <div style="margin-top:8px"><button id="refreshSignal" data-testid="reg-refresh-signal" style="padding:6px 12px;font-size:.8rem">Force refresh now</button></div>
+      </div>
+      <div id="signalIndex" class="panel-body" data-testid="reg-signal-panel"></div>
+    </section>
+  </div>
+
+  <div class="grid3" style="margin-top:18px">
+    <section class="panel">
+      <div class="panel-head"><h2>Alerts</h2></div>
+      <div id="alerts" class="panel-body" data-testid="reg-alerts-panel"></div>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><h2>Saved watchlists</h2></div>
+      <div id="watchlists" class="panel-body" data-testid="reg-watchlists-panel"></div>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><h2>Tracked companies</h2></div>
+      <div id="trackedCompanies" class="panel-body" data-testid="reg-tracked-panel"></div>
+    </section>
+  </div>
+
+  <h2 style="margin-top:24px">Settings</h2>
+  <div class="card">
+    <p class="muted" style="margin-top:0">Universe auto-scan defaults <strong>ON</strong> — it walks the scanner's universe and pulls SEC filings + USAspending awards for every ticker we can resolve to a CIK. The other scheduler features default <strong>OFF</strong>. Toggle them on as needed.</p>
+    <div class="row">
+      <select id="enable_universe_autoscan" data-testid="reg-set-enable-autoscan">
+        <option value="1">Universe auto-scan on</option><option value="0">Universe auto-scan off</option>
+      </select>
+      <input id="universe_autoscan_interval_seconds" placeholder="Auto-scan interval (sec, default 14400 = 4h)" data-testid="reg-set-autoscan-interval" />
+      <input id="universe_autoscan_request_gap_ms" placeholder="SEC request gap (ms, default 120)" data-testid="reg-set-autoscan-gap" />
+      <input id="universe_autoscan_limit_per_symbol" placeholder="Filings per symbol (default 3)" data-testid="reg-set-autoscan-perlim" />
+      <input id="universe_autoscan_max_tickers" placeholder="Cap tickers per sweep (0 = all)" data-testid="reg-set-autoscan-cap" />
+      <select id="enable_scheduler" data-testid="reg-set-enable-scheduler">
+        <option value="0">Watchlist scheduler off</option><option value="1">Watchlist scheduler on</option>
+      </select>
+      <select id="enable_auto_discovery" data-testid="reg-set-enable-discovery">
+        <option value="0">Atom-feed auto-discovery off</option><option value="1">Atom-feed auto-discovery on</option>
+      </select>
+      <select id="enable_entity_linking" data-testid="reg-set-enable-linking">
+        <option value="1">Entity linking on</option><option value="0">Entity linking off</option>
+      </select>
+      <input id="scheduler_interval_seconds" placeholder="Scheduler interval (sec)" data-testid="reg-set-scheduler-interval" />
+      <input id="default_scan_limit" placeholder="Default scan limit" data-testid="reg-set-scan-limit" />
+      <input id="auto_discovery_interval_seconds" placeholder="Auto-discovery interval (sec)" data-testid="reg-set-discovery-interval" />
+      <input id="large_award_threshold" placeholder="Large award threshold ($)" data-testid="reg-set-award-threshold" />
+      <input id="ownership_threshold_percent" placeholder="Ownership threshold (%)" data-testid="reg-set-ownership-threshold" />
+    </div>
+    <h3 style="margin-top:18px">Scanner signal feedback (per overnight feedback)</h3>
+    <p class="muted" style="margin-top:0">These knobs control how regulatory events nudge the main scanner ranking. Defaults: 5-day cutoff, ±8pt cap, decay starts at 3 days.</p>
+    <div class="row">
+      <input id="signal_max_age_days" placeholder="Max staleness (days)" data-testid="reg-set-signal-max-age" />
+      <input id="signal_decay_days" placeholder="Decay starts at (days)" data-testid="reg-set-signal-decay" />
+      <input id="signal_max_boost" placeholder="Max ±pts cap" data-testid="reg-set-signal-max-boost" />
+      <input id="signal_min_dollar_value" placeholder="Min $ value (tiny weight below)" data-testid="reg-set-signal-min-dollar" />
+      <input id="signal_strong_dollar_value" placeholder="Strong $ value (full weight)" data-testid="reg-set-signal-strong-dollar" />
+      <button id="saveSettings" data-testid="reg-save-settings">Save settings</button>
+    </div>
+  </div>
+</div>
+
+<div id="overlay" class="overlay"></div>
+<aside id="drawer" class="drawer">
+  <div class="drawer-head">
+    <h2 id="drawerTitle">Details</h2>
+    <button id="closeDrawer" type="button" data-testid="reg-close-drawer">Close</button>
+  </div>
+  <div id="drawerBody" class="drawer-body"></div>
+</aside>
+
+<script>
+const API_BASE = '/api/regulatory';
+const insider = document.getElementById('insider');
+const awards = document.getElementById('awards');
+const alertsEl = document.getElementById('alerts');
+const watchlists = document.getElementById('watchlists');
+const trackedCompanies = document.getElementById('trackedCompanies');
+const signalIndex = document.getElementById('signalIndex');
+const drawer = document.getElementById('drawer');
+const drawerTitle = document.getElementById('drawerTitle');
+const drawerBody = document.getElementById('drawerBody');
+const overlay = document.getElementById('overlay');
+
+function esc(v){ return v == null ? '' : String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function detailRows(obj){
+  return Object.entries(obj || {}).map(([k,v]) => `<div class="kv"><div class="muted">${esc(k)}</div><div>${v == null || v === '' ? '—' : esc(v)}</div></div>`).join('');
+}
+
+async function loadStats(){
+  const res = await fetch(`${API_BASE}/stats`);
+  const data = await res.json();
+  document.getElementById('statWatch').textContent = data.watchlists || 0;
+  document.getElementById('statTracked').textContent = data.tracked_companies || 0;
+  document.getElementById('statFilings').textContent = data.filings || 0;
+  document.getElementById('statAwards').textContent = data.awards || 0;
+  document.getElementById('statAlerts').textContent = data.alerts || 0;
+}
+
+async function loadSettings(){
+  const res = await fetch(`${API_BASE}/settings`);
+  const s = await res.json();
+  ['scheduler_interval_seconds','default_scan_limit','large_award_threshold','ownership_threshold_percent',
+   'enable_scheduler','enable_entity_linking','enable_auto_discovery','auto_discovery_interval_seconds',
+   'enable_universe_autoscan','universe_autoscan_interval_seconds','universe_autoscan_request_gap_ms',
+   'universe_autoscan_limit_per_symbol','universe_autoscan_max_tickers',
+   'signal_max_age_days','signal_decay_days','signal_max_boost','signal_min_dollar_value','signal_strong_dollar_value']
+   .forEach(k=>{ const el = document.getElementById(k); if(el) el.value = s[k] || ''; });
+}
+
+async function loadAlerts(){
+  const res = await fetch(`${API_BASE}/alerts`);
+  const data = await res.json();
+  alertsEl.innerHTML = data.map(x => `<div class="card clickable" data-alert-id="${x.id}"><strong>${esc(x.title)}</strong><br><span class="muted">${esc(x.alert_type)} | ${esc(x.created_at)}</span><br>${esc(x.body || '')}</div>`).join('') || '<div class="card">No alerts yet.</div>';
+}
+
+async function loadTrackedCompanies(){
+  const res = await fetch(`${API_BASE}/tracked-companies`);
+  const data = await res.json();
+  trackedCompanies.innerHTML = data.map(x => `<div class="card clickable" data-company-cik="${esc(x.cik)}"><strong>${esc(x.issuer_name || x.issuer_ticker || x.cik)}</strong><br><span class="muted">CIK ${esc(x.cik)} ${x.issuer_ticker ? '| '+esc(x.issuer_ticker) : ''}</span><br><span class="muted">Last filing: ${esc(x.last_seen_filing_date || 'n/a')}</span></div>`).join('') || '<div class="card">No tracked companies yet.</div>';
+}
+
+async function loadWatchlists(){
+  const res = await fetch(`${API_BASE}/watchlists`);
+  const data = await res.json();
+  watchlists.innerHTML = data.map(x => `<div class="card"><strong>${esc(x.recipient)}</strong><br><span class="muted">CIK ${esc(x.cik)} | ${esc(x.created_at)}</span></div>`).join('') || '<div class="card">No watchlists saved.</div>';
+}
+
+async function loadSignalIndex(){
+  const res = await fetch(`${API_BASE}/signal-summary?limit=50`);
+  const data = await res.json();
+  const items = (data.top || []).filter(s => Math.abs(s.score_delta || 0) > 0.05);
+  if (!items.length){
+    signalIndex.innerHTML = '<div class="card">No tickers currently carry an active regulatory signal.<br><span class="muted">Auto-scan is collecting data. Signals expire after the staleness cutoff (default 5 days).</span></div>';
+    return;
+  }
+  signalIndex.innerHTML = items.map(s => {
+    const delta = Number(s.score_delta || 0);
+    const cls = delta >= 0 ? 'up' : 'dn';
+    const sign = delta >= 0 ? '+' : '';
+    return `<div class="signal-row"><strong>${esc(s.symbol)}</strong><div><span class="muted">${esc(s.reason || '')}</span><br><span class="pill ${delta >= 0 ? 'green' : 'red'}">${s.event_count} event${s.event_count === 1 ? '' : 's'}</span><span class="pill">w=${(s.weight || 0).toFixed(2)}</span><span class="pill">age=${(s.staleness_days || 0).toFixed(1)}d</span></div><div class="delta ${cls}">${sign}${delta.toFixed(2)}</div></div>`;
+  }).join('');
+}
+
+// -----------------------------------------------------------------
+// Auto-scan results panel — the primary landing experience.
+// Polls /auto-results every 15s + autoscan-status every 5s so the
+// progress pill stays live during a sweep.
+// -----------------------------------------------------------------
+const autoResultsEl = document.getElementById('autoResults');
+const autoscanPill = document.getElementById('autoscanPill');
+const cancelAutoscanBtn = document.getElementById('cancelAutoscan');
+
+async function loadAutoscanStatus(){
+  try {
+    const res = await fetch(`${API_BASE}/autoscan-status`);
+    const d = await res.json();
+    if (!d || !d.enabled){
+      autoscanPill.textContent = 'autoscan: disabled';
+      autoscanPill.className = 'pill';
+      if (cancelAutoscanBtn) cancelAutoscanBtn.style.display = 'none';
+      return;
+    }
+    if (d.busy){
+      const pct = d.tickers_total > 0 ? Math.round(100 * d.tickers_done / d.tickers_total) : 0;
+      autoscanPill.textContent = `autoscan: ${d.tickers_done}/${d.tickers_total} (${pct}%) · ${d.tickers_with_hits} hits${d.current_symbol ? ' · '+d.current_symbol : ''}`;
+      autoscanPill.className = 'pill fresh';
+      if (cancelAutoscanBtn) cancelAutoscanBtn.style.display = '';
+    } else if (d.last_completed_at){
+      const minsAgo = Math.max(0, ((Date.now()/1000) - d.last_completed_at)/60);
+      const cancelLabel = d.last_error === 'cancelled' ? ' (cancelled)' : '';
+      autoscanPill.textContent = `autoscan: idle${cancelLabel} · last sweep ${d.tickers_with_hits} hits in ${(d.last_sweep_seconds||0).toFixed(0)}s, ${minsAgo.toFixed(0)}m ago`;
+      autoscanPill.className = 'pill green';
+      if (cancelAutoscanBtn) cancelAutoscanBtn.style.display = 'none';
+    } else {
+      autoscanPill.textContent = `autoscan: ready · CIK map ${d.cik_map_size}`;
+      autoscanPill.className = 'pill';
+      if (cancelAutoscanBtn) cancelAutoscanBtn.style.display = 'none';
+    }
+  } catch (e) { /* ignore */ }
+}
+
+async function loadAutoResults(){
+  try {
+    const res = await fetch(`${API_BASE}/auto-results?limit=200`);
+    const data = await res.json();
+    const items = data.top || [];
+    if (!items.length){
+      autoResultsEl.innerHTML = '<div class="card">No tickers in the auto-scan result set yet.<br><span class="muted">The first sweep is in progress. Results appear here as filings/awards are persisted (typically within a minute of the first hit).</span></div>';
+      return;
+    }
+    autoResultsEl.innerHTML = items.map(r => {
+      const delta = Number(r.score_delta || 0);
+      const dcls = delta > 0.05 ? 'up' : (delta < -0.05 ? 'dn' : 'zero');
+      const sign = delta >= 0 ? '+' : '';
+      const insBadge = r.insider_event_count > 0 ? `<span class="badge ins" title="Insider filings (Form 3/4/5 + 13D/G)">⚑ ${r.insider_event_count} insider</span>` : '';
+      const awBadge = r.award_event_count > 0 ? `<span class="badge aw" title="USAspending federal contract awards">📄 ${r.award_event_count} award${r.award_event_count === 1 ? '' : 's'}</span>` : '';
+      const freshBadge = r.is_fresh ? `<span class="badge" style="border-color:#fbbf24;color:#fbbf24" title="Activity within the decay window (signal at full weight)">fresh</span>` : '';
+      const ageBadge = r.staleness_days != null ? `<span class="badge" title="Days since freshest event">${Number(r.staleness_days).toFixed(1)}d</span>` : '';
+      const weightBadge = `<span class="badge" title="Confidence (0..1)">w=${Number(r.weight || 0).toFixed(2)}</span>`;
+      return `<div class="auto-row clickable" data-symbol="${esc(r.symbol)}">
+        <div class="sym">${esc(r.symbol)}</div>
+        <div class="delta ${dcls}">${sign}${delta.toFixed(2)} pts</div>
+        <div class="meta">${esc(r.reason || '')}<span class="muted">click to open in scanner detail panel</span></div>
+        <div class="badges">${freshBadge}${insBadge}${awBadge}${ageBadge}${weightBadge}</div>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    autoResultsEl.innerHTML = `<div class="card">Failed to load auto-results: ${esc(String(e))}</div>`;
+  }
+}
+
+document.getElementById('triggerAutoscan').addEventListener('click', async () => {
+  autoscanPill.textContent = 'autoscan: kicking off…';
+  await fetch(`${API_BASE}/autoscan-trigger`, {method:'POST'});
+  setTimeout(loadAutoscanStatus, 800);
+});
+
+if (cancelAutoscanBtn) {
+  cancelAutoscanBtn.addEventListener('click', async () => {
+    cancelAutoscanBtn.disabled = true;
+    cancelAutoscanBtn.textContent = 'Cancelling…';
+    try {
+      await fetch(`${API_BASE}/autoscan-cancel`, {method:'POST'});
+    } catch (e) { /* ignore */ }
+    setTimeout(() => {
+      cancelAutoscanBtn.disabled = false;
+      cancelAutoscanBtn.textContent = 'Cancel sweep';
+      loadAutoscanStatus();
+    }, 1200);
+  });
+}
+
+// Click any auto-row → open that symbol in the main scanner detail panel
+document.addEventListener('click', (e) => {
+  const row = e.target.closest('.auto-row[data-symbol]');
+  if (!row) return;
+  const sym = row.dataset.symbol;
+  if (sym) window.open(`/ui?focus=${encodeURIComponent(sym)}`, '_blank');
+});
+
+function openDrawer(title, html){
+  if (!drawer || !drawerTitle || !drawerBody || !overlay) return;
+  drawerTitle.textContent = title;
+  drawerBody.innerHTML = html;
+  drawer.classList.add('open');
+  overlay.classList.add('open');
+  const closeBtn = document.getElementById('closeDrawer'); if (closeBtn) closeBtn.focus();
+}
+function closeDrawer(){
+  if (!drawer || !overlay) return;
+  drawer.classList.remove('open');
+  overlay.classList.remove('open');
+}
+
+async function showTrackedCompany(cik){
+  const res = await fetch(`${API_BASE}/tracked-companies/${encodeURIComponent(cik)}`);
+  const data = await res.json();
+  const filings = (data.filings||[]).map(x => `<div class="card clickable" data-filing-key="${esc(x.unique_key || '')}"><strong>${esc(x.form || '')}</strong><br><span class="muted">${esc(x.filing_date || '')}</span><br>${esc(x.reporting_owner_name || '')}</div>`).join('') || '<div class="card">No related filings.</div>';
+  const alertsHtml = (data.alerts||[]).map(x => `<div class="card clickable" data-alert-id="${x.id}"><strong>${esc(x.title || '')}</strong><br><span class="muted">${esc(x.alert_type || '')}</span></div>`).join('') || '<div class="card">No related alerts.</div>';
+  openDrawer(`Tracked company ${esc(data.company.issuer_name || data.company.issuer_ticker || data.company.cik)}`, `${detailRows(data.company)}<h3>Related filings</h3>${filings}<h3>Related alerts</h3>${alertsHtml}`);
+}
+async function showFiling(uniqueKey){
+  if (!uniqueKey) return;
+  const res = await fetch(`${API_BASE}/filings/${encodeURIComponent(uniqueKey)}`);
+  const data = await res.json();
+  openDrawer(`Filing ${esc(data.form || '')}`, `${detailRows(data)}${data.source_url ? `<p><a style="color:#5eead4" href="${esc(data.source_url)}" target="_blank" rel="noopener noreferrer">Open source filing</a></p>` : ''}`);
+}
+async function showAward(id){
+  const res = await fetch(`${API_BASE}/awards/${encodeURIComponent(id)}`);
+  const data = await res.json();
+  openDrawer(`Award ${esc(data.recipient_name || data.award_id || id)}`, detailRows(data));
+}
+async function showAlert(id){
+  const res = await fetch(`${API_BASE}/alerts/${id}`);
+  const data = await res.json();
+  openDrawer(`Alert ${esc(data.title || id)}`, detailRows(data));
+}
+window.showTrackedCompany = showTrackedCompany;
+window.showFiling = showFiling;
+window.showAward = showAward;
+window.showAlert = showAlert;
+
+// Phase 25: insider event cards now lead with the buy/sell direction
+// (color-coded) + the notional dollar value so the user can scan a
+// list and instantly grok intent and size.
+function _formatNotional(shares, pps) {
+  if (!shares || !pps) return null;
+  const n = Number(shares) * Number(pps);
+  if (!isFinite(n) || n <= 0) return null;
+  if (n >= 1e9) return '$' + (n/1e9).toFixed(2) + 'B';
+  if (n >= 1e6) return '$' + (n/1e6).toFixed(2) + 'M';
+  if (n >= 1e3) return '$' + (n/1e3).toFixed(1) + 'k';
+  return '$' + n.toFixed(0);
+}
+function _insiderDirectionLabel(x) {
+  // P=open-market buy, S=open-market sell, A=grant, F=tax withholding,
+  // M=option exercise.  Color-code only the ones with clear directional
+  // intent.
+  const code = (x.transaction_code || '').toUpperCase();
+  const tt = (x.transaction_type || '').toLowerCase();
+  if (code === 'P' || tt.includes('buy')) return {label: 'BUY', cls: 'dir-buy'};
+  if (code === 'S' || tt.includes('sell')) return {label: 'SELL', cls: 'dir-sell'};
+  if (code === 'A') return {label: 'GRANT', cls: 'dir-grant'};
+  if (code === 'M') return {label: 'EXERCISE', cls: 'dir-grant'};
+  if (code === 'F') return {label: 'TAX WHHD', cls: 'dir-grant'};
+  if (x.form === 'SC 13D' || x.form === 'SC 13G' || x.form === 'SC 13D/A' || x.form === 'SC 13G/A') {
+    return {label: '5%+ OWNER', cls: 'dir-grant'};
+  }
+  return {label: 'EVENT', cls: 'dir-grant'};
+}
+function _renderInsiderCard(x) {
+  const dir = _insiderDirectionLabel(x);
+  const notional = _formatNotional(x.shares, x.price_per_share);
+  const sharesStr = x.shares ? Number(x.shares).toLocaleString() : '';
+  const ppsStr = x.price_per_share ? '$' + Number(x.price_per_share).toFixed(4) : '';
+  const titleLine = (x.officer_title || '').trim();
+  const roleBadges = [
+    x.is_ten_percent_owner ? '10% owner' : '',
+    x.is_officer ? 'officer' : '',
+    x.is_director ? 'director' : '',
+  ].filter(Boolean).join(' \u00b7 ');
+  const txDescriptor = x.transaction_type
+    ? esc(x.transaction_type).replace(/_/g, ' ')
+    : 'ownership event';
+  return `<div class="card clickable insider-card" data-filing-key="${esc(x.unique_key || '')}">
+    <div class="insider-head">
+      <span class="insider-dir ${dir.cls}">${dir.label}</span>
+      <span class="insider-form">${esc(x.form || '')}</span>
+      ${notional ? `<span class="insider-notional">${notional}</span>` : ''}
+    </div>
+    <div class="insider-row1"><strong>${esc(x.reporting_owner_name || 'Unknown owner')}</strong>${titleLine ? `<span class="muted"> \u2014 ${esc(titleLine)}</span>` : ''}</div>
+    <div class="muted insider-row2">${esc(x.filing_date || '')} \u00b7 ${esc(x.issuer_ticker || x.issuer_name || '')}${roleBadges ? ` \u00b7 ${roleBadges}` : ''}</div>
+    <div class="insider-row3">${txDescriptor}${x.transaction_code ? ` (${esc(x.transaction_code)})` : ''}${sharesStr ? ` \u2014 ${sharesStr} shares` : ''}${ppsStr ? ` @ ${ppsStr}` : ''}</div>
+    ${x.percent_owned ? `<div class="muted">Percent owned: ${esc(x.percent_owned)}%</div>` : ''}
+    <div class="muted">Click for details</div>
+  </div>`;
+}
+function _renderAwardCard(x) {
+  const amt = x.amount ? '$' + Number(x.amount).toLocaleString() : '';
+  return `<div class="card clickable award-card" data-award-id="${esc(x.generated_internal_id || '')}">
+    <div class="award-head">
+      <span class="insider-dir dir-buy">AWARD</span>
+      ${amt ? `<span class="insider-notional">${amt}</span>` : ''}
+    </div>
+    <strong>${esc(x.recipient_name || 'Unknown recipient')}</strong>
+    <div class="muted">${esc(x.action_date || '')}</div>
+    <div>${esc(x.awarding_agency || '')}${x.awarding_subagency ? ' / ' + esc(x.awarding_subagency) : ''}</div>
+    ${x.award_id ? `<div class="muted">Award ID: ${esc(x.award_id)}</div>` : ''}
+    ${esc(x.description || '')}
+    <div class="muted">Click for details</div>
+  </div>`;
+}
+
+async function runScan(){
+  insider.innerHTML = '<div class="card">Loading...</div>';
+  awards.innerHTML = '<div class="card">Loading...</div>';
+  const cik = document.getElementById('cik').value.trim();
+  const recipient = document.getElementById('recipient').value.trim();
+  const limit = document.getElementById('limit').value.trim();
+  const res = await fetch(`${API_BASE}/monitor?cik=${encodeURIComponent(cik)}&recipient=${encodeURIComponent(recipient)}&limit=${encodeURIComponent(limit)}`);
+  const data = await res.json();
+  const insiderStatus = data.insider_status || 'ok';
+  const awardsStatus = data.awards_status || 'ok';
+  const insiderBanner = insiderStatus !== 'ok' ? `<div class="card">Insider source error: ${esc(data.insider_error || 'Unknown error')}</div>` : '';
+  const awardsBanner = awardsStatus !== 'ok' ? `<div class="card">Awards source error: ${esc(data.awards_error || 'Unknown error')}</div>` : '';
+  const insiderCards = (data.insider_events || []).map(_renderInsiderCard).join('');
+  const awardCards = (data.award_events || []).map(_renderAwardCard).join('');
+  insider.innerHTML = insiderBanner + (insiderCards || '<div class="card">No results.</div>');
+  awards.innerHTML = awardsBanner + (awardCards || '<div class="card">No results.</div>');
+  // Force the signal index to rebuild so any new filings immediately impact scoring.
+  try { await fetch(`${API_BASE}/signal-refresh`, {method:'POST'}); } catch(e) {}
+  await Promise.all([loadAlerts(), loadStats(), loadTrackedCompanies(), loadSignalIndex()]);
+}
+
+document.getElementById('run').addEventListener('click', runScan);
+document.getElementById('saveWatch').addEventListener('click', async () => {
+  const cik = document.getElementById('cik').value.trim();
+  const recipient = document.getElementById('recipient').value.trim();
+  await fetch(`${API_BASE}/watchlists`, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({cik, recipient})});
+  await Promise.all([loadWatchlists(), loadTrackedCompanies(), loadStats()]);
+});
+document.getElementById('pollWatch').addEventListener('click', async () => {
+  await fetch(`${API_BASE}/poll`, {method:'POST'});
+  await Promise.all([loadAlerts(), loadStats(), loadTrackedCompanies(), loadSignalIndex()]);
+});
+document.getElementById('discoverTracked').addEventListener('click', async () => {
+  await fetch(`${API_BASE}/discover`, {method:'POST'});
+  await Promise.all([loadAlerts(), loadStats(), loadTrackedCompanies(), loadSignalIndex()]);
+});
+document.getElementById('scanTracked').addEventListener('click', async () => {
+  await fetch(`${API_BASE}/scan-tracked`, {method:'POST'});
+  await Promise.all([loadAlerts(), loadStats(), loadTrackedCompanies(), loadSignalIndex()]);
+});
+document.getElementById('refreshSignal').addEventListener('click', async () => {
+  await fetch(`${API_BASE}/signal-refresh`, {method:'POST'});
+  await loadSignalIndex();
+});
+document.getElementById('saveSettings').addEventListener('click', async () => {
+  const keys = ['scheduler_interval_seconds','default_scan_limit','large_award_threshold','ownership_threshold_percent',
+    'enable_scheduler','enable_entity_linking','enable_auto_discovery','auto_discovery_interval_seconds',
+    'enable_universe_autoscan','universe_autoscan_interval_seconds','universe_autoscan_request_gap_ms',
+    'universe_autoscan_limit_per_symbol','universe_autoscan_max_tickers',
+    'signal_max_age_days','signal_decay_days','signal_max_boost','signal_min_dollar_value','signal_strong_dollar_value'];
+  for (const k of keys){
+    const el = document.getElementById(k);
+    if (!el) continue;
+    const v = el.value;
+    if (v === '' || v == null) continue;
+    await fetch(`${API_BASE}/settings`, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({key:k, value:String(v)})});
+  }
+  await loadSettings();
+  // settings can change signal weights — force a refresh
+  await fetch(`${API_BASE}/signal-refresh`, {method:'POST'}).catch(()=>{});
+  await loadSignalIndex();
+});
+document.getElementById('closeDrawer').addEventListener('click', closeDrawer);
+overlay.addEventListener('click', closeDrawer);
+document.addEventListener('click', (e) => {
+  const card = e.target.closest('.clickable');
+  if (!card) return;
+  if (card.dataset.companyCik) showTrackedCompany(card.dataset.companyCik);
+  else if (card.dataset.filingKey) showFiling(card.dataset.filingKey);
+  else if (card.dataset.awardId) showAward(card.dataset.awardId);
+  else if (card.dataset.alertId) showAlert(card.dataset.alertId);
+});
+
+Promise.all([loadAlerts(), loadWatchlists(), loadTrackedCompanies(), loadSettings(), loadStats(), loadSignalIndex(), loadAutoResults(), loadAutoscanStatus()]);
+// Auto-refresh: signal index every 30s; auto-results every 15s; autoscan progress every 5s.
+setInterval(loadSignalIndex, 30000);
+setInterval(loadAutoResults, 15000);
+setInterval(loadAutoscanStatus, 5000);
+setInterval(loadStats, 20000);
+</script>
+<!-- Contextual help icons + tooltips (shared with the main dashboard) -->
+<script src="/frontend/help.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Shared Analyses — Market Refinement Dashboard</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/frontend/styles.css">
+  <style>
+    body.sa-body{background:#0d1117;color:#e6edf3;margin:0;font-family:'Satoshi','Segoe UI',system-ui,sans-serif;min-height:100vh}
+    .sa-header{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding:32px 40px 20px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .sa-header h1{margin:0;font-size:1.7rem;font-weight:700;letter-spacing:-.01em}
+    .sa-sub{color:#c8d0dd;font-size:.85rem;margin-top:6px;max-width:640px;line-height:1.5}
+    .sa-nav{display:flex;gap:10px;align-items:center}
+    .sa-nav a,.sa-nav button{display:inline-block;color:#e6edf3;text-decoration:none;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);padding:8px 14px;border-radius:8px;font-size:.78rem;letter-spacing:.02em;font-weight:500;cursor:pointer}
+    .sa-nav a:hover,.sa-nav button:hover{background:rgba(94,234,212,.12);border-color:rgba(94,234,212,.4);color:#dffcf5}
+    .sa-toolbar{display:flex;align-items:center;justify-content:space-between;padding:16px 40px;font-size:.75rem;color:#c8d0dd}
+    .sa-toolbar .sa-count{font-weight:600;color:#5eead4;letter-spacing:.06em;text-transform:uppercase}
+    .sa-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px;padding:12px 40px 60px}
+    .sa-card{background:#141a24;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden;transition:transform .12s,border-color .15s,box-shadow .15s}
+    .sa-card:hover{transform:translateY(-2px);border-color:rgba(94,234,212,.35);box-shadow:0 12px 30px rgba(0,0,0,.35)}
+    .sa-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+    .sa-symbol{font-size:1.5rem;font-weight:700;letter-spacing:-.01em;color:#e6edf3;line-height:1;margin:0}
+    .sa-name{font-size:.72rem;color:#8b95a6;margin-top:4px;letter-spacing:.02em}
+    .sa-score{font-size:1.3rem;font-weight:700;font-variant-numeric:tabular-nums}
+    .sa-score-label{font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.4);text-align:right}
+    .sa-tier-row{display:flex;flex-wrap:wrap;gap:6px;font-size:.7rem}
+    .sa-chip{display:inline-block;padding:3px 8px;border-radius:100px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#c8d0dd;letter-spacing:.02em}
+    .sa-chip.is-bull{border-color:rgba(94,193,154,.5);background:rgba(94,193,154,.12);color:#a8e0c6}
+    .sa-chip.is-bear{border-color:rgba(230,120,138,.5);background:rgba(230,120,138,.12);color:#f0b3bd}
+    .sa-chip.is-squeeze{border-color:rgba(94,234,212,.55);background:rgba(94,234,212,.14);color:#a8f0e2;font-weight:600}
+    .sa-chip.is-vol{border-color:rgba(251,191,36,.55);background:rgba(251,191,36,.14);color:#fde68a;font-weight:600}
+    .sa-metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;padding-top:8px;border-top:1px dashed rgba(255,255,255,.08)}
+    .sa-metric{display:flex;flex-direction:column;gap:2px}
+    .sa-metric-label{font-size:.6rem;color:rgba(255,255,255,.4);letter-spacing:.1em;text-transform:uppercase}
+    .sa-metric-value{font-size:.9rem;color:#e6edf3;font-weight:600;font-variant-numeric:tabular-nums}
+    .sa-foot{display:flex;justify-content:space-between;align-items:center;font-size:.68rem;color:rgba(255,255,255,.4);padding-top:8px;border-top:1px dashed rgba(255,255,255,.08)}
+    .sa-hits{background:rgba(255,255,255,.05);padding:2px 8px;border-radius:100px;color:#8b95a6}
+    .sa-hits.is-hot{background:rgba(94,234,212,.14);color:#5eead4;border:1px solid rgba(94,234,212,.35)}
+    .sa-open{color:#5eead4;text-decoration:none;font-weight:600;letter-spacing:.02em}
+    .sa-open:hover{color:#dffcf5}
+    .sa-empty{padding:80px 40px;text-align:center;color:#8b95a6}
+    .sa-empty h2{color:#c8d0dd;margin:0 0 10px;font-size:1.1rem}
+    .sa-download-card{grid-column:1 / -1;background:linear-gradient(135deg,rgba(94,234,212,.10),rgba(94,234,212,.02));border:1px solid rgba(94,234,212,.35);border-radius:12px;padding:22px 26px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+    .sa-download-card h3{margin:0 0 4px;color:#dffcf5;font-size:1rem;font-weight:700}
+    .sa-download-card p{margin:0;color:#a8f0e2;font-size:.78rem;line-height:1.5;max-width:520px}
+    .sa-download-card a.dl-btn{background:#5eead4;color:#0d1117;padding:12px 22px;border-radius:8px;text-decoration:none;font-weight:700;font-size:.85rem;letter-spacing:.02em}
+    .sa-download-card a.dl-btn:hover{background:#dffcf5}
+    .sa-download-meta{font-size:.7rem;color:rgba(255,255,255,.5);letter-spacing:.02em;margin-top:6px}
+  </style>
+</head>
+<body class="sa-body">
+
+  <header class="sa-header">
+    <div>
+      <h1>Shared analyses</h1>
+      <p class="sa-sub">
+        Every time someone shares a symbol from the detail panel, a snapshot of its metrics is logged here.
+        Cards show the state at share-time — click <em>Reopen</em> to see the current live analysis for that symbol.
+      </p>
+    </div>
+    <nav class="sa-nav">
+      <a href="/frontend/market-refinement-dashboard.html" data-testid="back-to-dashboard">← Dashboard</a>
+      <a href="/frontend/metrics-hub.html">Metrics hub</a>
+      <button type="button" id="saRefresh" data-testid="sa-refresh">⟳ Refresh</button>
+    </nav>
+  </header>
+
+  <div class="sa-toolbar">
+    <span class="sa-count"><span id="saCount" data-testid="sa-count">—</span> shared</span>
+    <span id="saMeta" data-testid="sa-meta">—</span>
+  </div>
+
+  <main class="sa-grid" id="saGrid" data-testid="sa-grid">
+    <div class="sa-empty">Loading shared analyses…</div>
+  </main>
+
+  <script>
+    const $ = (s) => document.querySelector(s);
+    const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const fmtRel = (iso) => {
+      if (!iso) return '—';
+      try {
+        const t = new Date(iso).getTime();
+        const s = Math.max(0, Math.floor((Date.now() - t) / 1000));
+        if (s < 60) return `${s}s ago`;
+        if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+        if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+        return `${Math.floor(s / 86400)}d ago`;
+      } catch (_) { return '—'; }
+    };
+
+    async function fetchDownloadInfo() {
+      try {
+        const r = await fetch('/api/download/source/info');
+        if (!r.ok) return null;
+        return await r.json();
+      } catch (_) { return null; }
+    }
+
+    function renderDownloadCard(info) {
+      if (!info || !info.exists) {
+        return `
+          <div class="sa-download-card" data-testid="sa-download-card">
+            <div>
+              <h3>Download source bundle</h3>
+              <p>Grab the complete backend + frontend as a zip for local testing or porting into tagedin.com. The bundle is generated on first request.</p>
+              <div class="sa-download-meta">First request will package the source (~5-15 seconds).</div>
+            </div>
+            <a class="dl-btn" href="/download/source.zip" data-testid="sa-download-btn">Download .zip ⇩</a>
+          </div>`;
+      }
+      return `
+        <div class="sa-download-card" data-testid="sa-download-card">
+          <div>
+            <h3>Download source bundle (${info.size_mb} MB)</h3>
+            <p>Self-contained zip of the FastAPI backend, Vanilla-JS dashboard, and Metrics Hub. Exclusions: provider caches, node_modules, __pycache__, .git. Includes a MANIFEST.txt with run instructions.</p>
+            <div class="sa-download-meta">Built ${fmtRel(info.built_utc)}${info.stale ? ' · stale → next request rebuilds' : ''}</div>
+          </div>
+          <a class="dl-btn" href="/download/source.zip" data-testid="sa-download-btn">Download .zip ⇩</a>
+        </div>`;
+    }
+
+    function renderCard(item) {
+      const s = item.snapshot || {};
+      const dir = (s.final_direction || 'Neutral').toLowerCase();
+      const dirCls = dir === 'bullish' ? 'is-bull' : dir === 'bearish' ? 'is-bear' : '';
+      const shareUrl = `/frontend/market-refinement-dashboard.html?symbol=${encodeURIComponent(item.symbol)}${item.preset ? '&preset=' + encodeURIComponent(item.preset) : ''}`;
+      const shareLandingUrl = `/share/${encodeURIComponent(item.symbol)}${item.preset ? '?preset=' + encodeURIComponent(item.preset) : ''}`;
+      const hits = Number(item.hit_count || 1);
+      const hitCls = hits >= 5 ? 'is-hot' : '';
+      const tags = [];
+      if (Number(s.squeeze || 0) >= 0.35) tags.push(`<span class="sa-chip is-squeeze">▲ Squeeze ${Math.round(s.squeeze * 100)}%</span>`);
+      if (Number(s.vol_event || 0) >= 0.45) tags.push(`<span class="sa-chip is-vol">⚡ Vol-event ${Math.round(s.vol_event * 100)}%</span>`);
+      const pUp = Number(s.p_up || 0.5);
+      const pCtx = (s.p_up_ctx != null) ? Number(s.p_up_ctx) : null;
+      const pStr = pCtx != null
+        ? `${(pUp * 100).toFixed(1)}% → ${(pCtx * 100).toFixed(1)}%`
+        : `${(pUp * 100).toFixed(1)}%`;
+      const kelly = (s.kelly != null) ? Number(s.kelly).toFixed(4) : '—';
+      const sspStr = (s.ssp_score != null) ? `${Number(s.ssp_score).toFixed(0)} · ${String(s.ssp_label || 'neutral').replace(/_/g,' ')}` : '—';
+      const pviStr = (s.pvi_score != null) ? `${Number(s.pvi_score).toFixed(0)} · ${s.pvi_bucket || 'low'}` : '—';
+      const expStr = s.nearest_exp ? `${s.nearest_exp} (${s.dte}d)` : '—';
+      return `
+        <article class="sa-card" data-testid="sa-card-${esc(item.symbol)}">
+          <div class="sa-card-head">
+            <div>
+              <div class="sa-symbol">$${esc(item.symbol)}</div>
+              <div class="sa-name">${esc(s.name || '')}${s.exchange ? ' · ' + esc(s.exchange) : ''}</div>
+            </div>
+            <div style="text-align:right">
+              <div class="sa-score-label">Score</div>
+              <div class="sa-score">${Number(s.final_score || 0).toFixed(1)}</div>
+            </div>
+          </div>
+          <div class="sa-tier-row">
+            <span class="sa-chip">Tier ${esc(s.tier || '?')}</span>
+            <span class="sa-chip ${dirCls}">${esc(s.final_direction || 'Neutral')}</span>
+            ${tags.join('')}
+          </div>
+          <div class="sa-metrics">
+            <div class="sa-metric"><span class="sa-metric-label">1d P(up) cf → ctx</span><span class="sa-metric-value">${pStr}</span></div>
+            <div class="sa-metric"><span class="sa-metric-label">Kelly rank</span><span class="sa-metric-value">${kelly}</span></div>
+            <div class="sa-metric"><span class="sa-metric-label">Short pressure</span><span class="sa-metric-value">${sspStr}</span></div>
+            <div class="sa-metric"><span class="sa-metric-label">Predicted volume</span><span class="sa-metric-value">${pviStr}</span></div>
+            <div class="sa-metric" style="grid-column:1 / -1"><span class="sa-metric-label">Nearest expiration</span><span class="sa-metric-value">${expStr}</span></div>
+          </div>
+          <div class="sa-foot">
+            <span>${fmtRel(item.iso_last || item.iso)}${item.ua_hint ? ' · via ' + esc(item.ua_hint) : ''} <span class="sa-hits ${hitCls}" title="Number of scraper / user hits on the share page">${hits} hit${hits === 1 ? '' : 's'}</span></span>
+            <span><a class="sa-open" href="${shareUrl}" data-testid="sa-open-${esc(item.symbol)}">Reopen ↗</a> · <a class="sa-open" href="${shareLandingUrl}" target="_blank" rel="noopener" title="View the shareable landing page">share ↗</a></span>
+          </div>
+        </article>`;
+    }
+
+    async function loadGallery() {
+      const grid = $('#saGrid');
+      grid.innerHTML = '<div class="sa-empty">Loading shared analyses…</div>';
+      const [dlInfo, res] = await Promise.all([
+        fetchDownloadInfo(),
+        fetch('/api/shares/recent?limit=100').then((r) => r.ok ? r.json() : { items: [] }).catch(() => ({ items: [] })),
+      ]);
+      const items = (res && res.items) || [];
+      $('#saCount').textContent = String(items.length);
+      $('#saMeta').textContent = items.length
+        ? `Newest: ${fmtRel(items[0].iso_last || items[0].iso)}`
+        : 'No shares yet — hit the Share button on any detail panel to seed the gallery';
+      const downloadHtml = renderDownloadCard(dlInfo);
+      if (!items.length) {
+        grid.innerHTML = downloadHtml + `
+          <div class="sa-empty">
+            <h2>No shares yet</h2>
+            <p>Open a symbol on the dashboard, click <strong>⇗ Share</strong>, and pick any platform.<br>Each share page hit (yours or from social scrapers) shows up here.</p>
+          </div>`;
+        return;
+      }
+      grid.innerHTML = downloadHtml + items.map(renderCard).join('');
+    }
+
+    document.getElementById('saRefresh').addEventListener('click', loadGallery);
+    loadGallery();
+  </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" aria-label="Market Refinement logo">
+  <rect x="8" y="8" width="48" height="48" rx="12" stroke="currentColor" stroke-width="4"/>
+  <path d="M18 40L28 30L35 35L46 22" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="46" cy="22" r="3" fill="currentColor"/>
+</svg>

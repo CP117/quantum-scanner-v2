@@ -1,0 +1,481 @@
+/* ============================================================
+ *  Metrics Hub — dedicated styles
+ *  Phase 26.61
+ *
+ *  Inherits the base palette + typography from `styles.css` (loaded
+ *  first in metrics-hub.html) and layers a tabbed-page layout on top.
+ *  Tokens are reused so the hub feels native to the rest of the app.
+ * ============================================================ */
+
+.metrics-hub-body {
+  background: var(--bg, #0c0f14);
+  color: var(--text, #e6edf3);
+  font-family: 'Satoshi', system-ui, sans-serif;
+  margin: 0;
+  /* Override the dashboard's overflow:hidden + height:100% — the
+     Metrics Hub is a long, scrollable subpage. */
+  height: auto !important;
+  min-height: 100vh;
+  overflow: auto !important;
+  overflow-x: hidden !important;
+}
+html:has(body.metrics-hub-body),
+body.metrics-hub-body {
+  /* Belt + suspenders: explicitly unlock scroll on both <html> and
+     <body> so the page can grow past the viewport.  The
+     dashboard's stylesheet locks both at `height:100%` + `overflow:hidden`. */
+  height: auto !important;
+  overflow-y: auto !important;
+}
+
+/* --- Header ---------------------------------------------------- */
+.mh-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 22px 32px 14px;
+  border-bottom: 1px solid var(--border, #1f2937);
+  gap: 24px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+}
+.mh-header h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  letter-spacing: -0.01em;
+}
+.mh-subtitle {
+  margin: 6px 0 0;
+  color: var(--muted, #94a3b8);
+  font-size: .9rem;
+  max-width: 620px;
+}
+.mh-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.mh-nav-link {
+  color: var(--accent, #7dd3fc);
+  text-decoration: none;
+  font-size: .85rem;
+}
+.mh-nav-link:hover {
+  text-decoration: underline;
+}
+.mh-freshness {
+  font-size: .78rem;
+  color: var(--muted, #94a3b8);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Buttons --------------------------------------------------- */
+.mh-btn {
+  background: var(--surface, #111827);
+  color: var(--text, #e6edf3);
+  border: 1px solid var(--border, #1f2937);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: .85rem;
+  font-family: inherit;
+  transition: background .15s ease, border-color .15s ease;
+}
+.mh-btn:hover {
+  background: var(--surface-2, #1f2937);
+  border-color: var(--accent, #7dd3fc);
+}
+.mh-btn:focus-visible {
+  outline: 2px solid var(--accent, #7dd3fc);
+  outline-offset: 2px;
+}
+.mh-btn-primary {
+  background: var(--accent, #7dd3fc);
+  color: #0c0f14;
+  border-color: transparent;
+}
+.mh-btn-primary:hover {
+  background: #38bdf8;
+}
+
+/* --- Tabs ------------------------------------------------------ */
+.mh-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 12px 32px 0;
+  border-bottom: 1px solid var(--border, #1f2937);
+  background: rgba(0,0,0,0.2);
+}
+.mh-tab {
+  background: transparent;
+  color: var(--muted, #94a3b8);
+  border: 1px solid transparent;
+  border-bottom: 2px solid transparent;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: .9rem;
+  font-family: inherit;
+  border-radius: 6px 6px 0 0;
+  transition: color .15s ease, border-color .15s ease, background .15s ease;
+}
+.mh-tab:hover {
+  color: var(--text, #e6edf3);
+  background: var(--surface, #111827);
+}
+.mh-tab.is-active {
+  color: var(--text, #e6edf3);
+  border-bottom-color: var(--accent, #7dd3fc);
+  background: var(--surface, #111827);
+}
+
+/* --- Main / sections ------------------------------------------- */
+.mh-main {
+  padding: 24px 32px 60px;
+}
+.mh-section {
+  display: none;
+}
+.mh-section.is-active {
+  display: block;
+  animation: mh-fade 200ms ease;
+}
+@keyframes mh-fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.mh-section-header h2 {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+}
+.mh-section-sub {
+  margin: 0 0 20px;
+  color: var(--muted, #94a3b8);
+  font-size: .85rem;
+  max-width: 760px;
+  line-height: 1.45;
+}
+
+/* --- Grids / cards --------------------------------------------- */
+.mh-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+.mh-card {
+  background: var(--surface, #111827);
+  border: 1px solid var(--border, #1f2937);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color .15s ease, transform .15s ease;
+}
+.mh-card:hover {
+  border-color: var(--accent, #7dd3fc);
+  transform: translateY(-1px);
+}
+.mh-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+.mh-card-title {
+  font-weight: 600;
+  font-size: .95rem;
+  color: var(--text, #e6edf3);
+}
+.mh-card-meta {
+  font-size: .72rem;
+  color: var(--muted, #94a3b8);
+  font-variant-numeric: tabular-nums;
+}
+.mh-card-desc {
+  font-size: .82rem;
+  color: #c5cbd2;
+  line-height: 1.5;
+}
+.mh-card-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+.mh-chip {
+  display: inline-block;
+  background: var(--surface-2, #1f2937);
+  border: 1px solid var(--border, #1f2937);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: .7rem;
+  color: var(--muted, #94a3b8);
+}
+.mh-chip.is-ok        { background: rgba(52, 211, 153, 0.12); color: #34d399; border-color: rgba(52, 211, 153, 0.35); }
+.mh-chip.is-warn      { background: rgba(251, 191, 36, 0.12); color: #fbbf24; border-color: rgba(251, 191, 36, 0.35); }
+.mh-chip.is-error     { background: rgba(239, 68, 68, 0.12);  color: #f87171; border-color: rgba(239, 68, 68, 0.35); }
+.mh-chip.is-experimental { background: rgba(124,29,40,0.20);  color: #fca5a5; border-color: rgba(252,165,165,0.35); }
+.mh-chip.is-info      { background: rgba(125, 211, 252, 0.12); color: #7dd3fc; border-color: rgba(125, 211, 252, 0.35); }
+
+/* --- Tables ---------------------------------------------------- */
+.mh-table-wrap {
+  background: var(--surface, #111827);
+  border: 1px solid var(--border, #1f2937);
+  border-radius: 10px;
+  overflow: hidden;
+}
+table.mh-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .85rem;
+}
+table.mh-table th,
+table.mh-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border, #1f2937);
+  text-align: left;
+  vertical-align: top;
+}
+table.mh-table th {
+  background: rgba(0,0,0,0.25);
+  font-weight: 600;
+  color: var(--muted, #94a3b8);
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+table.mh-table tr:last-child td {
+  border-bottom: none;
+}
+table.mh-table tr.is-experimental td:first-child {
+  border-left: 3px solid #7c1d28;
+}
+
+/* --- Two-column layout (data flows tab) ------------------------ */
+.mh-twocol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.mh-twocol h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  color: var(--text, #e6edf3);
+}
+@media (max-width: 900px) {
+  .mh-twocol { grid-template-columns: 1fr; }
+}
+.mh-flow-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border: 1px solid var(--border, #1f2937);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  background: var(--surface, #111827);
+}
+.mh-flow-row .mh-flow-name {
+  font-weight: 500;
+}
+.mh-flow-row .mh-flow-sub {
+  font-size: .75rem;
+  color: var(--muted, #94a3b8);
+  margin-top: 2px;
+}
+
+/* --- Weights tab ---------------------------------------------- */
+.mh-weights-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.mh-weights-status {
+  font-size: .8rem;
+  color: var(--muted, #94a3b8);
+}
+.mh-weights-status.is-saved { color: #34d399; }
+.mh-weights-status.is-error { color: #f87171; }
+/* Phase 26.61c — "Diff vs defaults" badge counter.  Sits between the
+   toolbar buttons and the status text.  Tints amber when any weight
+   has been moved from default; green when fully at defaults. */
+.mh-diff-badge {
+  font-size: .78rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(52, 211, 153, 0.12);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  font-variant-numeric: tabular-nums;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+.mh-diff-badge.is-dirty {
+  background: rgba(251, 191, 36, 0.14);
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.35);
+}
+.mh-weights-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 1100px) {
+  .mh-weights-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 800px) {
+  .mh-weights-grid { grid-template-columns: 1fr; }
+}
+.mh-weights-col {
+  background: var(--surface, #111827);
+  border: 1px solid var(--border, #1f2937);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.mh-weights-col h3 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+.mh-weights-hint {
+  margin: 0 0 12px;
+  color: var(--muted, #94a3b8);
+  font-size: .78rem;
+  line-height: 1.45;
+}
+
+.mh-weight-row {
+  display: grid;
+  grid-template-columns: 1fr 60px;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px dashed rgba(148, 163, 184, 0.18);
+}
+.mh-weight-row:last-child { border-bottom: none; }
+.mh-weight-row label {
+  font-size: .82rem;
+  color: var(--text, #e6edf3);
+}
+.mh-weight-row .mh-weight-sub {
+  display: block;
+  font-size: .7rem;
+  color: var(--muted, #94a3b8);
+  margin-top: 2px;
+}
+.mh-weight-row input[type="range"] {
+  grid-column: span 2;
+  width: 100%;
+  margin-top: 6px;
+}
+.mh-weight-row .mh-weight-value {
+  font-variant-numeric: tabular-nums;
+  font-size: .82rem;
+  text-align: right;
+  color: var(--accent, #7dd3fc);
+}
+.mh-weight-row.is-changed .mh-weight-value {
+  color: #fbbf24;
+}
+
+.mh-mask-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px dashed rgba(148, 163, 184, 0.18);
+}
+.mh-mask-row:last-child { border-bottom: none; }
+.mh-mask-row label {
+  font-size: .82rem;
+  color: var(--text, #e6edf3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.mh-mask-row .mh-mask-label-text {
+  display: flex;
+  flex-direction: column;
+}
+.mh-mask-row .mh-mask-sub {
+  font-size: .7rem;
+  color: var(--muted, #94a3b8);
+  margin-top: 1px;
+}
+.mh-mask-row.is-experimental label .mh-mask-label-text::after {
+  content: 'experimental+';
+  display: inline-block;
+  background: rgba(124,29,40,0.22);
+  color: #fca5a5;
+  font-size: .62rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-top: 4px;
+  width: max-content;
+}
+
+/* --- Empty/loading -------------------------------------------- */
+.mh-empty {
+  color: var(--muted, #94a3b8);
+  font-size: .82rem;
+  padding: 12px 0;
+  text-align: center;
+}
+
+/* --- Live preview panel --------------------------------------- */
+.mh-preview-panel {
+  margin-top: 24px;
+  background: var(--surface, #111827);
+  border: 1px solid var(--border, #1f2937);
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+.mh-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.mh-preview-header h3 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+}
+.mh-preview-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.mh-preview-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .82rem;
+  color: var(--text, #e6edf3);
+}
+.mh-preview-control input { cursor: pointer; }
+
+/* Preview table — narrower / denser than the metrics catalog table */
+.mh-preview-panel table.mh-table {
+  font-size: .82rem;
+}
+.mh-preview-panel table.mh-table th,
+.mh-preview-panel table.mh-table td {
+  padding: 6px 10px;
+}
+.mh-preview-panel table.mh-table td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.mh-preview-panel .delta-up   { color: #34d399; font-weight: 600; }
+.mh-preview-panel .delta-down { color: #f87171; font-weight: 600; }
+.mh-preview-panel .delta-flat { color: var(--muted, #94a3b8); }
+.mh-preview-panel .dir-bull   { color: #34d399; }
+.mh-preview-panel .dir-bear   { color: #f87171; }
+.mh-preview-panel .dir-flat   { color: var(--muted, #94a3b8); }
+.mh-preview-panel tr.is-mover {
+  background: rgba(125, 211, 252, 0.05);
+}
