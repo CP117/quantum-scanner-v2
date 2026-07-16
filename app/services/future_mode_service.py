@@ -51,6 +51,7 @@ import logging
 import math
 import threading
 import time
+from collections import OrderedDict
 from typing import Any
 
 from app.services.bayesian_factor_blend import (
@@ -110,7 +111,13 @@ _ADV_CACHE_MAX = 4096
 # cache-miss code paths.  Smoothing factor `_LAT_EMA_ALPHA` chosen so a
 # handful of slow outliers don't dominate; ~16-sample memory.
 _LAT_EMA_ALPHA = 0.125
-_adv_cache: dict[tuple[str, int, float], tuple[float, AdvancedSignals]] = {}
+# Phase 26.60: OrderedDict + popitem(last=False) gives O(1) FIFO eviction
+# (matching the previous insertion-timestamp-ordered eviction) instead
+# of O(N log N) sort-and-pop.  At _ADV_CACHE_MAX=4096, the old
+# `sorted(...)[:1024]` on every overflow insertion was a ~40k-tuple sort
+# under the cache lock, replicated across four parallel caches (adv,
+# lab, strategy, pred) — a measurable share of scoring-hot-path CPU.
+_adv_cache: 'OrderedDict[tuple[str, int, float], tuple[float, AdvancedSignals]]' = OrderedDict()
 _adv_cache_lock = threading.Lock()
 _adv_cache_hits = 0
 _adv_cache_misses = 0
@@ -155,9 +162,15 @@ def _get_or_compute_advanced(symbol: str, closes: list[float]) -> AdvancedSignal
                 + _LAT_EMA_ALPHA * _dt_ms
             )
         if len(_adv_cache) > _ADV_CACHE_MAX:
-            # Evict oldest 25 % so we don't thrash on every insertion.
-            for k, _ in sorted(_adv_cache.items(), key=lambda kv: kv[1][0])[: _ADV_CACHE_MAX // 4]:
-                _adv_cache.pop(k, None)
+            # Phase 26.60: O(1) FIFO evict (was O(N log N) sort-and-pop).
+            # Preserves the previous "drop oldest 25% on overflow" batch
+            # semantics — OrderedDict.popitem(last=False) pops the
+            # least-recently-inserted entry.
+            for _ in range(_ADV_CACHE_MAX // 4):
+                try:
+                    _adv_cache.popitem(last=False)
+                except KeyError:
+                    break
     return sigs
 
 
@@ -186,7 +199,7 @@ def get_advanced_cache_stats() -> dict[str, float | int]:
 # cold daily history triggers one cache miss for BOTH bundles, but the
 # Lab cost (≈3-8 ms) is still cheap enough to fetch on demand.
 # ---------------------------------------------------------------------------
-_lab_cache: dict[tuple[str, int, float], tuple[float, LabSignals]] = {}
+_lab_cache: 'OrderedDict[tuple[str, int, float], tuple[float, LabSignals]]' = OrderedDict()
 _lab_cache_lock = threading.Lock()
 _lab_cache_hits = 0
 _lab_cache_misses = 0
@@ -224,8 +237,12 @@ def _get_or_compute_lab(symbol: str, closes: list[float]) -> LabSignals:
                 + _LAT_EMA_ALPHA * _dt_ms
             )
         if len(_lab_cache) > _ADV_CACHE_MAX:
-            for k, _ in sorted(_lab_cache.items(), key=lambda kv: kv[1][0])[: _ADV_CACHE_MAX // 4]:
-                _lab_cache.pop(k, None)
+            # Phase 26.60: O(1) FIFO evict (see _adv_cache for rationale).
+            for _ in range(_ADV_CACHE_MAX // 4):
+                try:
+                    _lab_cache.popitem(last=False)
+                except KeyError:
+                    break
     return sigs
 
 
@@ -288,8 +305,12 @@ def _get_or_compute_strategy(symbol: str, closes: list[float]) -> StrategySignal
                 + _LAT_EMA_ALPHA * _dt_ms
             )
         if len(_strategy_cache) > _ADV_CACHE_MAX:
-            for k, _ in sorted(_strategy_cache.items(), key=lambda kv: kv[1][0])[: _ADV_CACHE_MAX // 4]:
-                _strategy_cache.pop(k, None)
+            # Phase 26.60: O(1) FIFO evict (see _adv_cache for rationale).
+            for _ in range(_ADV_CACHE_MAX // 4):
+                try:
+                    _strategy_cache.popitem(last=False)
+                except KeyError:
+                    break
     return sigs
 
 
@@ -342,7 +363,7 @@ def clear_future_mode_caches() -> dict[str, int]:
 # cache is mainly to avoid re-running on every priority-lane tick
 # for unchanged daily history.
 # ---------------------------------------------------------------------------
-_pred_cache: dict[tuple[str, int, float], tuple[float, PredictiveExpansionSignals]] = {}
+_pred_cache: 'OrderedDict[tuple[str, int, float], tuple[float, PredictiveExpansionSignals]]' = OrderedDict()
 _pred_cache_lock = threading.Lock()
 _pred_cache_hits = 0
 _pred_cache_misses = 0
@@ -421,8 +442,12 @@ def _get_or_compute_predictive(
                 + _LAT_EMA_ALPHA * _dt_ms
             )
         if len(_pred_cache) > _ADV_CACHE_MAX:
-            for k, _ in sorted(_pred_cache.items(), key=lambda kv: kv[1][0])[: _ADV_CACHE_MAX // 4]:
-                _pred_cache.pop(k, None)
+            # Phase 26.60: O(1) FIFO evict (see _adv_cache for rationale).
+            for _ in range(_ADV_CACHE_MAX // 4):
+                try:
+                    _pred_cache.popitem(last=False)
+                except KeyError:
+                    break
     return sigs
 
 
