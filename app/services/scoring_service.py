@@ -59,6 +59,19 @@ _YF_BATCH_STATS = {
     'submits': 0, 'completions': 0, 'timeouts': 0, 'errors': 0,
 }
 
+# Phase 26.60: persistent module-level intraday-fetch executor.
+# Previously an ephemeral ThreadPoolExecutor(max_workers=12) was created
+# and abandoned via shutdown(wait=False) on every scoring batch.  At
+# ~30 batches per universal sweep that was ~360 thread create/destroy
+# events per sweep for intraday alone.  Persistent pool sized 2x
+# (24 workers) absorbs hung sockets from previous batches without
+# starving new work — hung futures release their worker slot when the
+# underlying HTTP call finally times out at the OS layer, and the pool
+# naturally heals over time.
+_INTRADAY_POOL = _ScoringTpe(
+    max_workers=24, thread_name_prefix='intraday',
+)
+
 
 def yf_batch_executor_stats() -> dict:
     """Operator telemetry for the yfinance batch-download timeout
@@ -2310,45 +2323,42 @@ def score_symbol_rows(rows: List[dict], force_full_pass2: bool = False) -> List[
     # Parallel fetch only the symbols whose batched quote was incomplete.
     if needs_intraday:
         try:
-            # Phase 26.32: manual pool + shutdown(wait=False) so a hung
-            # provider socket cannot block the entire scoring batch
-            # past as_completed's 25s deadline.
+            # Phase 26.60: use the persistent module-level intraday pool
+            # `_INTRADAY_POOL` (declared at module scope).  Replaces the
+            # per-batch ThreadPoolExecutor(max_workers=12) that was
+            # created + abandoned on every scoring batch — ~30 batches
+            # per sweep at 3k universe = ~360 thread creations per
+            # sweep for intraday alone.  Persistent pool is sized 2x
+            # (24 workers) to absorb hung sockets from previous batches.
             from concurrent.futures import (
-                ThreadPoolExecutor,
                 as_completed,
                 TimeoutError as _FuturesTimeoutError,
             )
-            _intraday_pool = ThreadPoolExecutor(
-                max_workers=12, thread_name_prefix='intraday',
-            )
+            futures = {
+                _INTRADAY_POOL.submit(
+                    fetch_intraday_shape,
+                    sym,
+                    'crypto' if str(sym).upper().endswith('-USD') else 'stocks',
+                ): sym
+                for sym in needs_intraday
+            }
             try:
-                futures = {
-                    _intraday_pool.submit(
-                        fetch_intraday_shape,
-                        sym,
-                        'crypto' if str(sym).upper().endswith('-USD') else 'stocks',
-                    ): sym
-                    for sym in needs_intraday
-                }
-                try:
-                    for fut in as_completed(futures, timeout=25):
-                        sym = futures[fut]
-                        try:
-                            intraday_by_symbol[sym] = fut.result() or {}
-                        except Exception:
-                            intraday_by_symbol[sym] = {}
-                except _FuturesTimeoutError:
-                    log.debug(
-                        'intraday parallel fetch: as_completed timed out at '
-                        '25s; %d/%d done', len(intraday_by_symbol),
-                        len(needs_intraday),
-                    )
-                    # Fill any unfinished symbols with empty dicts so the
-                    # rest of scoring sees a uniform shape.
-                    for sym in needs_intraday:
-                        intraday_by_symbol.setdefault(sym, {})
-            finally:
-                _intraday_pool.shutdown(wait=False)
+                for fut in as_completed(futures, timeout=25):
+                    sym = futures[fut]
+                    try:
+                        intraday_by_symbol[sym] = fut.result() or {}
+                    except Exception:
+                        intraday_by_symbol[sym] = {}
+            except _FuturesTimeoutError:
+                log.debug(
+                    'intraday parallel fetch: as_completed timed out at '
+                    '25s; %d/%d done', len(intraday_by_symbol),
+                    len(needs_intraday),
+                )
+                # Fill any unfinished symbols with empty dicts so the
+                # rest of scoring sees a uniform shape.
+                for sym in needs_intraday:
+                    intraday_by_symbol.setdefault(sym, {})
         except Exception as exc:  # noqa: BLE001
             log.warning('intraday parallel fetch failed (%s); falling back to sequential', exc)
             for sym in needs_intraday:

@@ -30,6 +30,15 @@ _PARAMS = {'range': '5d', 'interval': '1d'}
 _HEADERS = {'User-Agent': UA, 'Accept': 'application/json'}
 _TIMEOUT = 6.0
 
+# Phase 26.60: persistent module-level executor (mirrors stooq_provider).
+# Replaces the per-batch ThreadPoolExecutor(max_workers=10) that was
+# created and abandoned on every fetch() call. Sized at 2x the prior
+# per-batch cap (10 -> 20) so hung sockets from previous batches don't
+# starve new work — the pool naturally heals as OS-level socket
+# timeouts release worker slots.
+from concurrent.futures import ThreadPoolExecutor as _YahooChartTpe
+_POOL = _YahooChartTpe(max_workers=20, thread_name_prefix='yahoo-chart')
+
 
 def _fetch_one(sym: str, captured_at: str) -> tuple[str, dict | None]:
     """Fetch a single symbol from the Yahoo chart endpoint."""
@@ -120,30 +129,26 @@ def fetch(symbols: list[str], market: str) -> dict[str, dict]:
     # sparse data (often the case on residential ISPs), this cascade is
     # invoked with up to 25 symbols and used to serialize at 5 s per batch.
     #
-    # Phase 26.32: manual pool + shutdown(wait=False) so a hung HTTP
-    # socket can't block the entire batch beyond as_completed's 20s
-    # deadline.  See stooq_provider.fetch for the full rationale.
+    # Phase 26.60: use the persistent module-level pool `_POOL`.
+    # `as_completed(timeout=20)` still enforces the batch deadline;
+    # hung futures continue in the background pool without blocking new
+    # submissions.
     from concurrent.futures import (
-        ThreadPoolExecutor,
         as_completed,
         TimeoutError as _FuturesTimeoutError,
     )
-    pool = ThreadPoolExecutor(max_workers=10, thread_name_prefix='yahoo-chart')
+    futures = [_POOL.submit(_fetch_one, sym, captured_at) for sym in symbols]
     try:
-        futures = [pool.submit(_fetch_one, sym, captured_at) for sym in symbols]
-        try:
-            for fut in as_completed(futures, timeout=20):
-                try:
-                    sym, payload = fut.result()
-                    if payload:
-                        out[sym] = payload
-                except Exception:
-                    continue
-        except _FuturesTimeoutError:
-            log.debug('yahoo-chart fetch: as_completed timed out at 20s; %d/%d done',
-                      len(out), len(futures))
-    finally:
-        pool.shutdown(wait=False)
+        for fut in as_completed(futures, timeout=20):
+            try:
+                sym, payload = fut.result()
+                if payload:
+                    out[sym] = payload
+            except Exception:
+                continue
+    except _FuturesTimeoutError:
+        log.debug('yahoo-chart fetch: as_completed timed out at 20s; %d/%d done',
+                  len(out), len(futures))
     return out
 
 

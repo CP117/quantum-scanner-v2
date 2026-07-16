@@ -26,6 +26,23 @@ _BASE = 'https://stooq.com/q/d/l/'
 _HEADERS = {'User-Agent': 'Mozilla/5.0 (compatible; MarketRefinementDashboard/1.0)'}
 _TIMEOUT = 3.0  # tightened from 6s — burning 6s per timeout on 943 attempts = 1.5 hrs of wasted clock
 
+# Phase 26.60: persistent module-level executor.
+# Previously we created a fresh ThreadPoolExecutor per fetch() batch and
+# abandoned it via shutdown(wait=False).  At ~30 batches per universal
+# sweep that was ~300 thread create/destroy events per sweep just for
+# stooq — one of four such per-batch pools (see also yahoo_chart,
+# scoring intraday, options prefetch).  Combined thread churn = ~1,100
+# per sweep, contributing measurably to CPU spikes at large universe
+# sizes.
+#
+# The persistent pool is sized at 2x the prior per-batch cap (10 -> 20)
+# to absorb hung sockets from previous batches without blocking new
+# work: hung futures release their worker slot when the underlying HTTP
+# call finally times out at the OS layer (_TIMEOUT=3.0s here), and the
+# pool naturally heals over time.
+from concurrent.futures import ThreadPoolExecutor as _StooqTpe
+_POOL = _StooqTpe(max_workers=20, thread_name_prefix='stooq')
+
 # Diagnostics so the operator can see WHY hit-rate is zero
 # (timeouts vs http_errors vs no_data vs parse_errors).
 _lock = Lock()
@@ -257,31 +274,28 @@ def fetch(symbols: list[str], market: str) -> dict[str, dict]:
     # 600-second snap-worker stall on every second pass.  Manual pool
     # management with shutdown(wait=False) lets us bail at exactly the
     # 20-second budget regardless of how many fetches are still hung.
+    # Phase 26.60: use the persistent module-level pool `_POOL`.
+    # `as_completed(timeout=20)` still enforces the batch deadline;
+    # hung futures continue running in the pool without blocking new
+    # submissions from the next batch (their worker slots free when
+    # the underlying HTTP call times out at the OS layer).
     from concurrent.futures import (
-        ThreadPoolExecutor,
         as_completed,
         TimeoutError as _FuturesTimeoutError,
     )
-    pool = ThreadPoolExecutor(max_workers=10, thread_name_prefix='stooq')
+    futures = [_POOL.submit(_fetch_one, sym, market, captured_at) for sym in symbols]
     try:
-        futures = [pool.submit(_fetch_one, sym, market, captured_at) for sym in symbols]
-        try:
-            for fut in as_completed(futures, timeout=20):
-                try:
-                    sym, payload = fut.result()
-                    if payload:
-                        out[sym] = payload
-                except Exception:
-                    continue
-        except _FuturesTimeoutError:
-            # 20s budget exhausted; whatever completed is in `out`.
-            # The remaining futures keep running in the background pool
-            # but we won't wait for them.
-            log.debug('stooq fetch: as_completed timed out at 20s; %d/%d done',
-                      len(out), len(futures))
-    finally:
-        # wait=False is critical: do NOT block on hung sockets.  The
-        # daemon worker threads will die when their socket eventually
-        # times out at the OS layer or when the process exits.
-        pool.shutdown(wait=False)
+        for fut in as_completed(futures, timeout=20):
+            try:
+                sym, payload = fut.result()
+                if payload:
+                    out[sym] = payload
+            except Exception:
+                continue
+    except _FuturesTimeoutError:
+        # 20s budget exhausted; whatever completed is in `out`.
+        # The remaining futures keep running in the persistent pool
+        # but we won't wait for them.
+        log.debug('stooq fetch: as_completed timed out at 20s; %d/%d done',
+                  len(out), len(futures))
     return out

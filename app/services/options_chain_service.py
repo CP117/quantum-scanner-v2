@@ -214,6 +214,16 @@ _fail_until: dict[str, float] = {}
 # 'rate_limited' (transient — not stored long-term).
 _skip_reason: dict[str, str] = {}
 
+# Phase 26.60: persistent module-level options-prefetch executor.
+# Previously a fresh ThreadPoolExecutor(max_workers=6) was created and
+# abandoned per prefetch_options_chains() call. Sized 2x (12 workers)
+# so hung options fetches from prior batches don't starve new work —
+# their worker slots free as the underlying yfinance / CBOE HTTP calls
+# time out (see _YF_CALL_TIMEOUT_SECONDS above).
+_PREFETCH_POOL = ThreadPoolExecutor(
+    max_workers=12, thread_name_prefix='opt-prefetch',
+)
+
 # Stats surfaced via /system/status.options_chain_stats
 _stats = {'attempts': 0, 'hits_real': 0, 'cache_hits': 0, 'errors': 0,
           'cooldown_skips': 0, 'throttle_skips': 0,
@@ -667,7 +677,7 @@ def prefetch_options_chains(
         'cooldown', 'error', or 'timeout'. Pure telemetry — callers can
         ignore.
     """
-    from concurrent.futures import ThreadPoolExecutor, as_completed
+    from concurrent.futures import as_completed
 
     workers = max(1, int(max_workers if max_workers is not None else _PREFETCH_MAX_WORKERS))
     deadline_s = float(timeout_seconds if timeout_seconds is not None else _PREFETCH_TIMEOUT_SECONDS)
@@ -704,18 +714,22 @@ def prefetch_options_chains(
             log.debug('prefetch_options_chains worker raised for %s: %s', sym_u, exc)
             return sym_u, 'error'
 
-    # Phase 26.32: manual pool + shutdown(wait=False) so a hung options
-    # fetch can't block the entire prefetch past the as_completed deadline.
-    pool = ThreadPoolExecutor(max_workers=workers, thread_name_prefix='opt-prefetch')
+    # Phase 26.60: use persistent module-level pool `_PREFETCH_POOL`.
+    # `workers` (max_workers env override) is kept as documentation of
+    # the intended per-batch concurrency but is no longer used to size
+    # a fresh pool — the persistent pool at module scope is fixed at
+    # 12 slots which covers the prior default of 6 with 2x headroom.
+    # `as_completed(timeout=deadline_s)` still enforces the batch
+    # deadline; abandoned futures continue running in the persistent
+    # pool and their slots free when the underlying HTTP call
+    # completes or times out.
+    _ = workers  # documented but no longer used
+    futures = {_PREFETCH_POOL.submit(_fetch_one, sp): sp[0] for sp in todo}
     try:
-        futures = {pool.submit(_fetch_one, sp): sp[0] for sp in todo}
-        try:
-            for fut in as_completed(futures, timeout=deadline_s):
-                sym_u, outcome = fut.result()
-                outcomes[sym_u] = outcome
-        except Exception:  # noqa: BLE001 - includes concurrent.futures.TimeoutError
-            for sp_sym in futures.values():
-                outcomes.setdefault(sp_sym, 'timeout')
-    finally:
-        pool.shutdown(wait=False)
+        for fut in as_completed(futures, timeout=deadline_s):
+            sym_u, outcome = fut.result()
+            outcomes[sym_u] = outcome
+    except Exception:  # noqa: BLE001 - includes concurrent.futures.TimeoutError
+        for sp_sym in futures.values():
+            outcomes.setdefault(sp_sym, 'timeout')
     return outcomes
