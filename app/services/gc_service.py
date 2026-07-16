@@ -117,6 +117,20 @@ def collect_at_sweep_boundary(reason: str = 'sweep_wrap') -> None:
         daily_history_service.prune_expired_state()
     except Exception as exc:  # noqa: BLE001
         log.debug('gc sweep-prune: daily_history failed: %s', exc)
+    # Phase 26.60: reap any abandoned worker pools whose blocked threads
+    # have exited naturally.  Prevents unbounded thread accumulation
+    # across days of watchdog rebuilds even if no telemetry endpoint is
+    # polled to trigger the on-demand reap.
+    try:
+        from app.services import options_chain_service as _ocs
+        _ocs._reap_yf_abandoned_pools()
+    except Exception as exc:  # noqa: BLE001
+        log.debug('gc sweep-prune: options_chain abandoned-pool reap failed: %s', exc)
+    try:
+        from app.services import snapshot_store as _ss
+        _ss._reap_abandoned_snap_pools()
+    except Exception as exc:  # noqa: BLE001
+        log.debug('gc sweep-prune: snapshot_store abandoned-pool reap failed: %s', exc)
     # ---- Step B: force the actual collection -----------------------
     try:
         t0 = time.monotonic()

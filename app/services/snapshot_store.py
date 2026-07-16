@@ -935,6 +935,57 @@ _loop_started = False
 _loop_started_lock = threading.Lock()
 
 
+# Phase 26.60: abandoned-pool reaper for the snapshot watchdog.
+# When the watchdog fires (no batch completion for _WATCHDOG_STALL_S),
+# it calls `pool.shutdown(wait=False)` on the current snap-worker pool
+# and spins up a fresh one.  Historically the old pool was dropped
+# without any tracking — its worker threads (blocked on hung Yahoo /
+# provider HTTP reads) stayed pinned until the OS reaped the socket,
+# leaking thread state indefinitely.  Track them so a subsequent read
+# of `abandoned_pools_stats()` can drop references to fully-drained
+# pools and prevent unbounded accumulation across many rebuilds.
+_ABANDONED_SNAP_POOLS_LOCK = threading.Lock()
+_ABANDONED_SNAP_POOLS: list = []  # list[tuple[float, ThreadPoolExecutor]]
+
+
+def _reap_abandoned_snap_pools() -> dict:
+    """Drop any abandoned snap-worker pool whose worker threads have
+    all exited naturally.  Returns telemetry about what's still leaking.
+    Uses `pool._threads` (stable across CPython 3.x); degrades to
+    "assume leaking" if introspection fails.
+    """
+    drained = 0
+    remaining_pools = 0
+    remaining_threads = 0
+    with _ABANDONED_SNAP_POOLS_LOCK:
+        keep: list = []
+        for abandoned_at, pool in _ABANDONED_SNAP_POOLS:
+            try:
+                alive = [t for t in getattr(pool, '_threads', ()) if t.is_alive()]
+            except Exception:  # noqa: BLE001
+                alive = ['unknown']
+            if not alive:
+                drained += 1
+                continue
+            keep.append((abandoned_at, pool))
+            remaining_pools += 1
+            remaining_threads += len(alive)
+        _ABANDONED_SNAP_POOLS[:] = keep
+    return {
+        'drained_this_call': drained,
+        'remaining_pools': remaining_pools,
+        'remaining_threads': remaining_threads,
+    }
+
+
+def abandoned_snap_pools_stats() -> dict:
+    """Telemetry — surfaced via /system/status so operators can see
+    whether the watchdog is systematically leaking threads (a warning
+    sign that the pool concurrency ceiling needs adjustment or a
+    provider is chronically hung)."""
+    return _reap_abandoned_snap_pools()
+
+
 def _sweep_one_batch(market: str) -> None:
     """Compute one batch for `market`, write the result rows into the
     snapshot, and advance the per-market batch pointer.
@@ -1202,6 +1253,22 @@ def _scan_loop_target() -> None:
                             # from `_in_flight_ids` — which has been
                             # cleared — so the .discard is a no-op).
                             pool.shutdown(wait=False)
+                            # Phase 26.60: register the abandoned pool
+                            # so the reaper can drop our reference once
+                            # its blocked workers exit naturally.  This
+                            # prevents unbounded thread accumulation
+                            # across many watchdog rebuilds.
+                            with _ABANDONED_SNAP_POOLS_LOCK:
+                                _ABANDONED_SNAP_POOLS.append(
+                                    (time.monotonic(), pool),
+                                )
+                        except Exception:  # noqa: BLE001
+                            pass
+                        # Opportunistic reap while we're already in the
+                        # watchdog path — drops any prior pools whose
+                        # workers finally released.
+                        try:
+                            _reap_abandoned_snap_pools()
                         except Exception:  # noqa: BLE001
                             pass
                         pool = _new_pool()

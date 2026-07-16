@@ -75,23 +75,86 @@ _YF_TIMEOUT_STATS = {
     'executor_rebuilds': 0,
 }
 
+# Phase 26.60: abandoned-pool reaper.
+# Previously `_rebuild_yf_timeout_executor` did `old.shutdown(wait=False)`
+# and dropped the reference — but the pool's worker threads that were
+# blocked on hung Yahoo socket reads did NOT die: they kept their 8 KB
+# stacks + Python thread-state pinned until the OS eventually reaped
+# the socket (minutes to hours later on Windows).  Over a day of watchdog
+# rebuilds this leaked hundreds of threads → GIL scheduler overhead climbs
+# → whole app slows → user restart required.
+#
+# Now: track abandoned pools; every rebuild + every stats query sweeps
+# the list and drops any pool whose workers have all exited naturally.
+# We do NOT force-kill any thread (Python doesn't support that portably);
+# we just release our references to fully-drained pools so the GC can
+# reclaim the executor object itself + its thread bookkeeping.
+_YF_ABANDONED_POOLS: list[tuple[float, ThreadPoolExecutor]] = []
+
+
+def _reap_yf_abandoned_pools() -> dict:
+    """Iterate `_YF_ABANDONED_POOLS`; drop any pool whose workers have
+    all exited.  Returns telemetry about what's still leaking.  Safe
+    to call concurrently with `_rebuild_yf_timeout_executor` — both
+    hold `_YF_TIMEOUT_EXECUTOR_LOCK`.
+
+    Uses `pool._threads` which is technically private but stable across
+    all CPython 3.x versions.  If Python's threadpool internals ever
+    change, we degrade gracefully to "assume it's still leaking".
+    """
+    drained = 0
+    remaining_pools = 0
+    remaining_threads = 0
+    with _YF_TIMEOUT_EXECUTOR_LOCK:
+        keep: list[tuple[float, ThreadPoolExecutor]] = []
+        for abandoned_at, pool in _YF_ABANDONED_POOLS:
+            try:
+                alive = [t for t in getattr(pool, '_threads', ()) if t.is_alive()]
+            except Exception:  # noqa: BLE001
+                alive = ['unknown']  # assume leaking on introspection failure
+            if not alive:
+                drained += 1
+                continue
+            keep.append((abandoned_at, pool))
+            remaining_pools += 1
+            remaining_threads += len(alive)
+        _YF_ABANDONED_POOLS[:] = keep
+    return {
+        'drained_this_call': drained,
+        'remaining_pools': remaining_pools,
+        'remaining_threads': remaining_threads,
+    }
+
 
 def yf_timeout_executor_stats() -> dict:
     """Operator telemetry for the yfinance timeout executor.  Surfaced in
     `/system/status.options_chain_stats` so we can see at a glance if
     Yahoo is hanging us systematically."""
+    # Phase 26.60: opportunistic reap on every stats read so periodic
+    # /system/status polls double as a maintenance sweep — no dedicated
+    # reaper thread needed.
+    reap = _reap_yf_abandoned_pools()
     with _YF_TIMEOUT_EXECUTOR_LOCK:
-        return dict(_YF_TIMEOUT_STATS)
+        snap = dict(_YF_TIMEOUT_STATS)
+    snap['abandoned_pools_remaining'] = reap['remaining_pools']
+    snap['abandoned_threads_remaining'] = reap['remaining_threads']
+    snap['abandoned_pools_drained_this_call'] = reap['drained_this_call']
+    return snap
 
 
 def _rebuild_yf_timeout_executor() -> None:
     """Last-ditch recovery if the timeout executor's queue fills with
     hung work and stays full for too long.  Called from
     `_call_with_timeout` when we detect chronic submission backpressure.
-    The old executor is shutdown(wait=False) and abandoned — its
-    daemon threads will exit when their sockets time out.
+    The old executor is shutdown(wait=False) and registered in the
+    abandoned-pool reaper — its daemon threads exit when their sockets
+    time out and the reaper drops the pool reference on the next
+    `yf_timeout_executor_stats()` call.
     """
     global _YF_TIMEOUT_EXECUTOR
+    # Take a lock-free reap first so we drop stale references before
+    # adding the new one (keeps the abandoned list short).
+    _reap_yf_abandoned_pools()
     with _YF_TIMEOUT_EXECUTOR_LOCK:
         try:
             old = _YF_TIMEOUT_EXECUTOR
@@ -101,6 +164,9 @@ def _rebuild_yf_timeout_executor() -> None:
             _YF_TIMEOUT_STATS['executor_rebuilds'] += 1
             try:
                 old.shutdown(wait=False)
+                # Phase 26.60: remember `old` so the reaper can drop
+                # our reference once its workers have all exited.
+                _YF_ABANDONED_POOLS.append((time.monotonic(), old))
             except Exception:  # noqa: BLE001
                 pass
         except Exception:  # noqa: BLE001
