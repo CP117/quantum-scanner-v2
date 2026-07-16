@@ -428,19 +428,26 @@ def _public_url_file_has_trycloudflare() -> bool:
 
 
 def _find_stale_public_url_file(max_age_seconds: float) -> Path | None:
-    """Return the first public_url.txt that either
-       (a) contains a trycloudflare URL but whose mtime is older than
-           `max_age_seconds` (left over from a previous launch), OR
-       (b) contains any non-blank, non-comment line that is NOT a valid
-           URL — indicating pollution from a buggy launcher (e.g. the
-           literal string "ECHO is off." leaked by start.bat when
-           delayed-expansion capture failed pre-Phase-26.60).
+    """Return the first public_url.txt that should be wiped at startup.
 
-    Both conditions warrant wiping the file so the launcher (or backend
-    fallback) can publish a fresh URL cleanly.  Files that are entirely
-    blank or entirely valid URLs are LEFT ALONE regardless of age (the
-    valid content is either fresh enough to keep or truly empty and
-    harmless).
+    We wipe ONLY in two cases:
+      (a) the file contains a trycloudflare URL AND its mtime is older
+          than `max_age_seconds` (left over from a previous launch, or
+          shipped inside the zip artifact), OR
+      (b) the file is non-empty but has ZERO legitimate URL lines —
+          pure pollution (e.g. shell diagnostic garbage from a buggy
+          launcher).  A file with EVEN ONE valid URL line is left
+          alone: the launcher's LAN + localhost lines are useful even
+          when cloudflared is still negotiating, and `_read_lines` in
+          public_url.py already filters any polluted lines defensively.
+
+    Phase 26.60 note: an earlier tightened version of this check also
+    wiped files whose content was a MIX of valid URLs plus any
+    non-URL line.  That was too aggressive — it destroyed the
+    launcher's LAN URLs when cloudflared was slow, leaving the
+    frontend banner entirely hidden.  The frontend-side filter is
+    sufficient; the backend should not throw away useful data just
+    because one line is off.
     """
     import time as _time
     now = _time.time()
@@ -451,31 +458,41 @@ def _find_stale_public_url_file(max_age_seconds: float) -> Path | None:
             txt = cand.read_text(encoding='utf-8', errors='replace')
             stripped = txt.strip()
             if not stripped:
-                # Empty file — not stale, not polluted.
+                # Truly empty — not stale, not polluted.
                 continue
-            # Check for pollution: any non-blank, non-comment line that
-            # isn't a URL.
-            polluted = False
+            # Count legitimate URL lines vs non-URL lines.
+            url_lines = 0
+            non_url_lines = 0
             for line in txt.splitlines():
                 s = line.strip()
                 if not s or s.startswith('#'):
                     continue
-                if not _URL_LINE_RE.match(s):
-                    polluted = True
-                    break
-            if polluted:
+                if _URL_LINE_RE.match(s):
+                    url_lines += 1
+                else:
+                    non_url_lines += 1
+            if url_lines == 0 and non_url_lines > 0:
+                # Pure pollution — no valid URLs to preserve.  Wipe.
                 log.info(
-                    'startup: public_url.txt at %s contains non-URL '
-                    'lines (launcher pollution); will wipe',
-                    cand,
+                    'startup: public_url.txt at %s has %d non-URL lines '
+                    'and zero URL lines (pure pollution); will wipe',
+                    cand, non_url_lines,
                 )
                 return cand
-            # Not polluted — apply mtime-based staleness only if it
-            # holds a tunnel URL that could be from a prior session.
+            # File has at least one legitimate URL.  Only wipe if it
+            # ALSO holds a trycloudflare URL that's too old to trust.
             if _URL_RE.search(txt):
                 mtime = cand.stat().st_mtime
                 if (now - mtime) > max_age_seconds:
+                    log.info(
+                        'startup: public_url.txt at %s has an old '
+                        'trycloudflare URL (mtime %.0fs old, threshold '
+                        '%.0fs); will wipe so a fresh URL can be published',
+                        cand, now - mtime, max_age_seconds,
+                    )
                     return cand
+            # Otherwise: keep the file as-is.  The launcher's LAN +
+            # localhost URLs are useful even without a public tunnel.
         except OSError:
             continue
     return None

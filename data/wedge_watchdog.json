@@ -1,34 +1,34 @@
 {
-  "timestamp_utc": "2026-07-16T19:38:58.705646+00:00",
-  "monotonic_seconds": 9896.515412748,
+  "timestamp_utc": "2026-07-16T21:04:58.453158+00:00",
+  "monotonic_seconds": 1611104.405593718,
   "process_health": {},
   "snapshot_meta_stocks": {
     "last_full_sweep_at": null,
-    "last_batch_at": "2026-07-16T19:38:15.177313+00:00",
-    "current_batch_index": 6,
-    "highest_completed_batch": 3,
+    "last_batch_at": "2026-07-16T21:04:08.799042+00:00",
+    "current_batch_index": 4,
+    "highest_completed_batch": 1,
     "total_batches": 35,
     "universe_size": 3455,
-    "rows_scored": 395,
-    "evaluations_ever": 425,
-    "current_sweep_scanned": 425,
+    "rows_scored": 200,
+    "evaluations_ever": 220,
+    "current_sweep_scanned": 220,
     "sweeps_completed": 0
   },
   "top10_priority_lane": {
     "running": true,
-    "started_at_epoch": 1784230527.8164666,
-    "uptime_seconds": 210.88915491104126,
-    "last_tick_at_epoch": 1784230723.3603082,
-    "last_tick_seconds_ago": 15.345314502716064,
+    "started_at_epoch": 1784235747.5932524,
+    "uptime_seconds": 150.85988450050354,
+    "last_tick_at_epoch": 1784235887.620314,
+    "last_tick_seconds_ago": 10.832824230194092,
     "last_tick_symbols_rescored": 10,
     "last_tick_error": "",
-    "total_ticks": 3,
-    "total_symbols_rescored": 30,
-    "consecutive_slow": 1,
+    "total_ticks": 2,
+    "total_symbols_rescored": 20,
+    "consecutive_slow": 2,
     "consecutive_fast": 0,
     "monitor_only": false,
     "last_sleep_seconds": 30.0,
-    "last_tick_elapsed_seconds": 22.271135091781616,
+    "last_tick_elapsed_seconds": 29.62498664855957,
     "viewport_first_pass": {
       "tracked_total": 0,
       "ttl_seconds": 600,
@@ -37,8 +37,8 @@
   },
   "threads": [
     {
-      "tid": 276497604211104,
-      "name": "Thread-594 (_run_via_pool)",
+      "tid": 274316197294496,
+      "name": "Thread-420 (_run_via_pool)",
       "daemon": false,
       "alive": true,
       "stack": [
@@ -63,7 +63,19 @@
       ]
     },
     {
-      "tid": 276496611602848,
+      "tid": 274316163477920,
+      "name": "opt-prefetch_4",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274316205748640,
       "name": "opt-prefetch_3",
       "daemon": true,
       "alive": true,
@@ -75,7 +87,7 @@
       ]
     },
     {
-      "tid": 276496527061408,
+      "tid": 274316171932064,
       "name": "opt-prefetch_2",
       "daemon": true,
       "alive": true,
@@ -87,7 +99,7 @@
       ]
     },
     {
-      "tid": 276496535515552,
+      "tid": 274316180386208,
       "name": "opt-prefetch_1",
       "daemon": true,
       "alive": true,
@@ -99,7 +111,7 @@
       ]
     },
     {
-      "tid": 276496518607264,
+      "tid": 274316188840352,
       "name": "opt-prefetch_0",
       "daemon": true,
       "alive": true,
@@ -111,7 +123,7 @@
       ]
     },
     {
-      "tid": 276496840126880,
+      "tid": 274318839378336,
       "name": "intraday_23",
       "daemon": true,
       "alive": true,
@@ -119,301 +131,16 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276496857035168,
-      "name": "intraday_22",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276496865489312,
-      "name": "intraday_21",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276496873943456,
-      "name": "intraday_20",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276496890851744,
-      "name": "intraday_19",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276496899305888,
-      "name": "intraday_18",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276496907760032,
-      "name": "intraday_17",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276496916214176,
-      "name": "intraday_16",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276496924668320,
-      "name": "intraday_15",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276496933122464,
-      "name": "intraday_14",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276496950030752,
-      "name": "intraday_13",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276496966939040,
-      "name": "intraday_12",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276497075794336,
-      "name": "intraday_11",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276497109610912,
-      "name": "intraday_10",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276498157990304,
-      "name": "intraday_9",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276498677952928,
-      "name": "intraday_8",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276496958484896,
-      "name": "intraday_7",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276496941576608,
-      "name": "intraday_6",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276497067340192,
-      "name": "intraday_5",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276498141082016,
-      "name": "intraday_4",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276496975393184,
-      "name": "yf-options-timeout_1",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276497621119392,
-      "name": "yf-options-timeout_0",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276496806310304,
-      "name": "yf-batch-timeout_14",
-      "daemon": false,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276496814764448,
-      "name": "yf-batch-timeout_13",
-      "daemon": false,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276496848581024,
-      "name": "yf-batch-timeout_12",
-      "daemon": false,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
         "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
         "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/daily_history_service.py\", line 802, in <lambda>\n    lambda: yf.Ticker(sym).history(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 132, in history\n    return self._lazy_load_price_history().history(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/history.py\", line 210, in history\n    data = get_fn(",
+        "  File \"/app/app/services/scoring_service.py\", line 1794, in fetch_intraday_shape\n    'previousClose': safe_float(getattr(fast, 'previous_close', None) if hasattr(fast, 'previous_close') else fast.get('previousClose') if isinstance(fast, dict) else None),",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 282, in previous_close\n    self._tkr.info  # trigger fetch",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/ticker.py\", line 163, in info\n    return self.get_info()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 329, in get_info\n    data = self._quote.info",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 511, in info\n    self._fetch_info()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 611, in _fetch_info\n    additional_info = self._fetch_additional_info()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 599, in _fetch_additional_info\n    result = self._data.get_raw_json(f\"{_QUERY1_URL_}/v7/finance/quote?\", params=params_dict)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 443, in get_raw_json\n    response = self.get(url, params=params, timeout=timeout)",
         "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
         "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 371, in get\n    response = self._make_request(url, request_method = self._session.get, params=params, timeout=timeout)",
         "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
@@ -425,7 +152,479 @@
       ]
     },
     {
-      "tid": 276497084248480,
+      "tid": 274318705160608,
+      "name": "intraday_22",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274317950579104,
+      "name": "intraday_21",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/scoring_service.py\", line 1799, in fetch_intraday_shape\n    'marketCap': safe_float(getattr(fast, 'market_cap', None) if hasattr(fast, 'market_cap') else fast.get('marketCap') if isinstance(fast, dict) else None),",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 286, in previous_close\n    return self._prev_close",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 160, in _get_1wk_1h_prepost_prices\n    return self._prices_1wk_1h_prepost",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 132, in history\n    return self._lazy_load_price_history().history(*args, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/history.py\", line 521, in history\n    return df",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 381, in get\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 434, in _make_request\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 749, in _request_once\n    c.reset()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 508, in perform\n    self.clean_handles_and_buffers(clear_headers, clear_resolve)"
+      ]
+    },
+    {
+      "tid": 274319653138848,
+      "name": "intraday_20",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274317790998944,
+      "name": "intraday_19",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/scoring_service.py\", line 1799, in fetch_intraday_shape\n    'marketCap': safe_float(getattr(fast, 'market_cap', None) if hasattr(fast, 'market_cap') else fast.get('marketCap') if isinstance(fast, dict) else None),",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 479, in market_cap\n    self._tkr.info",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/ticker.py\", line 163, in info\n    return self.get_info()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 329, in get_info\n    data = self._quote.info",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 511, in info\n    self._fetch_info()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 611, in _fetch_info\n    additional_info = self._fetch_additional_info()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 599, in _fetch_additional_info\n    result = self._data.get_raw_json(f\"{_QUERY1_URL_}/v7/finance/quote?\", params=params_dict)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 443, in get_raw_json\n    response = self.get(url, params=params, timeout=timeout)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 371, in get\n    response = self._make_request(url, request_method = self._session.get, params=params, timeout=timeout)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 417, in _make_request\n    response = request_method(**request_args)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 732, in _request_once\n    c.perform()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 502, in perform\n    ret = lib.curl_easy_perform(self._curl)"
+      ]
+    },
+    {
+      "tid": 274317799453088,
+      "name": "intraday_18",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274317807907232,
+      "name": "intraday_17",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274317916762528,
+      "name": "intraday_16",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/scoring_service.py\", line 1794, in fetch_intraday_shape\n    'previousClose': safe_float(getattr(fast, 'previous_close', None) if hasattr(fast, 'previous_close') else fast.get('previousClose') if isinstance(fast, dict) else None),",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 282, in previous_close\n    self._tkr.info  # trigger fetch",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/ticker.py\", line 163, in info\n    return self.get_info()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 329, in get_info\n    data = self._quote.info",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 511, in info\n    self._fetch_info()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 611, in _fetch_info\n    additional_info = self._fetch_additional_info()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 599, in _fetch_additional_info\n    result = self._data.get_raw_json(f\"{_QUERY1_URL_}/v7/finance/quote?\", params=params_dict)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 443, in get_raw_json\n    response = self.get(url, params=params, timeout=timeout)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 371, in get\n    response = self._make_request(url, request_method = self._session.get, params=params, timeout=timeout)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 417, in _make_request\n    response = request_method(**request_args)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 732, in _request_once\n    c.perform()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 502, in perform\n    ret = lib.curl_easy_perform(self._curl)"
+      ]
+    },
+    {
+      "tid": 274318579659168,
+      "name": "intraday_15",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274318588113312,
+      "name": "intraday_14",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274318713614752,
+      "name": "intraday_13",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/scoring_service.py\", line 1799, in fetch_intraday_shape\n    'marketCap': safe_float(getattr(fast, 'market_cap', None) if hasattr(fast, 'market_cap') else fast.get('marketCap') if isinstance(fast, dict) else None),",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 466, in market_cap\n    shares = self.shares",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 237, in shares\n    shares = self._tkr.get_shares_full(start=pd.Timestamp.utcnow().date()-pd.Timedelta(days=548))",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 628, in get_shares_full\n    json_data = self._data.cache_get(url=shares_url)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 31, in wrapped\n    return func(*args, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 439, in cache_get\n    return self.get(url, params, timeout)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 371, in get\n    response = self._make_request(url, request_method = self._session.get, params=params, timeout=timeout)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 417, in _make_request\n    response = request_method(**request_args)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 732, in _request_once\n    c.perform()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/utils.py\", line 754, in set_curl_options\n    return req, buffer, header_buffer, q, header_recved, quit_now",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 472, in impersonate\n    return lib.curl_easy_impersonate("
+      ]
+    },
+    {
+      "tid": 274318890103200,
+      "name": "intraday_12",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274319250485664,
+      "name": "intraday_11",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274319258939808,
+      "name": "intraday_10",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/scoring_service.py\", line 1794, in fetch_intraday_shape\n    'previousClose': safe_float(getattr(fast, 'previous_close', None) if hasattr(fast, 'previous_close') else fast.get('previousClose') if isinstance(fast, dict) else None),",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 282, in previous_close\n    self._tkr.info  # trigger fetch",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/ticker.py\", line 163, in info\n    return self.get_info()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 329, in get_info\n    data = self._quote.info",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 512, in info\n    self._fetch_complementary()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 660, in _fetch_info\n    self._info = {k: _format(k, v) for k, v in query1_info.items()}",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 603, in _fetch_additional_info\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 445, in get_raw_json\n    return response.json()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 381, in get\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 434, in _make_request\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 749, in _request_once\n    c.reset()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 508, in perform\n    self.clean_handles_and_buffers(clear_headers, clear_resolve)"
+      ]
+    },
+    {
+      "tid": 274320726880672,
+      "name": "intraday_9",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 64, in run\n    self.future.set_result(result)",
+        "  File \"/app/app/services/scoring_service.py\", line 1900, in fetch_intraday_shape\n    return merged",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 485, in market_cap\n    return self._mcap",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 245, in shares\n    return self._shares",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 652, in get_shares_full\n    return df",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 31, in wrapped\n    return func(*args, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 439, in cache_get\n    return self.get(url, params, timeout)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 381, in get\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 434, in _make_request\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 749, in _request_once\n    c.reset()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 508, in perform\n    self.clean_handles_and_buffers(clear_headers, clear_resolve)"
+      ]
+    },
+    {
+      "tid": 274320769151392,
+      "name": "intraday_8",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/scoring_service.py\", line 1799, in fetch_intraday_shape\n    'marketCap': safe_float(getattr(fast, 'market_cap', None) if hasattr(fast, 'market_cap') else fast.get('marketCap') if isinstance(fast, dict) else None),",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 479, in market_cap\n    self._tkr.info",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/ticker.py\", line 163, in info\n    return self.get_info()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 329, in get_info\n    data = self._quote.info",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 511, in info\n    self._fetch_info()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 611, in _fetch_info\n    additional_info = self._fetch_additional_info()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 599, in _fetch_additional_info\n    result = self._data.get_raw_json(f\"{_QUERY1_URL_}/v7/finance/quote?\", params=params_dict)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 443, in get_raw_json\n    response = self.get(url, params=params, timeout=timeout)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 371, in get\n    response = self._make_request(url, request_method = self._session.get, params=params, timeout=timeout)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 417, in _make_request\n    response = request_method(**request_args)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 732, in _request_once\n    c.perform()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 502, in perform\n    ret = lib.curl_easy_perform(self._curl)"
+      ]
+    },
+    {
+      "tid": 274317899854240,
+      "name": "intraday_7",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/scoring_service.py\", line 1799, in fetch_intraday_shape\n    'marketCap': safe_float(getattr(fast, 'market_cap', None) if hasattr(fast, 'market_cap') else fast.get('marketCap') if isinstance(fast, dict) else None),",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 262, in last_price\n    return self._last_price",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 155, in _get_1y_prices\n    return self._prices_1y.loc[str(d0):str(d1)]",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 921, in get_history_metadata\n    return self._lazy_load_price_history().get_history_metadata(proxy)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/history.py\", line 545, in get_history_metadata\n    return self._history_metadata",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/history.py\", line 530, in _get_history_cache\n    return df",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/history.py\", line 521, in history\n    return df",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 381, in get\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 434, in _make_request\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 749, in _request_once\n    c.reset()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 508, in perform\n    self.clean_handles_and_buffers(clear_headers, clear_resolve)"
+      ]
+    },
+    {
+      "tid": 274317816361376,
+      "name": "intraday_6",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 64, in run\n    self.future.set_result(result)",
+        "  File \"/app/app/services/scoring_service.py\", line 1900, in fetch_intraday_shape\n    return merged",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 485, in market_cap\n    return self._mcap",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 245, in shares\n    return self._shares",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 652, in get_shares_full\n    return df",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 31, in wrapped\n    return func(*args, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 439, in cache_get\n    return self.get(url, params, timeout)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 381, in get\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 434, in _make_request\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 749, in _request_once\n    c.reset()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 508, in perform\n    self.clean_handles_and_buffers(clear_headers, clear_resolve)"
+      ]
+    },
+    {
+      "tid": 274317908308384,
+      "name": "intraday_5",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 64, in run\n    self.future.set_result(result)",
+        "  File \"/app/app/services/scoring_service.py\", line 1900, in fetch_intraday_shape\n    return merged",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 485, in market_cap\n    return self._mcap",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 245, in shares\n    return self._shares",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 652, in get_shares_full\n    return df",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 31, in wrapped\n    return func(*args, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 439, in cache_get\n    return self.get(url, params, timeout)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 381, in get\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 434, in _make_request\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 749, in _request_once\n    c.reset()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 508, in perform\n    self.clean_handles_and_buffers(clear_headers, clear_resolve)"
+      ]
+    },
+    {
+      "tid": 274321263751584,
+      "name": "intraday_4",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274318856286624,
+      "name": "yahoo-chart_19",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274318730523040,
+      "name": "yahoo-chart_18",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274318722068896,
+      "name": "yahoo-chart_17",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 64, in run\n    self.future.set_result(result)",
+        "  File \"/app/app/services/providers/yahoo_chart_provider.py\", line 100, in _fetch_one\n    return sym, {",
+        "  File \"/app/app/services/http_client.py\", line 203, in resilient_get\n    return ResilientResponse(",
+        "  File \"/root/.venv/lib/python3.11/site-packages/requests/api.py\", line 87, in get\n    return request(\"get\", url, params=params, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/requests/api.py\", line 70, in request\n    with sessions.Session() as session:",
+        "  File \"/root/.venv/lib/python3.11/site-packages/requests/sessions.py\", line 653, in request\n    return resp",
+        "  File \"/root/.venv/lib/python3.11/site-packages/requests/sessions.py\", line 829, in send\n    return r",
+        "  File \"/root/.venv/lib/python3.11/site-packages/requests/adapters.py\", line 748, in send\n    return self.build_response(request, resp)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 973, in urlopen\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 556, in _make_request\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 1109, in _validate_conn\n    if not conn.is_verified and not conn.proxy_is_verified:",
+        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connection.py\", line 858, in connect\n    if self._has_connected_to_proxy and self.proxy_is_verified is None:",
+        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connection.py\", line 1016, in _ssl_wrap_socket_and_match_hostname\n    return _WrappedAndVerifiedSocket(",
+        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/util/ssl_.py\", line 434, in ssl_wrap_socket\n    return ssl_sock",
+        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/util/ssl_.py\", line 477, in _ssl_wrap_socket_impl\n    return ssl_context.wrap_socket(sock, server_hostname=server_hostname)",
+        "  File \"/usr/local/lib/python3.11/ssl.py\", line 517, in wrap_socket\n    return self.sslsocket_class._create(",
+        "  File \"/usr/local/lib/python3.11/ssl.py\", line 1111, in _create\n    return self",
+        "  File \"/usr/local/lib/python3.11/ssl.py\", line 1384, in do_handshake\n    self.settimeout(timeout)"
+      ]
+    },
+    {
+      "tid": 274318847832480,
+      "name": "yf-options-timeout_0",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 64, in run\n    self.future.set_result(result)",
+        "  File \"/app/app/services/options_chain_service.py\", line 626, in <lambda>\n    lambda: list(getattr(ticker, 'options', []) or []),",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/ticker.py\", line 312, in options\n    return tuple(self._expirations.keys())",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/ticker.py\", line 61, in _download_options\n    return dict(**opt[0],underlying=self._underlying) if len(opt) > 0 else {}",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 381, in get\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 434, in _make_request\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 749, in _request_once\n    c.reset()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 508, in perform\n    self.clean_handles_and_buffers(clear_headers, clear_resolve)"
+      ]
+    },
+    {
+      "tid": 274320743788960,
       "name": "quote-cache-flusher",
       "daemon": true,
       "alive": true,
@@ -439,73 +638,7 @@
       ]
     },
     {
-      "tid": 276497058886048,
-      "name": "asyncio_0",
-      "daemon": false,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276498166444448,
-      "name": "yf-batch-timeout_11",
-      "daemon": false,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/daily_history_service.py\", line 802, in <lambda>\n    lambda: yf.Ticker(sym).history(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 132, in history\n    return self._lazy_load_price_history().history(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 138, in _lazy_load_price_history\n    self._price_history = PriceHistory(self._data, self.ticker, self._get_ticker_tz(timeout=10))",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 153, in _get_ticker_tz\n    tz = self._fetch_ticker_tz(timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 185, in _fetch_ticker_tz\n    data = self._data.cache_get(url=url, params=params, timeout=timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 31, in wrapped\n    return func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 439, in cache_get\n    return self.get(url, params, timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 371, in get\n    response = self._make_request(url, request_method = self._session.get, params=params, timeout=timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 417, in _make_request\n    response = request_method(**request_args)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 732, in _request_once\n    c.perform()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 502, in perform\n    ret = lib.curl_easy_perform(self._curl)"
-      ]
-    },
-    {
-      "tid": 276498183352736,
-      "name": "yf-batch-timeout_10",
-      "daemon": false,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276498686407072,
-      "name": "yf-batch-timeout_9",
-      "daemon": false,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276498669498784,
+      "tid": 274319267393952,
       "name": "intraday_3",
       "daemon": true,
       "alive": true,
@@ -513,11 +646,28 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/scoring_service.py\", line 1794, in fetch_intraday_shape\n    'previousClose': safe_float(getattr(fast, 'previous_close', None) if hasattr(fast, 'previous_close') else fast.get('previousClose') if isinstance(fast, dict) else None),",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 282, in previous_close\n    self._tkr.info  # trigger fetch",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/ticker.py\", line 163, in info\n    return self.get_info()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 329, in get_info\n    data = self._quote.info",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 512, in info\n    self._fetch_complementary()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 660, in _fetch_info\n    self._info = {k: _format(k, v) for k, v in query1_info.items()}",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 603, in _fetch_additional_info\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 445, in get_raw_json\n    return response.json()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 381, in get\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 434, in _make_request\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 749, in _request_once\n    c.reset()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 508, in perform\n    self.clean_handles_and_buffers(clear_headers, clear_resolve)"
       ]
     },
     {
-      "tid": 276497595756960,
+      "tid": 274318747431328,
       "name": "intraday_2",
       "daemon": true,
       "alive": true,
@@ -529,116 +679,8 @@
       ]
     },
     {
-      "tid": 276498174898592,
+      "tid": 274318881649056,
       "name": "intraday_1",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276497101156768,
-      "name": "intraday_0",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276498711769504,
-      "name": "stooq_6",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276498720223648,
-      "name": "stooq_5",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276499231732128,
-      "name": "stooq_4",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276497638027680,
-      "name": "stooq_3",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276497646481824,
-      "name": "stooq_2",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276498132627872,
-      "name": "stooq_1",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276498149536160,
-      "name": "stooq_0",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276497629573536,
-      "name": "yahoo-chart_17",
       "daemon": true,
       "alive": true,
       "stack": [
@@ -647,13 +689,53 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
         "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
         "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/providers/yahoo_chart_provider.py\", line 58, in _fetch_one\n    res = resilient_get(url, params=_PARAMS, headers={'Accept': 'application/json'}, cfg=cfg)",
-        "  File \"/app/app/services/http_client.py\", line 240, in resilient_get\n    _sleep_for_attempt(attempt - 1, cfg, _retry_after_seconds(last_headers))",
-        "  File \"/app/app/services/http_client.py\", line 131, in _sleep_for_attempt\n    time.sleep(wait)"
+        "  File \"/app/app/services/scoring_service.py\", line 1799, in fetch_intraday_shape\n    'marketCap': safe_float(getattr(fast, 'market_cap', None) if hasattr(fast, 'market_cap') else fast.get('marketCap') if isinstance(fast, dict) else None),",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 286, in previous_close\n    return self._prev_close",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 160, in _get_1wk_1h_prepost_prices\n    return self._prices_1wk_1h_prepost",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 132, in history\n    return self._lazy_load_price_history().history(*args, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/history.py\", line 521, in history\n    return df",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 381, in get\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 434, in _make_request\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 749, in _request_once\n    c.reset()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 508, in perform\n    self.clean_handles_and_buffers(clear_headers, clear_resolve)"
       ]
     },
     {
-      "tid": 276499240186272,
+      "tid": 274320752243104,
+      "name": "intraday_0",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 64, in run\n    self.future.set_result(result)",
+        "  File \"/app/app/services/scoring_service.py\", line 1900, in fetch_intraday_shape\n    return merged",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 485, in market_cap\n    return self._mcap",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 245, in shares\n    return self._shares",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 652, in get_shares_full\n    return df",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 31, in wrapped\n    return func(*args, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 439, in cache_get\n    return self.get(url, params, timeout)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 381, in get\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
+        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 434, in _make_request\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 749, in _request_once\n    c.reset()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 508, in perform\n    self.clean_handles_and_buffers(clear_headers, clear_resolve)"
+      ]
+    },
+    {
+      "tid": 274318755885472,
       "name": "yahoo-chart_16",
       "daemon": true,
       "alive": true,
@@ -665,7 +747,151 @@
       ]
     },
     {
-      "tid": 276498694861216,
+      "tid": 274321297568160,
+      "name": "asyncio_0",
+      "daemon": false,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274318738977184,
+      "name": "yf-batch-timeout_12",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274320735334816,
+      "name": "yf-batch-timeout_11",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274320760697248,
+      "name": "yf-batch-timeout_10",
+      "daemon": false,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274321280659872,
+      "name": "stooq_5",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274321289114016,
+      "name": "stooq_4",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274321306022304,
+      "name": "stooq_3",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274321272205728,
+      "name": "stooq_2",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274321255297440,
+      "name": "stooq_1",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274321792168352,
+      "name": "stooq_0",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274319292756384,
+      "name": "yf-batch-timeout_9",
+      "daemon": false,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274319284302240,
+      "name": "yf-batch-timeout_8",
+      "daemon": false,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274321817530784,
       "name": "yahoo-chart_15",
       "daemon": true,
       "alive": true,
@@ -677,7 +903,7 @@
       ]
     },
     {
-      "tid": 276498703315360,
+      "tid": 274321809076640,
       "name": "yahoo-chart_14",
       "daemon": true,
       "alive": true,
@@ -689,7 +915,7 @@
       ]
     },
     {
-      "tid": 276499743240608,
+      "tid": 274321825984928,
       "name": "yahoo-chart_13",
       "daemon": true,
       "alive": true,
@@ -701,7 +927,7 @@
       ]
     },
     {
-      "tid": 276499751694752,
+      "tid": 274322744537504,
       "name": "yahoo-chart_12",
       "daemon": true,
       "alive": true,
@@ -713,7 +939,7 @@
       ]
     },
     {
-      "tid": 276499760148896,
+      "tid": 274322329039264,
       "name": "yahoo-chart_11",
       "daemon": true,
       "alive": true,
@@ -725,8 +951,126 @@
       ]
     },
     {
-      "tid": 276499768603040,
+      "tid": 274322345947552,
       "name": "yahoo-chart_10",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274322736083360,
+      "name": "yahoo-chart_9",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274322371309984,
+      "name": "yahoo-chart_8",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 64, in run\n    self.future.set_result(result)",
+        "  File \"/app/app/services/providers/yahoo_chart_provider.py\", line 100, in _fetch_one\n    return sym, {",
+        "  File \"/app/app/services/http_client.py\", line 203, in resilient_get\n    return ResilientResponse(",
+        "  File \"/root/.venv/lib/python3.11/site-packages/requests/api.py\", line 87, in get\n    return request(\"get\", url, params=params, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/requests/api.py\", line 70, in request\n    with sessions.Session() as session:",
+        "  File \"/root/.venv/lib/python3.11/site-packages/requests/sessions.py\", line 653, in request\n    return resp",
+        "  File \"/root/.venv/lib/python3.11/site-packages/requests/sessions.py\", line 829, in send\n    return r",
+        "  File \"/root/.venv/lib/python3.11/site-packages/requests/adapters.py\", line 748, in send\n    return self.build_response(request, resp)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 973, in urlopen\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 556, in _make_request\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connection.py\", line 600, in getresponse\n    return response",
+        "  File \"/usr/local/lib/python3.11/http/client.py\", line 1429, in getresponse\n    return response",
+        "  File \"/usr/local/lib/python3.11/http/client.py\", line 392, in begin\n    self.length is None):",
+        "  File \"/usr/local/lib/python3.11/http/client.py\", line 321, in _read_status\n    return version, status, reason",
+        "  File \"/usr/local/lib/python3.11/socket.py\", line 718, in readinto\n    return self._sock.recv_into(b)",
+        "  File \"/usr/local/lib/python3.11/ssl.py\", line 1314, in recv_into\n    return self.read(nbytes, buffer)",
+        "  File \"/usr/local/lib/python3.11/ssl.py\", line 1166, in read\n    return self._sslobj.read(len, buffer)"
+      ]
+    },
+    {
+      "tid": 274321842893216,
+      "name": "yahoo-chart_7",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274322379764128,
+      "name": "yahoo-chart_6",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274319644684704,
+      "name": "yahoo-chart_5",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/providers/yahoo_chart_provider.py\", line 58, in _fetch_one\n    res = resilient_get(url, params=_PARAMS, headers={'Accept': 'application/json'}, cfg=cfg)",
+        "  File \"/app/app/services/http_client.py\", line 240, in resilient_get\n    _sleep_for_attempt(attempt - 1, cfg, _retry_after_seconds(last_headers))",
+        "  File \"/root/.venv/lib/python3.11/site-packages/requests/api.py\", line 87, in get\n    return request(\"get\", url, params=params, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/requests/api.py\", line 70, in request\n    with sessions.Session() as session:",
+        "  File \"/root/.venv/lib/python3.11/site-packages/requests/sessions.py\", line 653, in request\n    return resp",
+        "  File \"/root/.venv/lib/python3.11/site-packages/requests/sessions.py\", line 829, in send\n    return r",
+        "  File \"/root/.venv/lib/python3.11/site-packages/requests/adapters.py\", line 748, in send\n    return self.build_response(request, resp)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 973, in urlopen\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 556, in _make_request\n    return response",
+        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connection.py\", line 600, in getresponse\n    return response",
+        "  File \"/usr/local/lib/python3.11/http/client.py\", line 1429, in getresponse\n    return response",
+        "  File \"/usr/local/lib/python3.11/http/client.py\", line 392, in begin\n    self.length is None):",
+        "  File \"/usr/local/lib/python3.11/http/client.py\", line 321, in _read_status\n    return version, status, reason",
+        "  File \"/usr/local/lib/python3.11/socket.py\", line 718, in readinto\n    return self._sock.recv_into(b)",
+        "  File \"/usr/local/lib/python3.11/ssl.py\", line 1314, in recv_into\n    return self.read(nbytes, buffer)",
+        "  File \"/usr/local/lib/python3.11/ssl.py\", line 1166, in read\n    return self._sslobj.read(len, buffer)"
+      ]
+    },
+    {
+      "tid": 274322761445792,
+      "name": "yahoo-chart_4",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274322727629216,
+      "name": "yahoo-chart_3",
       "daemon": true,
       "alive": true,
       "stack": [
@@ -741,105 +1085,7 @@
       ]
     },
     {
-      "tid": 276499777057184,
-      "name": "yahoo-chart_9",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276499785511328,
-      "name": "yahoo-chart_8",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276499793965472,
-      "name": "yahoo-chart_7",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276499257094560,
-      "name": "yahoo-chart_6",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/providers/yahoo_chart_provider.py\", line 58, in _fetch_one\n    res = resilient_get(url, params=_PARAMS, headers={'Accept': 'application/json'}, cfg=cfg)",
-        "  File \"/app/app/services/http_client.py\", line 194, in resilient_get\n    resp = requests.get(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/requests/api.py\", line 87, in get\n    return request(\"get\", url, params=params, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/requests/api.py\", line 71, in request\n    return session.request(method=method, url=url, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/requests/sessions.py\", line 651, in request\n    resp = self.send(prep, **send_kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/requests/sessions.py\", line 784, in send\n    r = adapter.send(request, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/requests/adapters.py\", line 696, in send\n    resp = conn.urlopen(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 788, in urlopen\n    response = self._make_request(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 464, in _make_request\n    self._validate_conn(conn)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 1106, in _validate_conn\n    conn.connect()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connection.py\", line 759, in connect\n    self.sock = sock = self._new_conn()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connection.py\", line 204, in _new_conn\n    sock = connection.create_connection(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/util/connection.py\", line 73, in create_connection\n    sock.connect(sa)"
-      ]
-    },
-    {
-      "tid": 276500280111520,
-      "name": "yahoo-chart_5",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276500288565664,
-      "name": "yahoo-chart_4",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276499223277984,
-      "name": "yahoo-chart_3",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
-      ]
-    },
-    {
-      "tid": 276499214823840,
+      "tid": 274322752991648,
       "name": "yahoo-chart_2",
       "daemon": true,
       "alive": true,
@@ -851,7 +1097,7 @@
       ]
     },
     {
-      "tid": 276499248640416,
+      "tid": 274321800622496,
       "name": "yahoo-chart_1",
       "daemon": true,
       "alive": true,
@@ -863,7 +1109,7 @@
       ]
     },
     {
-      "tid": 276499206369696,
+      "tid": 274322362855840,
       "name": "yahoo-chart_0",
       "daemon": true,
       "alive": true,
@@ -875,8 +1121,8 @@
       ]
     },
     {
-      "tid": 276497612665248,
-      "name": "yf-batch-timeout_8",
+      "tid": 274322354401696,
+      "name": "yf-batch-timeout_7",
       "daemon": false,
       "alive": true,
       "stack": [
@@ -887,33 +1133,7 @@
       ]
     },
     {
-      "tid": 276497092702624,
-      "name": "yf-batch-timeout_7",
-      "daemon": false,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/daily_history_service.py\", line 802, in <lambda>\n    lambda: yf.Ticker(sym).history(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 132, in history\n    return self._lazy_load_price_history().history(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/history.py\", line 210, in history\n    data = get_fn(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 371, in get\n    response = self._make_request(url, request_method = self._session.get, params=params, timeout=timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 417, in _make_request\n    response = request_method(**request_args)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 732, in _request_once\n    c.perform()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 502, in perform\n    ret = lib.curl_easy_perform(self._curl)"
-      ]
-    },
-    {
-      "tid": 276500297019808,
+      "tid": 274319242031520,
       "name": "yf-batch-timeout_6",
       "daemon": false,
       "alive": true,
@@ -925,39 +1145,9 @@
       ]
     },
     {
-      "tid": 276500305473952,
+      "tid": 274319661592992,
       "name": "yf-batch-timeout_5",
-      "daemon": true,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/daily_history_service.py\", line 802, in <lambda>\n    lambda: yf.Ticker(sym).history(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 132, in history\n    return self._lazy_load_price_history().history(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 138, in _lazy_load_price_history\n    self._price_history = PriceHistory(self._data, self.ticker, self._get_ticker_tz(timeout=10))",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 153, in _get_ticker_tz\n    tz = self._fetch_ticker_tz(timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 185, in _fetch_ticker_tz\n    data = self._data.cache_get(url=url, params=params, timeout=timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 31, in wrapped\n    return func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 439, in cache_get\n    return self.get(url, params, timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 371, in get\n    response = self._make_request(url, request_method = self._session.get, params=params, timeout=timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 417, in _make_request\n    response = request_method(**request_args)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 732, in _request_once\n    c.perform()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 502, in perform\n    ret = lib.curl_easy_perform(self._curl)"
-      ]
-    },
-    {
-      "tid": 276500884091296,
-      "name": "yf-batch-timeout_4",
-      "daemon": true,
+      "daemon": false,
       "alive": true,
       "stack": [
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
@@ -967,7 +1157,19 @@
       ]
     },
     {
-      "tid": 276500313928096,
+      "tid": 274319670047136,
+      "name": "yf-batch-timeout_4",
+      "daemon": false,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274319678501280,
       "name": "yf-batch-timeout_3",
       "daemon": false,
       "alive": true,
@@ -979,9 +1181,169 @@
       ]
     },
     {
-      "tid": 276500322382240,
-      "name": "yf-batch-timeout_2",
+      "tid": 274319686955424,
+      "name": "dh-worker_9",
       "daemon": false,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/daily_history_service.py\", line 215, in _prefetch_worker\n    sym = _prefetch_q.get(timeout=60)",
+        "  File \"/usr/local/lib/python3.11/queue.py\", line 180, in get\n    self.not_empty.wait(remaining)",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 331, in wait\n    gotit = waiter.acquire(True, timeout)"
+      ]
+    },
+    {
+      "tid": 274319695409568,
+      "name": "dh-worker_8",
+      "daemon": false,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/daily_history_service.py\", line 215, in _prefetch_worker\n    sym = _prefetch_q.get(timeout=60)",
+        "  File \"/usr/local/lib/python3.11/queue.py\", line 180, in get\n    self.not_empty.wait(remaining)",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 331, in wait\n    gotit = waiter.acquire(True, timeout)"
+      ]
+    },
+    {
+      "tid": 274320181555616,
+      "name": "dh-worker_7",
+      "daemon": false,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/daily_history_service.py\", line 215, in _prefetch_worker\n    sym = _prefetch_q.get(timeout=60)",
+        "  File \"/usr/local/lib/python3.11/queue.py\", line 180, in get\n    self.not_empty.wait(remaining)",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 331, in wait\n    gotit = waiter.acquire(True, timeout)"
+      ]
+    },
+    {
+      "tid": 274320190009760,
+      "name": "dh-worker_6",
+      "daemon": false,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/daily_history_service.py\", line 215, in _prefetch_worker\n    sym = _prefetch_q.get(timeout=60)",
+        "  File \"/usr/local/lib/python3.11/queue.py\", line 180, in get\n    self.not_empty.wait(remaining)",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 331, in wait\n    gotit = waiter.acquire(True, timeout)"
+      ]
+    },
+    {
+      "tid": 274320198463904,
+      "name": "dh-worker_5",
+      "daemon": false,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/daily_history_service.py\", line 215, in _prefetch_worker\n    sym = _prefetch_q.get(timeout=60)",
+        "  File \"/usr/local/lib/python3.11/queue.py\", line 180, in get\n    self.not_empty.wait(remaining)",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 331, in wait\n    gotit = waiter.acquire(True, timeout)"
+      ]
+    },
+    {
+      "tid": 274320206918048,
+      "name": "dh-worker_4",
+      "daemon": false,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/daily_history_service.py\", line 215, in _prefetch_worker\n    sym = _prefetch_q.get(timeout=60)",
+        "  File \"/usr/local/lib/python3.11/queue.py\", line 180, in get\n    self.not_empty.wait(remaining)",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 331, in wait\n    gotit = waiter.acquire(True, timeout)"
+      ]
+    },
+    {
+      "tid": 274320215372192,
+      "name": "dh-worker_3",
+      "daemon": false,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/daily_history_service.py\", line 215, in _prefetch_worker\n    sym = _prefetch_q.get(timeout=60)",
+        "  File \"/usr/local/lib/python3.11/queue.py\", line 180, in get\n    self.not_empty.wait(remaining)",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 331, in wait\n    gotit = waiter.acquire(True, timeout)"
+      ]
+    },
+    {
+      "tid": 274320223826336,
+      "name": "dh-worker_2",
+      "daemon": false,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/daily_history_service.py\", line 215, in _prefetch_worker\n    sym = _prefetch_q.get(timeout=60)",
+        "  File \"/usr/local/lib/python3.11/queue.py\", line 180, in get\n    self.not_empty.wait(remaining)",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 331, in wait\n    gotit = waiter.acquire(True, timeout)"
+      ]
+    },
+    {
+      "tid": 274320232280480,
+      "name": "dh-worker_1",
+      "daemon": false,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/daily_history_service.py\", line 215, in _prefetch_worker\n    sym = _prefetch_q.get(timeout=60)",
+        "  File \"/usr/local/lib/python3.11/queue.py\", line 180, in get\n    self.not_empty.wait(remaining)",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 331, in wait\n    gotit = waiter.acquire(True, timeout)"
+      ]
+    },
+    {
+      "tid": 274320718426528,
+      "name": "dh-worker_0",
+      "daemon": false,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/daily_history_service.py\", line 215, in _prefetch_worker\n    sym = _prefetch_q.get(timeout=60)",
+        "  File \"/usr/local/lib/python3.11/queue.py\", line 180, in get\n    self.not_empty.wait(remaining)",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 331, in wait\n    gotit = waiter.acquire(True, timeout)"
+      ]
+    },
+    {
+      "tid": 274321834439072,
+      "name": "yf-batch-timeout_2",
+      "daemon": true,
       "alive": true,
       "stack": [
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
@@ -991,7 +1353,7 @@
       ]
     },
     {
-      "tid": 276500330836384,
+      "tid": 274322337493408,
       "name": "yf-batch-timeout_1",
       "daemon": true,
       "alive": true,
@@ -1003,197 +1365,19 @@
       ]
     },
     {
-      "tid": 276500892545440,
+      "tid": 274323453505952,
       "name": "yf-batch-timeout_0",
-      "daemon": false,
+      "daemon": true,
       "alive": true,
       "stack": [
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/daily_history_service.py\", line 802, in <lambda>\n    lambda: yf.Ticker(sym).history(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 132, in history\n    return self._lazy_load_price_history().history(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 138, in _lazy_load_price_history\n    self._price_history = PriceHistory(self._data, self.ticker, self._get_ticker_tz(timeout=10))",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 153, in _get_ticker_tz\n    tz = self._fetch_ticker_tz(timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 185, in _fetch_ticker_tz\n    data = self._data.cache_get(url=url, params=params, timeout=timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 31, in wrapped\n    return func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 439, in cache_get\n    return self.get(url, params, timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 371, in get\n    response = self._make_request(url, request_method = self._session.get, params=params, timeout=timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 417, in _make_request\n    response = request_method(**request_args)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 732, in _request_once\n    c.perform()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 502, in perform\n    ret = lib.curl_easy_perform(self._curl)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
       ]
     },
     {
-      "tid": 276500900999584,
-      "name": "dh-worker_9",
-      "daemon": false,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/daily_history_service.py\", line 219, in _prefetch_worker\n    get_daily_history(sym, allow_fetch=True, blocking=True)",
-        "  File \"/app/app/services/daily_history_service.py\", line 808, in get_daily_history\n    df = _fut.result(timeout=20.0)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/_base.py\", line 451, in result\n    self._condition.wait(timeout)",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 331, in wait\n    gotit = waiter.acquire(True, timeout)"
-      ]
-    },
-    {
-      "tid": 276500909453728,
-      "name": "dh-worker_8",
-      "daemon": false,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/daily_history_service.py\", line 219, in _prefetch_worker\n    get_daily_history(sym, allow_fetch=True, blocking=True)",
-        "  File \"/app/app/services/daily_history_service.py\", line 779, in get_daily_history\n    time.sleep(min(0.2, wait_s))"
-      ]
-    },
-    {
-      "tid": 276500917907872,
-      "name": "dh-worker_7",
-      "daemon": false,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/daily_history_service.py\", line 219, in _prefetch_worker\n    get_daily_history(sym, allow_fetch=True, blocking=True)",
-        "  File \"/app/app/services/daily_history_service.py\", line 808, in get_daily_history\n    df = _fut.result(timeout=20.0)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/_base.py\", line 451, in result\n    self._condition.wait(timeout)",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 331, in wait\n    gotit = waiter.acquire(True, timeout)"
-      ]
-    },
-    {
-      "tid": 276500926362016,
-      "name": "dh-worker_6",
-      "daemon": false,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/daily_history_service.py\", line 219, in _prefetch_worker\n    get_daily_history(sym, allow_fetch=True, blocking=True)",
-        "  File \"/app/app/services/daily_history_service.py\", line 779, in get_daily_history\n    time.sleep(min(0.2, wait_s))"
-      ]
-    },
-    {
-      "tid": 276500934816160,
-      "name": "dh-worker_5",
-      "daemon": false,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/daily_history_service.py\", line 219, in _prefetch_worker\n    get_daily_history(sym, allow_fetch=True, blocking=True)",
-        "  File \"/app/app/services/daily_history_service.py\", line 808, in get_daily_history\n    df = _fut.result(timeout=20.0)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/_base.py\", line 451, in result\n    self._condition.wait(timeout)",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 331, in wait\n    gotit = waiter.acquire(True, timeout)"
-      ]
-    },
-    {
-      "tid": 276501216686496,
-      "name": "dh-worker_4",
-      "daemon": false,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/daily_history_service.py\", line 219, in _prefetch_worker\n    get_daily_history(sym, allow_fetch=True, blocking=True)",
-        "  File \"/app/app/services/daily_history_service.py\", line 808, in get_daily_history\n    df = _fut.result(timeout=20.0)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/_base.py\", line 451, in result\n    self._condition.wait(timeout)",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 331, in wait\n    gotit = waiter.acquire(True, timeout)"
-      ]
-    },
-    {
-      "tid": 276501225140640,
-      "name": "dh-worker_3",
-      "daemon": false,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/daily_history_service.py\", line 219, in _prefetch_worker\n    get_daily_history(sym, allow_fetch=True, blocking=True)",
-        "  File \"/app/app/services/daily_history_service.py\", line 779, in get_daily_history\n    time.sleep(min(0.2, wait_s))"
-      ]
-    },
-    {
-      "tid": 276501233594784,
-      "name": "dh-worker_2",
-      "daemon": false,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/daily_history_service.py\", line 219, in _prefetch_worker\n    get_daily_history(sym, allow_fetch=True, blocking=True)",
-        "  File \"/app/app/services/daily_history_service.py\", line 808, in get_daily_history\n    df = _fut.result(timeout=20.0)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/_base.py\", line 451, in result\n    self._condition.wait(timeout)",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 331, in wait\n    gotit = waiter.acquire(True, timeout)"
-      ]
-    },
-    {
-      "tid": 276501242048928,
-      "name": "dh-worker_1",
-      "daemon": false,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/daily_history_service.py\", line 219, in _prefetch_worker\n    get_daily_history(sym, allow_fetch=True, blocking=True)",
-        "  File \"/app/app/services/daily_history_service.py\", line 779, in get_daily_history\n    time.sleep(min(0.2, wait_s))"
-      ]
-    },
-    {
-      "tid": 276501865886112,
-      "name": "dh-worker_0",
-      "daemon": false,
-      "alive": true,
-      "stack": [
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/daily_history_service.py\", line 219, in _prefetch_worker\n    get_daily_history(sym, allow_fetch=True, blocking=True)",
-        "  File \"/app/app/services/daily_history_service.py\", line 779, in get_daily_history\n    time.sleep(min(0.2, wait_s))"
-      ]
-    },
-    {
-      "tid": 276501697851808,
+      "tid": 274323226816928,
       "name": "quote-warmer",
       "daemon": true,
       "alive": true,
@@ -1201,13 +1385,18 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/app/app/services/warmer_service.py\", line 66, in _loop\n    _stop.wait(settings.warmer_interval_seconds)",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 629, in wait\n    signaled = self._cond.wait(timeout)",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 331, in wait\n    gotit = waiter.acquire(True, timeout)"
+        "  File \"/app/app/services/warmer_service.py\", line 47, in _loop\n    score_symbol_rows(rows)",
+        "  File \"/app/app/services/scoring_service.py\", line 2290, in score_symbol_rows\n    symbol_to_quote.update(download_quotes(group, 'stocks'))",
+        "  File \"/app/app/services/scoring_service.py\", line 2182, in download_quotes\n    return run_quote_chain(symbols, market, chain)",
+        "  File \"/app/app/services/providers/base.py\", line 449, in run_quote_chain\n    payload = fetcher(pending, market) or {}",
+        "  File \"/app/app/services/providers/yahoo_chart_provider.py\", line 142, in fetch\n    for fut in as_completed(futures, timeout=20):",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/_base.py\", line 243, in as_completed\n    waiter.event.wait(wait_timeout)",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 626, in wait\n    with self._cond:",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 337, in wait\n    if not gotit:"
       ]
     },
     {
-      "tid": 276501706305952,
+      "tid": 274323235271072,
       "name": "wedge-watchdog",
       "daemon": true,
       "alive": true,
@@ -1221,7 +1410,7 @@
       ]
     },
     {
-      "tid": 276501714760096,
+      "tid": 274323243725216,
       "name": "top10-priority-lane",
       "daemon": true,
       "alive": true,
@@ -1235,7 +1424,7 @@
       ]
     },
     {
-      "tid": 276501723214240,
+      "tid": 274323413643680,
       "name": "snap-worker_1",
       "daemon": true,
       "alive": true,
@@ -1247,17 +1436,14 @@
         "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
         "  File \"/app/app/services/snapshot_store.py\", line 1061, in _sweep_one_batch\n    envelope = get_results_batch(batch=batch_idx, limit=limit, market=market)",
         "  File \"/app/app/services/result_store.py\", line 140, in get_results_batch\n    scored_rows = score_symbol_rows(slice_rows)",
-        "  File \"/app/app/services/scoring_service.py\", line 2290, in score_symbol_rows\n    symbol_to_quote.update(download_quotes(group, 'stocks'))",
-        "  File \"/app/app/services/scoring_service.py\", line 2182, in download_quotes\n    return run_quote_chain(symbols, market, chain)",
-        "  File \"/app/app/services/providers/base.py\", line 449, in run_quote_chain\n    payload = fetcher(pending, market) or {}",
-        "  File \"/app/app/services/providers/yahoo_chart_provider.py\", line 142, in fetch\n    for fut in as_completed(futures, timeout=20):",
+        "  File \"/app/app/services/scoring_service.py\", line 2346, in score_symbol_rows\n    for fut in as_completed(futures, timeout=25):",
         "  File \"/usr/local/lib/python3.11/concurrent/futures/_base.py\", line 243, in as_completed\n    waiter.event.wait(wait_timeout)",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 629, in wait\n    signaled = self._cond.wait(timeout)",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 331, in wait\n    gotit = waiter.acquire(True, timeout)"
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 626, in wait\n    with self._cond:",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 337, in wait\n    if not gotit:"
       ]
     },
     {
-      "tid": 276501731668384,
+      "tid": 274323252179360,
       "name": "snap-worker_0",
       "daemon": true,
       "alive": true,
@@ -1269,17 +1455,18 @@
         "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
         "  File \"/app/app/services/snapshot_store.py\", line 1061, in _sweep_one_batch\n    envelope = get_results_batch(batch=batch_idx, limit=limit, market=market)",
         "  File \"/app/app/services/result_store.py\", line 140, in get_results_batch\n    scored_rows = score_symbol_rows(slice_rows)",
-        "  File \"/app/app/services/scoring_service.py\", line 2290, in score_symbol_rows\n    symbol_to_quote.update(download_quotes(group, 'stocks'))",
-        "  File \"/app/app/services/scoring_service.py\", line 2182, in download_quotes\n    return run_quote_chain(symbols, market, chain)",
-        "  File \"/app/app/services/providers/base.py\", line 449, in run_quote_chain\n    payload = fetcher(pending, market) or {}",
-        "  File \"/app/app/services/providers/yahoo_chart_provider.py\", line 142, in fetch\n    for fut in as_completed(futures, timeout=20):",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/_base.py\", line 243, in as_completed\n    waiter.event.wait(wait_timeout)",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 629, in wait\n    signaled = self._cond.wait(timeout)",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 331, in wait\n    gotit = waiter.acquire(True, timeout)"
+        "  File \"/app/app/services/scoring_service.py\", line 2656, in score_symbol_rows\n    full_row = score_from_prices(score_depth='full', **kwargs)",
+        "  File \"/app/app/services/scoring_service.py\", line 1726, in score_from_prices\n    return {",
+        "  File \"/app/app/services/extended_factors.py\", line 387, in compute_extended_factors\n    return {",
+        "  File \"/app/app/services/options_chain_service.py\", line 565, in get_real_options_positioning\n    return _get_yahoo_options_positioning(sym, last_price, max_expirations=yahoo_max_exp)",
+        "  File \"/app/app/services/options_chain_service.py\", line 683, in _get_yahoo_options_positioning\n    return dict(payload) if payload else None",
+        "  File \"/app/app/services/options_chain_service.py\", line 238, in _call_with_timeout\n    return result",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/_base.py\", line 461, in result\n    self = None",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 337, in wait\n    if not gotit:"
       ]
     },
     {
-      "tid": 276501740122528,
+      "tid": 274323433976224,
       "name": "snapshot-scanner",
       "daemon": true,
       "alive": true,
@@ -1291,7 +1478,7 @@
       ]
     },
     {
-      "tid": 276501874340256,
+      "tid": 274323536933280,
       "name": "maintenance-loop",
       "daemon": true,
       "alive": true,
@@ -1305,7 +1492,7 @@
       ]
     },
     {
-      "tid": 276501957112224,
+      "tid": 274323545387424,
       "name": "pred-tracker-eval",
       "daemon": true,
       "alive": true,
@@ -1319,7 +1506,7 @@
       ]
     },
     {
-      "tid": 276502450270240,
+      "tid": 274324374704160,
       "name": "MainThread",
       "daemon": false,
       "alive": true,
@@ -1335,8 +1522,8 @@
         "  File \"/usr/local/lib/python3.11/asyncio/runners.py\", line 118, in run\n    return self._loop.run_until_complete(task)",
         "  File \"/usr/local/lib/python3.11/asyncio/base_events.py\", line 641, in run_until_complete\n    self.run_forever()",
         "  File \"/usr/local/lib/python3.11/asyncio/base_events.py\", line 608, in run_forever\n    self._run_once()",
-        "  File \"/usr/local/lib/python3.11/asyncio/base_events.py\", line 1898, in _run_once\n    event_list = self._selector.select(timeout)",
-        "  File \"/usr/local/lib/python3.11/selectors.py\", line 468, in select\n    fd_event_list = self._selector.poll(timeout, max_ev)"
+        "  File \"/usr/local/lib/python3.11/asyncio/base_events.py\", line 1937, in _run_once\n    handle = None  # Needed to break cycles when an exception occurs.",
+        "  File \"/usr/local/lib/python3.11/selectors.py\", line 481, in select\n    return ready"
       ]
     }
   ],
