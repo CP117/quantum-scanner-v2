@@ -60,20 +60,94 @@ echo [ok] Virtual environment ready.
 echo.
 
 REM ---- 3) Install dependencies on first run ---------------------
-if not exist ".deps_installed" (
-    echo [info] Installing Python dependencies on first run.
-    echo        This takes a few minutes the very first time only.
+REM
+REM The `.deps_installed` marker is used to skip pip install on
+REM subsequent launches (it's slow).  But a bare marker is fragile —
+REM if `requirements.txt` changed between launches, or if a previous
+REM install failed halfway, we would happily skip and blow up later
+REM with "No module named uvicorn" (or similar).
+REM
+REM Phase 26.60: two-layer guard.
+REM   Layer A — the marker records the SHA-256 of the current
+REM             requirements.txt.  If the hash on disk differs from
+REM             the marker, we treat deps as stale and reinstall.
+REM   Layer B — even when the hash matches, we run a fast import
+REM             smoke-test against the venv (`uvicorn`, `fastapi`,
+REM             `httpx`).  If any of them fail to import we wipe the
+REM             marker and reinstall.  This catches partial-install
+REM             corruption, deleted-package situations, or a bad
+REM             venv from an aborted previous run.
+set "DEPS_MARKER=.deps_installed"
+set "DEPS_NEEDED="
+
+REM Compute the requirements.txt hash (best-effort; skip if PowerShell
+REM absent — the smoke-test in Layer B still protects us).
+set "REQ_HASH="
+for /f "usebackq delims=" %%H in (`powershell -NoProfile -Command "(Get-FileHash -Algorithm SHA256 -LiteralPath 'requirements.txt').Hash" 2^>nul`) do (
+    set "REQ_HASH=%%H"
+)
+
+if not exist "%DEPS_MARKER%" (
+    set "DEPS_NEEDED=1"
+) else (
+    if defined REQ_HASH (
+        REM Read the stored hash (first line of the marker file).
+        set "STORED_HASH="
+        for /f "usebackq delims=" %%L in ("%DEPS_MARKER%") do (
+            if not defined STORED_HASH set "STORED_HASH=%%L"
+        )
+        if not "!STORED_HASH!"=="%REQ_HASH%" (
+            echo [info] requirements.txt has changed since last install --
+            echo        reinstalling dependencies.
+            set "DEPS_NEEDED=1"
+        )
+    )
+)
+
+REM Layer B: smoke-test critical imports even if the hash matched.
+if not defined DEPS_NEEDED (
+    "%VENV_PY%" -c "import uvicorn, fastapi, httpx" 2>nul
+    if errorlevel 1 (
+        echo [warn] Dependencies marker present but critical packages
+        echo        do not import ^(venv may be partially installed or
+        echo        was updated externally^). Reinstalling.
+        set "DEPS_NEEDED=1"
+    )
+)
+
+if defined DEPS_NEEDED (
+    echo [info] Installing Python dependencies. This takes a few minutes
+    echo        the very first time; subsequent runs are near-instant.
     echo.
     "%VENV_PY%" -m pip install --upgrade pip
     if errorlevel 1 goto pip_failed
     "%VENV_PY%" -m pip install -r requirements.txt
     if errorlevel 1 goto pip_failed
-    echo done > ".deps_installed"
+    REM Verify the install actually gave us the packages we need before
+    REM writing the success marker.
+    "%VENV_PY%" -c "import uvicorn, fastapi, httpx" 2>nul
+    if errorlevel 1 (
+        echo [ERROR] Dependencies installed but critical packages still
+        echo         do not import.  This usually means pip succeeded
+        echo         against a wrong Python version.  Delete the .\venv
+        echo         folder and rerun start.bat.
+        pause
+        exit /b 1
+    )
+    REM Write the marker: first line = requirements.txt hash, second =
+    REM a human-readable timestamp.  The launcher only reads the first
+    REM line so extra lines are safe to append for diagnostics.
+    if defined REQ_HASH (
+        > "%DEPS_MARKER%" echo %REQ_HASH%
+    ) else (
+        > "%DEPS_MARKER%" echo unknown
+    )
+    >> "%DEPS_MARKER%" echo installed at %DATE% %TIME%
     echo [ok] Dependencies installed.
     echo.
 ) else (
-    echo [ok] Dependencies already installed.
-    echo      To force a fresh install delete the file .deps_installed
+    echo [ok] Dependencies already installed and verified.
+    echo      To force a fresh install delete the file %DEPS_MARKER%
     echo.
 )
 
