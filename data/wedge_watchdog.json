@@ -1,34 +1,34 @@
 {
-  "timestamp_utc": "2026-07-16T21:04:58.453158+00:00",
-  "monotonic_seconds": 1611104.405593718,
+  "timestamp_utc": "2026-07-16T21:21:59.907286+00:00",
+  "monotonic_seconds": 1612125.859720112,
   "process_health": {},
   "snapshot_meta_stocks": {
-    "last_full_sweep_at": null,
-    "last_batch_at": "2026-07-16T21:04:08.799042+00:00",
-    "current_batch_index": 4,
-    "highest_completed_batch": 1,
+    "last_full_sweep_at": "2026-07-16T21:13:58.660020+00:00",
+    "last_batch_at": "2026-07-16T21:21:59.793939+00:00",
+    "current_batch_index": 33,
+    "highest_completed_batch": 32,
     "total_batches": 35,
     "universe_size": 3455,
-    "rows_scored": 200,
-    "evaluations_ever": 220,
-    "current_sweep_scanned": 220,
-    "sweeps_completed": 0
+    "rows_scored": 3394,
+    "evaluations_ever": 7367,
+    "current_sweep_scanned": 3343,
+    "sweeps_completed": 1
   },
   "top10_priority_lane": {
     "running": true,
     "started_at_epoch": 1784235747.5932524,
-    "uptime_seconds": 150.85988450050354,
-    "last_tick_at_epoch": 1784235887.620314,
-    "last_tick_seconds_ago": 10.832824230194092,
+    "uptime_seconds": 1172.3140184879303,
+    "last_tick_at_epoch": 1784236540.8230371,
+    "last_tick_seconds_ago": 379.0842344760895,
     "last_tick_symbols_rescored": 10,
     "last_tick_error": "",
-    "total_ticks": 2,
-    "total_symbols_rescored": 20,
-    "consecutive_slow": 2,
+    "total_ticks": 73,
+    "total_symbols_rescored": 730,
+    "consecutive_slow": 11,
     "consecutive_fast": 0,
-    "monitor_only": false,
-    "last_sleep_seconds": 30.0,
-    "last_tick_elapsed_seconds": 29.62498664855957,
+    "monitor_only": true,
+    "last_sleep_seconds": 56.953125,
+    "last_tick_elapsed_seconds": 3.337860107421875e-06,
     "viewport_first_pass": {
       "tracked_total": 0,
       "ttl_seconds": 600,
@@ -37,29 +37,87 @@
   },
   "threads": [
     {
-      "tid": 274316197294496,
-      "name": "Thread-420 (_run_via_pool)",
-      "daemon": false,
+      "tid": 274314729353632,
+      "name": "detail-fetch_3",
+      "daemon": true,
       "alive": true,
       "stack": [
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/multitasking/__init__.py\", line 303, in _run_via_pool\n    return callee(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/multi.py\", line 267, in _download_one_threaded\n    _download_one(ticker, start, end, auto_adjust, back_adjust, repair,",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/multi.py\", line 281, in _download_one\n    data = Ticker(ticker).history(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 132, in history\n    return self._lazy_load_price_history().history(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/history.py\", line 210, in history\n    data = get_fn(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 371, in get\n    response = self._make_request(url, request_method = self._session.get, params=params, timeout=timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 417, in _make_request\n    response = request_method(**request_args)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 732, in _request_once\n    c.perform()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 502, in perform\n    ret = lib.curl_easy_perform(self._curl)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274315098190240,
+      "name": "detail-fetch_2",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274315132006816,
+      "name": "detail-fetch_1",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274316155023776,
+      "name": "detail-fetch_0",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274318864740768,
+      "name": "opt-prefetch_7",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274318571205024,
+      "name": "opt-prefetch_6",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+      ]
+    },
+    {
+      "tid": 274316197294496,
+      "name": "opt-prefetch_5",
+      "daemon": true,
+      "alive": true,
+      "stack": [
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
       ]
     },
     {
@@ -131,24 +189,7 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/scoring_service.py\", line 1794, in fetch_intraday_shape\n    'previousClose': safe_float(getattr(fast, 'previous_close', None) if hasattr(fast, 'previous_close') else fast.get('previousClose') if isinstance(fast, dict) else None),",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 282, in previous_close\n    self._tkr.info  # trigger fetch",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/ticker.py\", line 163, in info\n    return self.get_info()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 329, in get_info\n    data = self._quote.info",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 511, in info\n    self._fetch_info()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 611, in _fetch_info\n    additional_info = self._fetch_additional_info()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 599, in _fetch_additional_info\n    result = self._data.get_raw_json(f\"{_QUERY1_URL_}/v7/finance/quote?\", params=params_dict)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 443, in get_raw_json\n    response = self.get(url, params=params, timeout=timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 371, in get\n    response = self._make_request(url, request_method = self._session.get, params=params, timeout=timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 417, in _make_request\n    response = request_method(**request_args)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 732, in _request_once\n    c.perform()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 502, in perform\n    ret = lib.curl_easy_perform(self._curl)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
       ]
     },
     {
@@ -172,23 +213,7 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/scoring_service.py\", line 1799, in fetch_intraday_shape\n    'marketCap': safe_float(getattr(fast, 'market_cap', None) if hasattr(fast, 'market_cap') else fast.get('marketCap') if isinstance(fast, dict) else None),",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 286, in previous_close\n    return self._prev_close",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 160, in _get_1wk_1h_prepost_prices\n    return self._prices_1wk_1h_prepost",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 132, in history\n    return self._lazy_load_price_history().history(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/history.py\", line 521, in history\n    return df",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 381, in get\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 434, in _make_request\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 749, in _request_once\n    c.reset()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 508, in perform\n    self.clean_handles_and_buffers(clear_headers, clear_resolve)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
       ]
     },
     {
@@ -212,24 +237,7 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/scoring_service.py\", line 1799, in fetch_intraday_shape\n    'marketCap': safe_float(getattr(fast, 'market_cap', None) if hasattr(fast, 'market_cap') else fast.get('marketCap') if isinstance(fast, dict) else None),",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 479, in market_cap\n    self._tkr.info",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/ticker.py\", line 163, in info\n    return self.get_info()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 329, in get_info\n    data = self._quote.info",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 511, in info\n    self._fetch_info()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 611, in _fetch_info\n    additional_info = self._fetch_additional_info()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 599, in _fetch_additional_info\n    result = self._data.get_raw_json(f\"{_QUERY1_URL_}/v7/finance/quote?\", params=params_dict)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 443, in get_raw_json\n    response = self.get(url, params=params, timeout=timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 371, in get\n    response = self._make_request(url, request_method = self._session.get, params=params, timeout=timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 417, in _make_request\n    response = request_method(**request_args)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 732, in _request_once\n    c.perform()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 502, in perform\n    ret = lib.curl_easy_perform(self._curl)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
       ]
     },
     {
@@ -265,24 +273,7 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/scoring_service.py\", line 1794, in fetch_intraday_shape\n    'previousClose': safe_float(getattr(fast, 'previous_close', None) if hasattr(fast, 'previous_close') else fast.get('previousClose') if isinstance(fast, dict) else None),",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 282, in previous_close\n    self._tkr.info  # trigger fetch",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/ticker.py\", line 163, in info\n    return self.get_info()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 329, in get_info\n    data = self._quote.info",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 511, in info\n    self._fetch_info()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 611, in _fetch_info\n    additional_info = self._fetch_additional_info()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 599, in _fetch_additional_info\n    result = self._data.get_raw_json(f\"{_QUERY1_URL_}/v7/finance/quote?\", params=params_dict)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 443, in get_raw_json\n    response = self.get(url, params=params, timeout=timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 371, in get\n    response = self._make_request(url, request_method = self._session.get, params=params, timeout=timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 417, in _make_request\n    response = request_method(**request_args)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 732, in _request_once\n    c.perform()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 502, in perform\n    ret = lib.curl_easy_perform(self._curl)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
       ]
     },
     {
@@ -318,24 +309,7 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/scoring_service.py\", line 1799, in fetch_intraday_shape\n    'marketCap': safe_float(getattr(fast, 'market_cap', None) if hasattr(fast, 'market_cap') else fast.get('marketCap') if isinstance(fast, dict) else None),",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 466, in market_cap\n    shares = self.shares",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 237, in shares\n    shares = self._tkr.get_shares_full(start=pd.Timestamp.utcnow().date()-pd.Timedelta(days=548))",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 628, in get_shares_full\n    json_data = self._data.cache_get(url=shares_url)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 31, in wrapped\n    return func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 439, in cache_get\n    return self.get(url, params, timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 371, in get\n    response = self._make_request(url, request_method = self._session.get, params=params, timeout=timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 417, in _make_request\n    response = request_method(**request_args)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 732, in _request_once\n    c.perform()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/utils.py\", line 754, in set_curl_options\n    return req, buffer, header_buffer, q, header_recved, quit_now",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 472, in impersonate\n    return lib.curl_easy_impersonate("
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
       ]
     },
     {
@@ -371,24 +345,7 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/scoring_service.py\", line 1794, in fetch_intraday_shape\n    'previousClose': safe_float(getattr(fast, 'previous_close', None) if hasattr(fast, 'previous_close') else fast.get('previousClose') if isinstance(fast, dict) else None),",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 282, in previous_close\n    self._tkr.info  # trigger fetch",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/ticker.py\", line 163, in info\n    return self.get_info()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 329, in get_info\n    data = self._quote.info",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 512, in info\n    self._fetch_complementary()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 660, in _fetch_info\n    self._info = {k: _format(k, v) for k, v in query1_info.items()}",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 603, in _fetch_additional_info\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 445, in get_raw_json\n    return response.json()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 381, in get\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 434, in _make_request\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 749, in _request_once\n    c.reset()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 508, in perform\n    self.clean_handles_and_buffers(clear_headers, clear_resolve)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
       ]
     },
     {
@@ -400,23 +357,7 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 64, in run\n    self.future.set_result(result)",
-        "  File \"/app/app/services/scoring_service.py\", line 1900, in fetch_intraday_shape\n    return merged",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 485, in market_cap\n    return self._mcap",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 245, in shares\n    return self._shares",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 652, in get_shares_full\n    return df",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 31, in wrapped\n    return func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 439, in cache_get\n    return self.get(url, params, timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 381, in get\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 434, in _make_request\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 749, in _request_once\n    c.reset()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 508, in perform\n    self.clean_handles_and_buffers(clear_headers, clear_resolve)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
       ]
     },
     {
@@ -428,24 +369,7 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/scoring_service.py\", line 1799, in fetch_intraday_shape\n    'marketCap': safe_float(getattr(fast, 'market_cap', None) if hasattr(fast, 'market_cap') else fast.get('marketCap') if isinstance(fast, dict) else None),",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 479, in market_cap\n    self._tkr.info",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/ticker.py\", line 163, in info\n    return self.get_info()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 329, in get_info\n    data = self._quote.info",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 511, in info\n    self._fetch_info()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 611, in _fetch_info\n    additional_info = self._fetch_additional_info()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 599, in _fetch_additional_info\n    result = self._data.get_raw_json(f\"{_QUERY1_URL_}/v7/finance/quote?\", params=params_dict)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 443, in get_raw_json\n    response = self.get(url, params=params, timeout=timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 371, in get\n    response = self._make_request(url, request_method = self._session.get, params=params, timeout=timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 92, in wrapper\n    result = func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 417, in _make_request\n    response = request_method(**request_args)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 732, in _request_once\n    c.perform()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 502, in perform\n    ret = lib.curl_easy_perform(self._curl)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
       ]
     },
     {
@@ -457,24 +381,7 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/scoring_service.py\", line 1799, in fetch_intraday_shape\n    'marketCap': safe_float(getattr(fast, 'market_cap', None) if hasattr(fast, 'market_cap') else fast.get('marketCap') if isinstance(fast, dict) else None),",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 262, in last_price\n    return self._last_price",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 155, in _get_1y_prices\n    return self._prices_1y.loc[str(d0):str(d1)]",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 921, in get_history_metadata\n    return self._lazy_load_price_history().get_history_metadata(proxy)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/history.py\", line 545, in get_history_metadata\n    return self._history_metadata",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/history.py\", line 530, in _get_history_cache\n    return df",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/history.py\", line 521, in history\n    return df",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 381, in get\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 434, in _make_request\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 749, in _request_once\n    c.reset()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 508, in perform\n    self.clean_handles_and_buffers(clear_headers, clear_resolve)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
       ]
     },
     {
@@ -486,23 +393,7 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 64, in run\n    self.future.set_result(result)",
-        "  File \"/app/app/services/scoring_service.py\", line 1900, in fetch_intraday_shape\n    return merged",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 485, in market_cap\n    return self._mcap",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 245, in shares\n    return self._shares",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 652, in get_shares_full\n    return df",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 31, in wrapped\n    return func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 439, in cache_get\n    return self.get(url, params, timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 381, in get\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 434, in _make_request\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 749, in _request_once\n    c.reset()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 508, in perform\n    self.clean_handles_and_buffers(clear_headers, clear_resolve)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
       ]
     },
     {
@@ -514,23 +405,7 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 64, in run\n    self.future.set_result(result)",
-        "  File \"/app/app/services/scoring_service.py\", line 1900, in fetch_intraday_shape\n    return merged",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 485, in market_cap\n    return self._mcap",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 245, in shares\n    return self._shares",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 652, in get_shares_full\n    return df",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 31, in wrapped\n    return func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 439, in cache_get\n    return self.get(url, params, timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 381, in get\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 434, in _make_request\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 749, in _request_once\n    c.reset()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 508, in perform\n    self.clean_handles_and_buffers(clear_headers, clear_resolve)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
       ]
     },
     {
@@ -554,7 +429,11 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/providers/yahoo_chart_provider.py\", line 58, in _fetch_one\n    res = resilient_get(url, params=_PARAMS, headers={'Accept': 'application/json'}, cfg=cfg)",
+        "  File \"/app/app/services/http_client.py\", line 240, in resilient_get\n    _sleep_for_attempt(attempt - 1, cfg, _retry_after_seconds(last_headers))",
+        "  File \"/app/app/services/http_client.py\", line 131, in _sleep_for_attempt\n    time.sleep(wait)"
       ]
     },
     {
@@ -578,25 +457,11 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 64, in run\n    self.future.set_result(result)",
-        "  File \"/app/app/services/providers/yahoo_chart_provider.py\", line 100, in _fetch_one\n    return sym, {",
-        "  File \"/app/app/services/http_client.py\", line 203, in resilient_get\n    return ResilientResponse(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/requests/api.py\", line 87, in get\n    return request(\"get\", url, params=params, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/requests/api.py\", line 70, in request\n    with sessions.Session() as session:",
-        "  File \"/root/.venv/lib/python3.11/site-packages/requests/sessions.py\", line 653, in request\n    return resp",
-        "  File \"/root/.venv/lib/python3.11/site-packages/requests/sessions.py\", line 829, in send\n    return r",
-        "  File \"/root/.venv/lib/python3.11/site-packages/requests/adapters.py\", line 748, in send\n    return self.build_response(request, resp)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 973, in urlopen\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 556, in _make_request\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 1109, in _validate_conn\n    if not conn.is_verified and not conn.proxy_is_verified:",
-        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connection.py\", line 858, in connect\n    if self._has_connected_to_proxy and self.proxy_is_verified is None:",
-        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connection.py\", line 1016, in _ssl_wrap_socket_and_match_hostname\n    return _WrappedAndVerifiedSocket(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/util/ssl_.py\", line 434, in ssl_wrap_socket\n    return ssl_sock",
-        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/util/ssl_.py\", line 477, in _ssl_wrap_socket_impl\n    return ssl_context.wrap_socket(sock, server_hostname=server_hostname)",
-        "  File \"/usr/local/lib/python3.11/ssl.py\", line 517, in wrap_socket\n    return self.sslsocket_class._create(",
-        "  File \"/usr/local/lib/python3.11/ssl.py\", line 1111, in _create\n    return self",
-        "  File \"/usr/local/lib/python3.11/ssl.py\", line 1384, in do_handshake\n    self.settimeout(timeout)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/providers/yahoo_chart_provider.py\", line 58, in _fetch_one\n    res = resilient_get(url, params=_PARAMS, headers={'Accept': 'application/json'}, cfg=cfg)",
+        "  File \"/app/app/services/http_client.py\", line 240, in resilient_get\n    _sleep_for_attempt(attempt - 1, cfg, _retry_after_seconds(last_headers))",
+        "  File \"/app/app/services/http_client.py\", line 131, in _sleep_for_attempt\n    time.sleep(wait)"
       ]
     },
     {
@@ -608,19 +473,7 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 64, in run\n    self.future.set_result(result)",
-        "  File \"/app/app/services/options_chain_service.py\", line 626, in <lambda>\n    lambda: list(getattr(ticker, 'options', []) or []),",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/ticker.py\", line 312, in options\n    return tuple(self._expirations.keys())",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/ticker.py\", line 61, in _download_options\n    return dict(**opt[0],underlying=self._underlying) if len(opt) > 0 else {}",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 381, in get\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 434, in _make_request\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 749, in _request_once\n    c.reset()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 508, in perform\n    self.clean_handles_and_buffers(clear_headers, clear_resolve)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
       ]
     },
     {
@@ -646,24 +499,7 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/scoring_service.py\", line 1794, in fetch_intraday_shape\n    'previousClose': safe_float(getattr(fast, 'previous_close', None) if hasattr(fast, 'previous_close') else fast.get('previousClose') if isinstance(fast, dict) else None),",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 282, in previous_close\n    self._tkr.info  # trigger fetch",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/ticker.py\", line 163, in info\n    return self.get_info()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 329, in get_info\n    data = self._quote.info",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 512, in info\n    self._fetch_complementary()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 660, in _fetch_info\n    self._info = {k: _format(k, v) for k, v in query1_info.items()}",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 603, in _fetch_additional_info\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 445, in get_raw_json\n    return response.json()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 381, in get\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 434, in _make_request\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 749, in _request_once\n    c.reset()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 508, in perform\n    self.clean_handles_and_buffers(clear_headers, clear_resolve)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
       ]
     },
     {
@@ -687,23 +523,7 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/scoring_service.py\", line 1799, in fetch_intraday_shape\n    'marketCap': safe_float(getattr(fast, 'market_cap', None) if hasattr(fast, 'market_cap') else fast.get('marketCap') if isinstance(fast, dict) else None),",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 286, in previous_close\n    return self._prev_close",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 160, in _get_1wk_1h_prepost_prices\n    return self._prices_1wk_1h_prepost",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 132, in history\n    return self._lazy_load_price_history().history(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/history.py\", line 521, in history\n    return df",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 381, in get\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 434, in _make_request\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 749, in _request_once\n    c.reset()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 508, in perform\n    self.clean_handles_and_buffers(clear_headers, clear_resolve)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
       ]
     },
     {
@@ -715,23 +535,7 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 64, in run\n    self.future.set_result(result)",
-        "  File \"/app/app/services/scoring_service.py\", line 1900, in fetch_intraday_shape\n    return merged",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 485, in market_cap\n    return self._mcap",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/scrapers/quote.py\", line 245, in shares\n    return self._shares",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/base.py\", line 652, in get_shares_full\n    return df",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 31, in wrapped\n    return func(*args, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 439, in cache_get\n    return self.get(url, params, timeout)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 381, in get\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/utils.py\", line 95, in wrapper\n    return result",
-        "  File \"/root/.venv/lib/python3.11/site-packages/yfinance/data.py\", line 434, in _make_request\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 842, in get\n    return self.request(method=\"GET\", url=url, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 795, in request\n    return self._request_once(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/requests/session.py\", line 749, in _request_once\n    c.reset()",
-        "  File \"/root/.venv/lib/python3.11/site-packages/curl_cffi/curl.py\", line 508, in perform\n    self.clean_handles_and_buffers(clear_headers, clear_resolve)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
       ]
     },
     {
@@ -899,7 +703,21 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/providers/yahoo_chart_provider.py\", line 58, in _fetch_one\n    res = resilient_get(url, params=_PARAMS, headers={'Accept': 'application/json'}, cfg=cfg)",
+        "  File \"/app/app/services/http_client.py\", line 194, in resilient_get\n    resp = requests.get(",
+        "  File \"/root/.venv/lib/python3.11/site-packages/requests/api.py\", line 87, in get\n    return request(\"get\", url, params=params, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/requests/api.py\", line 71, in request\n    return session.request(method=method, url=url, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/requests/sessions.py\", line 651, in request\n    resp = self.send(prep, **send_kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/requests/sessions.py\", line 784, in send\n    r = adapter.send(request, **kwargs)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/requests/adapters.py\", line 696, in send\n    resp = conn.urlopen(",
+        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 788, in urlopen\n    response = self._make_request(",
+        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 464, in _make_request\n    self._validate_conn(conn)",
+        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 1106, in _validate_conn\n    conn.connect()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connection.py\", line 759, in connect\n    self.sock = sock = self._new_conn()",
+        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connection.py\", line 204, in _new_conn\n    sock = connection.create_connection(",
+        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/util/connection.py\", line 73, in create_connection\n    sock.connect(sa)"
       ]
     },
     {
@@ -935,7 +753,11 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/providers/yahoo_chart_provider.py\", line 58, in _fetch_one\n    res = resilient_get(url, params=_PARAMS, headers={'Accept': 'application/json'}, cfg=cfg)",
+        "  File \"/app/app/services/http_client.py\", line 240, in resilient_get\n    _sleep_for_attempt(attempt - 1, cfg, _retry_after_seconds(last_headers))",
+        "  File \"/app/app/services/http_client.py\", line 131, in _sleep_for_attempt\n    time.sleep(wait)"
       ]
     },
     {
@@ -947,7 +769,11 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/providers/yahoo_chart_provider.py\", line 58, in _fetch_one\n    res = resilient_get(url, params=_PARAMS, headers={'Accept': 'application/json'}, cfg=cfg)",
+        "  File \"/app/app/services/http_client.py\", line 240, in resilient_get\n    _sleep_for_attempt(attempt - 1, cfg, _retry_after_seconds(last_headers))",
+        "  File \"/app/app/services/http_client.py\", line 131, in _sleep_for_attempt\n    time.sleep(wait)"
       ]
     },
     {
@@ -971,7 +797,11 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/providers/yahoo_chart_provider.py\", line 58, in _fetch_one\n    res = resilient_get(url, params=_PARAMS, headers={'Accept': 'application/json'}, cfg=cfg)",
+        "  File \"/app/app/services/http_client.py\", line 240, in resilient_get\n    _sleep_for_attempt(attempt - 1, cfg, _retry_after_seconds(last_headers))",
+        "  File \"/app/app/services/http_client.py\", line 131, in _sleep_for_attempt\n    time.sleep(wait)"
       ]
     },
     {
@@ -983,24 +813,7 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 64, in run\n    self.future.set_result(result)",
-        "  File \"/app/app/services/providers/yahoo_chart_provider.py\", line 100, in _fetch_one\n    return sym, {",
-        "  File \"/app/app/services/http_client.py\", line 203, in resilient_get\n    return ResilientResponse(",
-        "  File \"/root/.venv/lib/python3.11/site-packages/requests/api.py\", line 87, in get\n    return request(\"get\", url, params=params, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/requests/api.py\", line 70, in request\n    with sessions.Session() as session:",
-        "  File \"/root/.venv/lib/python3.11/site-packages/requests/sessions.py\", line 653, in request\n    return resp",
-        "  File \"/root/.venv/lib/python3.11/site-packages/requests/sessions.py\", line 829, in send\n    return r",
-        "  File \"/root/.venv/lib/python3.11/site-packages/requests/adapters.py\", line 748, in send\n    return self.build_response(request, resp)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 973, in urlopen\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 556, in _make_request\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connection.py\", line 600, in getresponse\n    return response",
-        "  File \"/usr/local/lib/python3.11/http/client.py\", line 1429, in getresponse\n    return response",
-        "  File \"/usr/local/lib/python3.11/http/client.py\", line 392, in begin\n    self.length is None):",
-        "  File \"/usr/local/lib/python3.11/http/client.py\", line 321, in _read_status\n    return version, status, reason",
-        "  File \"/usr/local/lib/python3.11/socket.py\", line 718, in readinto\n    return self._sock.recv_into(b)",
-        "  File \"/usr/local/lib/python3.11/ssl.py\", line 1314, in recv_into\n    return self.read(nbytes, buffer)",
-        "  File \"/usr/local/lib/python3.11/ssl.py\", line 1166, in read\n    return self._sslobj.read(len, buffer)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
       ]
     },
     {
@@ -1012,7 +825,11 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/providers/yahoo_chart_provider.py\", line 58, in _fetch_one\n    res = resilient_get(url, params=_PARAMS, headers={'Accept': 'application/json'}, cfg=cfg)",
+        "  File \"/app/app/services/http_client.py\", line 240, in resilient_get\n    _sleep_for_attempt(attempt - 1, cfg, _retry_after_seconds(last_headers))",
+        "  File \"/app/app/services/http_client.py\", line 131, in _sleep_for_attempt\n    time.sleep(wait)"
       ]
     },
     {
@@ -1040,20 +857,7 @@
         "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
         "  File \"/app/app/services/providers/yahoo_chart_provider.py\", line 58, in _fetch_one\n    res = resilient_get(url, params=_PARAMS, headers={'Accept': 'application/json'}, cfg=cfg)",
         "  File \"/app/app/services/http_client.py\", line 240, in resilient_get\n    _sleep_for_attempt(attempt - 1, cfg, _retry_after_seconds(last_headers))",
-        "  File \"/root/.venv/lib/python3.11/site-packages/requests/api.py\", line 87, in get\n    return request(\"get\", url, params=params, **kwargs)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/requests/api.py\", line 70, in request\n    with sessions.Session() as session:",
-        "  File \"/root/.venv/lib/python3.11/site-packages/requests/sessions.py\", line 653, in request\n    return resp",
-        "  File \"/root/.venv/lib/python3.11/site-packages/requests/sessions.py\", line 829, in send\n    return r",
-        "  File \"/root/.venv/lib/python3.11/site-packages/requests/adapters.py\", line 748, in send\n    return self.build_response(request, resp)",
-        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 973, in urlopen\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py\", line 556, in _make_request\n    return response",
-        "  File \"/root/.venv/lib/python3.11/site-packages/urllib3/connection.py\", line 600, in getresponse\n    return response",
-        "  File \"/usr/local/lib/python3.11/http/client.py\", line 1429, in getresponse\n    return response",
-        "  File \"/usr/local/lib/python3.11/http/client.py\", line 392, in begin\n    self.length is None):",
-        "  File \"/usr/local/lib/python3.11/http/client.py\", line 321, in _read_status\n    return version, status, reason",
-        "  File \"/usr/local/lib/python3.11/socket.py\", line 718, in readinto\n    return self._sock.recv_into(b)",
-        "  File \"/usr/local/lib/python3.11/ssl.py\", line 1314, in recv_into\n    return self.read(nbytes, buffer)",
-        "  File \"/usr/local/lib/python3.11/ssl.py\", line 1166, in read\n    return self._sslobj.read(len, buffer)"
+        "  File \"/app/app/services/http_client.py\", line 131, in _sleep_for_attempt\n    time.sleep(wait)"
       ]
     },
     {
@@ -1077,11 +881,7 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/providers/yahoo_chart_provider.py\", line 58, in _fetch_one\n    res = resilient_get(url, params=_PARAMS, headers={'Accept': 'application/json'}, cfg=cfg)",
-        "  File \"/app/app/services/http_client.py\", line 240, in resilient_get\n    _sleep_for_attempt(attempt - 1, cfg, _retry_after_seconds(last_headers))",
-        "  File \"/app/app/services/http_client.py\", line 131, in _sleep_for_attempt\n    time.sleep(wait)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
       ]
     },
     {
@@ -1093,7 +893,11 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
+        "  File \"/app/app/services/providers/yahoo_chart_provider.py\", line 58, in _fetch_one\n    res = resilient_get(url, params=_PARAMS, headers={'Accept': 'application/json'}, cfg=cfg)",
+        "  File \"/app/app/services/http_client.py\", line 240, in resilient_get\n    _sleep_for_attempt(attempt - 1, cfg, _retry_after_seconds(last_headers))",
+        "  File \"/app/app/services/http_client.py\", line 131, in _sleep_for_attempt\n    time.sleep(wait)"
       ]
     },
     {
@@ -1391,8 +1195,8 @@
         "  File \"/app/app/services/providers/base.py\", line 449, in run_quote_chain\n    payload = fetcher(pending, market) or {}",
         "  File \"/app/app/services/providers/yahoo_chart_provider.py\", line 142, in fetch\n    for fut in as_completed(futures, timeout=20):",
         "  File \"/usr/local/lib/python3.11/concurrent/futures/_base.py\", line 243, in as_completed\n    waiter.event.wait(wait_timeout)",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 626, in wait\n    with self._cond:",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 337, in wait\n    if not gotit:"
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 629, in wait\n    signaled = self._cond.wait(timeout)",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 331, in wait\n    gotit = waiter.acquire(True, timeout)"
       ]
     },
     {
@@ -1432,14 +1236,7 @@
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1002, in _bootstrap\n    self._bootstrap_inner()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 1045, in _bootstrap_inner\n    self.run()",
         "  File \"/usr/local/lib/python3.11/threading.py\", line 982, in run\n    self._target(*self._args, **self._kwargs)",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 83, in _worker\n    work_item.run()",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
-        "  File \"/app/app/services/snapshot_store.py\", line 1061, in _sweep_one_batch\n    envelope = get_results_batch(batch=batch_idx, limit=limit, market=market)",
-        "  File \"/app/app/services/result_store.py\", line 140, in get_results_batch\n    scored_rows = score_symbol_rows(slice_rows)",
-        "  File \"/app/app/services/scoring_service.py\", line 2346, in score_symbol_rows\n    for fut in as_completed(futures, timeout=25):",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/_base.py\", line 243, in as_completed\n    waiter.event.wait(wait_timeout)",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 626, in wait\n    with self._cond:",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 337, in wait\n    if not gotit:"
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 81, in _worker\n    work_item = work_queue.get(block=True)"
       ]
     },
     {
@@ -1455,14 +1252,13 @@
         "  File \"/usr/local/lib/python3.11/concurrent/futures/thread.py\", line 58, in run\n    result = self.fn(*self.args, **self.kwargs)",
         "  File \"/app/app/services/snapshot_store.py\", line 1061, in _sweep_one_batch\n    envelope = get_results_batch(batch=batch_idx, limit=limit, market=market)",
         "  File \"/app/app/services/result_store.py\", line 140, in get_results_batch\n    scored_rows = score_symbol_rows(slice_rows)",
-        "  File \"/app/app/services/scoring_service.py\", line 2656, in score_symbol_rows\n    full_row = score_from_prices(score_depth='full', **kwargs)",
-        "  File \"/app/app/services/scoring_service.py\", line 1726, in score_from_prices\n    return {",
-        "  File \"/app/app/services/extended_factors.py\", line 387, in compute_extended_factors\n    return {",
-        "  File \"/app/app/services/options_chain_service.py\", line 565, in get_real_options_positioning\n    return _get_yahoo_options_positioning(sym, last_price, max_expirations=yahoo_max_exp)",
-        "  File \"/app/app/services/options_chain_service.py\", line 683, in _get_yahoo_options_positioning\n    return dict(payload) if payload else None",
-        "  File \"/app/app/services/options_chain_service.py\", line 238, in _call_with_timeout\n    return result",
-        "  File \"/usr/local/lib/python3.11/concurrent/futures/_base.py\", line 461, in result\n    self = None",
-        "  File \"/usr/local/lib/python3.11/threading.py\", line 337, in wait\n    if not gotit:"
+        "  File \"/app/app/services/scoring_service.py\", line 2290, in score_symbol_rows\n    symbol_to_quote.update(download_quotes(group, 'stocks'))",
+        "  File \"/app/app/services/scoring_service.py\", line 2182, in download_quotes\n    return run_quote_chain(symbols, market, chain)",
+        "  File \"/app/app/services/providers/base.py\", line 449, in run_quote_chain\n    payload = fetcher(pending, market) or {}",
+        "  File \"/app/app/services/providers/yahoo_chart_provider.py\", line 142, in fetch\n    for fut in as_completed(futures, timeout=20):",
+        "  File \"/usr/local/lib/python3.11/concurrent/futures/_base.py\", line 243, in as_completed\n    waiter.event.wait(wait_timeout)",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 629, in wait\n    signaled = self._cond.wait(timeout)",
+        "  File \"/usr/local/lib/python3.11/threading.py\", line 331, in wait\n    gotit = waiter.acquire(True, timeout)"
       ]
     },
     {
@@ -1522,8 +1318,8 @@
         "  File \"/usr/local/lib/python3.11/asyncio/runners.py\", line 118, in run\n    return self._loop.run_until_complete(task)",
         "  File \"/usr/local/lib/python3.11/asyncio/base_events.py\", line 641, in run_until_complete\n    self.run_forever()",
         "  File \"/usr/local/lib/python3.11/asyncio/base_events.py\", line 608, in run_forever\n    self._run_once()",
-        "  File \"/usr/local/lib/python3.11/asyncio/base_events.py\", line 1937, in _run_once\n    handle = None  # Needed to break cycles when an exception occurs.",
-        "  File \"/usr/local/lib/python3.11/selectors.py\", line 481, in select\n    return ready"
+        "  File \"/usr/local/lib/python3.11/asyncio/base_events.py\", line 1898, in _run_once\n    event_list = self._selector.select(timeout)",
+        "  File \"/usr/local/lib/python3.11/selectors.py\", line 468, in select\n    fd_event_list = self._selector.poll(timeout, max_ev)"
       ]
     }
   ],
