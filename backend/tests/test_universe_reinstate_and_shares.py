@@ -14,7 +14,7 @@ import requests
 BACKEND = "http://localhost:8001"
 PREVIEW = os.environ.get(
     "REACT_APP_BACKEND_URL",
-    "https://a50d5ff2-a25c-4f65-8076-e42f17b69a95.preview.emergentagent.com",
+    "https://stock-scan-modular.preview.emergentagent.com",
 ).rstrip("/")
 
 TIMEOUT = 60

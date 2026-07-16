@@ -16,7 +16,7 @@ import requests
 BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "").rstrip("/")
 if not BASE_URL:
     # Fallback to preview URL declared in the review request
-    BASE_URL = "https://a50d5ff2-a25c-4f65-8076-e42f17b69a95.preview.emergentagent.com"
+    BASE_URL = "https://stock-scan-modular.preview.emergentagent.com"
 
 TIMEOUT = 90
 
