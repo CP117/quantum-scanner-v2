@@ -38,6 +38,14 @@ _TIMEOUT = 4.0
 _MIN_GAP = 0.05   # 20 req/sec max — well under the 60/min free-tier limit
 _RATE_COOLDOWN = 60.0  # if we hit 429, back off for 60 s globally
 
+# Phase 26.60: module-level shared httpx.Client with bounded pool.
+# Reused across fetch() calls so the TLS session stays warm and TCP
+# connections are pooled instead of re-established per batch.
+_HTTPX_CLIENT = httpx.Client(
+    timeout=_TIMEOUT,
+    limits=httpx.Limits(max_connections=10, max_keepalive_connections=5),
+)
+
 _lock = Lock()
 _last_request_ts = 0.0
 _rate_limited_until = 0.0
@@ -153,16 +161,21 @@ def fetch(symbols: Iterable[str], market: str) -> dict[str, dict]:
     if not syms:
         return {}
     out: dict[str, dict] = {}
+    # Phase 26.60: module-level shared httpx.Client.  Reusing across
+    # invocations keeps the TLS session + connection pool warm between
+    # scan batches.  Previously each fetch() call opened + closed a
+    # fresh client — one TLS handshake per batch (typically 25-100
+    # symbols) — which added measurable latency on cold starts and
+    # amplified socket/FD churn.
     try:
-        with httpx.Client(timeout=_TIMEOUT) as client:
-            for sym in syms:
+        for sym in syms:
+            with _lock:
+                _stats["requests"] += 1
+            snap = _fetch_one(_HTTPX_CLIENT, sym, token)
+            if snap:
+                out[sym] = snap
                 with _lock:
-                    _stats["requests"] += 1
-                snap = _fetch_one(client, sym, token)
-                if snap:
-                    out[sym] = snap
-                    with _lock:
-                        _stats["hits"] += 1
+                    _stats["hits"] += 1
     except Exception as exc:
         log.debug("finnhub batch failed: %s", exc)
     return out
