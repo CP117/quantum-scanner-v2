@@ -157,7 +157,15 @@ REM ---- 6c) Persist URL + LAN URLs to app\data\public_url.txt -----
 REM Build the file synchronously (one URL per line, no /ui suffix) so the
 REM backend's /api/public-url endpoint has it ready before the dashboard
 REM loads. Public URL first, then LAN URLs, then localhost.
-if not "!PUBLIC_URL!"=="" (
+REM
+REM Guard: require the captured value to actually START with "https://"
+REM before writing it.  Previously the guard was `if not ""=="" ...` which
+REM the PowerShell capture could accidentally pass with a whitespace-only
+REM string, causing cmd.exe to emit the literal text "ECHO is off." into
+REM the URL file (bare `echo` with no visible args prints the state of
+REM echo mode).  That polluted the frontend banner AND caused the backend
+REM to think a URL had been published when in fact none had.
+if "!PUBLIC_URL:~0,8!"=="https://" (
     >>"%PUBLIC_URL_FILE%" echo !PUBLIC_URL!
 )
 for /f "tokens=2 delims=:" %%A in ('ipconfig ^| findstr /R /C:"IPv4 Address"') do (
@@ -180,8 +188,14 @@ REM tokenizer mis-parses the `{` immediately after `for(...)`, producing
 REM the famous "Start-Sleep was unexpected at this time" error. The fix
 REM is to ship the watcher as a standalone .ps1 file with normal quoting
 REM and invoke it with `-File`.
+REM
+REM Guard: only launch the watcher if we ALSO have no captured URL AND
+REM the standalone `tunnel_watcher.ps1` is present.  Skip silently if
+REM the .ps1 was stripped from the archive — the backend's own
+REM `ensure_public_url_on_startup()` hook will still spawn cloudflared
+REM as a fallback so the user isn't left without a public URL.
 if defined CFD_RUNNING (
-    if "!PUBLIC_URL!"=="" (
+    if "!PUBLIC_URL:~0,8!" NEQ "https://" (
         if exist "tunnel_watcher.ps1" (
             start "MRD-PublicURLWatcher" /b powershell -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "tunnel_watcher.ps1" "%CFD_LOG%" "%PUBLIC_URL_FILE%"
         )
@@ -202,14 +216,20 @@ for /f "tokens=2 delims=:" %%A in ('ipconfig ^| findstr /R /C:"IPv4 Address"') d
 )
 echo.
 if defined PUBLIC_URL (
-    echo  PUBLIC URL ^(works from ANY network -- share with anyone^):
-    echo    !PUBLIC_URL!/ui
-    echo.
-    echo    ^* this URL is generated fresh every time you start the
-    echo      app. It only works while this window stays open.
-    echo    ^* anyone with the URL can reach the dashboard, so don't
-    echo      paste it in public chats if you only want one or two
-    echo      people to see it.
+    if "!PUBLIC_URL:~0,8!"=="https://" (
+        echo  PUBLIC URL ^(works from ANY network -- share with anyone^):
+        echo    !PUBLIC_URL!/ui
+        echo.
+        echo    ^* this URL is generated fresh every time you start the
+        echo      app. It only works while this window stays open.
+        echo    ^* anyone with the URL can reach the dashboard, so don't
+        echo      paste it in public chats if you only want one or two
+        echo      people to see it.
+    ) else (
+        echo  PUBLIC URL: still negotiating with Cloudflare ^(may take
+        echo    a few more seconds^). Check %CFD_LOG% if it doesn't
+        echo    show up -- your firewall may be blocking outbound TCP.
+    )
 ) else (
     if defined CFD_RUNNING (
         echo  PUBLIC URL: still negotiating with Cloudflare ^(may take

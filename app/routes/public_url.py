@@ -59,7 +59,19 @@ def _pick_file() -> Path | None:
 
 
 def _read_lines() -> list[str]:
-    """Read every non-empty, non-comment line from the URL file."""
+    """Read every legitimate URL line from the URL file.
+
+    Filters out:
+      - blank lines and comments
+      - non-URL diagnostic output (e.g. "ECHO is off." from a buggy
+        Windows launcher — see start.bat Phase 26.60 comment block)
+      - anything that doesn't start with http:// or https://
+
+    This is defense-in-depth: the launcher SHOULD only ever write real
+    URLs, and the backend startup hook wipes obvious pollution, but the
+    frontend banner must never surface garbage no matter what upstream
+    bug produced it.
+    """
     path = _pick_file()
     if not path:
         return []
@@ -72,6 +84,12 @@ def _read_lines() -> list[str]:
     for line in raw.splitlines():
         s = line.strip()
         if not s or s.startswith('#'):
+            continue
+        # Strict URL prefix check.  Rejects any non-URL diagnostic text
+        # that a buggy launcher may have leaked into the file.
+        s_lower = s.lower()
+        if not (s_lower.startswith('http://') or s_lower.startswith('https://')):
+            log.debug('public_url: discarding non-URL line %r from %s', s, path)
             continue
         lines.append(s)
     return lines

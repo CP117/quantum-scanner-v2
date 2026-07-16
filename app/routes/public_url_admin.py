@@ -226,6 +226,11 @@ def _write_url_file(public_url: str | None, port: int) -> None:
     path.write_text('\n'.join(lines) + '\n', encoding='utf-8')
 
 
+# Pattern matches ONLY real URLs we're willing to publish.  Anything
+# else read out of public_url.txt (whitespace, "ECHO is off." garbage
+# from a buggy launcher, comments, or stray shell diagnostics) is
+# rejected so the frontend banner never surfaces junk.
+_URL_LINE_RE = re.compile(r'^\s*https?://[^\s]+', re.IGNORECASE)
 _URL_RE = re.compile(r'https://[a-z0-9-]+\.trycloudflare\.com', re.IGNORECASE)
 
 
@@ -423,10 +428,19 @@ def _public_url_file_has_trycloudflare() -> bool:
 
 
 def _find_stale_public_url_file(max_age_seconds: float) -> Path | None:
-    """Return the first public_url.txt that contains a trycloudflare URL but
-    whose mtime is older than `max_age_seconds`. Used to detect URLs left
-    behind from a previous launch (e.g. when the file shipped inside the
-    zip artifact or the previous process crashed without truncating).
+    """Return the first public_url.txt that either
+       (a) contains a trycloudflare URL but whose mtime is older than
+           `max_age_seconds` (left over from a previous launch), OR
+       (b) contains any non-blank, non-comment line that is NOT a valid
+           URL — indicating pollution from a buggy launcher (e.g. the
+           literal string "ECHO is off." leaked by start.bat when
+           delayed-expansion capture failed pre-Phase-26.60).
+
+    Both conditions warrant wiping the file so the launcher (or backend
+    fallback) can publish a fresh URL cleanly.  Files that are entirely
+    blank or entirely valid URLs are LEFT ALONE regardless of age (the
+    valid content is either fresh enough to keep or truly empty and
+    harmless).
     """
     import time as _time
     now = _time.time()
@@ -435,11 +449,33 @@ def _find_stale_public_url_file(max_age_seconds: float) -> Path | None:
             if not cand.exists():
                 continue
             txt = cand.read_text(encoding='utf-8', errors='replace')
-            if not _URL_RE.search(txt):
+            stripped = txt.strip()
+            if not stripped:
+                # Empty file — not stale, not polluted.
                 continue
-            mtime = cand.stat().st_mtime
-            if (now - mtime) > max_age_seconds:
+            # Check for pollution: any non-blank, non-comment line that
+            # isn't a URL.
+            polluted = False
+            for line in txt.splitlines():
+                s = line.strip()
+                if not s or s.startswith('#'):
+                    continue
+                if not _URL_LINE_RE.match(s):
+                    polluted = True
+                    break
+            if polluted:
+                log.info(
+                    'startup: public_url.txt at %s contains non-URL '
+                    'lines (launcher pollution); will wipe',
+                    cand,
+                )
                 return cand
+            # Not polluted — apply mtime-based staleness only if it
+            # holds a tunnel URL that could be from a prior session.
+            if _URL_RE.search(txt):
+                mtime = cand.stat().st_mtime
+                if (now - mtime) > max_age_seconds:
+                    return cand
         except OSError:
             continue
     return None
