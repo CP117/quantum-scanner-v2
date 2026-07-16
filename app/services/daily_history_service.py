@@ -52,6 +52,7 @@ import logging
 import os
 import threading
 import time
+from collections import OrderedDict
 from pathlib import Path
 from threading import Lock
 from typing import Any
@@ -103,7 +104,19 @@ _prefetch_pool: ThreadPoolExecutor | None = None
 _prefetch_started = False
 
 _lock = Lock()
-_cache: dict[str, tuple[float, Any]] = {}
+# Phase 26.60: bounded LRU cache to prevent unbounded heap growth.
+# Previously an unbounded dict — at 3,000+ active tickers with 90-day
+# DataFrames (~5-10 KB each) plus pandas overhead, this dict alone
+# could reach 300-800 MB of Python heap, causing gen-2 GC walks during
+# scoring to spike CPU to 100% for 500 ms - 2 s at a time.  OrderedDict
+# gives O(1) move_to_end() on read and popitem(last=False) on evict.
+# Eviction respects shard dirtiness: any evicted symbol whose shard
+# still has unflushed writes triggers a background force-flush so no
+# fetched data is lost — the on-disk shard remains the durable source
+# of truth and an evicted symbol will be reloaded from its shard on
+# the next `get_daily_history` call for that symbol.
+_CACHE_MAX = int(os.environ.get('DAILY_HISTORY_CACHE_MAX', '6000'))
+_cache: 'OrderedDict[str, tuple[float, Any]]' = OrderedDict()
 _last_request_ts = 0.0
 _inflight = 0
 _fail_until: dict[str, float] = {}
@@ -138,7 +151,43 @@ _stats = {
 # records list once; subsequent flushes pull from this cache instead of
 # re-running _df_to_records on the same unchanged DataFrame. Cleared via
 # `_records_cache.pop(sym)` whenever a symbol is invalidated/refetched.
-_records_cache: dict[str, list[dict]] = {}
+#
+# Phase 26.60: mirrored as OrderedDict so the LRU eviction pass in
+# `_evict_lru_if_over_capacity` can drop matching records-cache entries
+# in the same critical section.  Always a subset of `_cache` keys — no
+# independent cap needed.
+_records_cache: 'OrderedDict[str, list[dict]]' = OrderedDict()
+
+
+def _evict_lru_if_over_capacity() -> None:
+    """Evict oldest entries from `_cache` (and mirror in `_records_cache`)
+    until `len(_cache) <= _CACHE_MAX`.  MUST be called under `_lock`.
+
+    If any evicted symbol has an unflushed shard, schedules a background
+    force-flush so its fetch data is persisted before the in-memory copy
+    is dropped.  `_flush_disk(force=True)` only spawns a daemon thread —
+    that thread waits on `_lock` and runs after our caller releases it,
+    so there is no deadlock.
+
+    O(k) where k = number of entries over cap (usually 0 or 1 after a
+    fetch).  Safe to call every insert.
+    """
+    if len(_cache) <= _CACHE_MAX:
+        return
+    needs_flush = False
+    while len(_cache) > _CACHE_MAX:
+        try:
+            evicted_sym, _ = _cache.popitem(last=False)
+        except KeyError:
+            break
+        _records_cache.pop(evicted_sym, None)
+        if _shard_key(evicted_sym) in _dirty_shards:
+            needs_flush = True
+    if needs_flush:
+        try:
+            _flush_disk(force=True)
+        except Exception:  # noqa: BLE001 — never let eviction cause a fault
+            pass
 
 
 def _shard_key(symbol: str) -> str:
@@ -438,6 +487,14 @@ def _ensure_disk_loaded() -> None:
             'daily_history: loaded %d cached symbols from %d shards',
             loaded_total, len(list(_SHARD_DIR.glob('*.json'))),
         )
+    # Phase 26.60: enforce cache cap after startup load.  If the
+    # persisted set exceeds `_CACHE_MAX` (e.g. large historical
+    # universe), evict oldest by insertion order.  Shards are the
+    # durable source of truth so evicted entries can be reloaded
+    # on demand — this just prevents startup from immediately
+    # pinning gigabytes of heap.
+    with _lock:
+        _evict_lru_if_over_capacity()
 
 
 def _dumps_bytes(obj) -> bytes:
@@ -695,6 +752,10 @@ def get_daily_history(symbol: str, allow_fetch: bool = True, blocking: bool = Fa
                 return None
             cached = _cache.get(sym)
             if cached and (now - cached[0] <= _TTL_SECONDS):
+                # Phase 26.60: LRU touch — move this symbol to the
+                # most-recently-used end so it survives eviction while
+                # the scanner is actively touching it.
+                _cache.move_to_end(sym)
                 _stats['cache_hits'] += 1
                 return cached[1]
             if not allow_fetch:
@@ -787,6 +848,11 @@ def get_daily_history(symbol: str, allow_fetch: bool = True, blocking: bool = Fa
     with _lock:
         _inflight = max(0, _inflight - 1)
         _cache[sym] = (_now(), df)
+        # Phase 26.60: enforce LRU cap. Newly-inserted entry is already
+        # at the MRU end (OrderedDict semantics); this evicts the oldest
+        # if we're over capacity, flushing any dirty shard first so no
+        # fetch data is lost.
+        _evict_lru_if_over_capacity()
         _dirty_shards.add(_shard_key(sym))
     # Phase 26.33: drop the stale per-symbol records so the next flush
     # re-serializes from the new DataFrame instead of writing the prior
