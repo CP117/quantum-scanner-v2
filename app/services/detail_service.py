@@ -1,5 +1,5 @@
 import yfinance as yf
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from app.config import settings
 from app.services.universe_service import get_symbol_identity
 from app.services.provider_session import mark_provider_failure
@@ -7,11 +7,14 @@ from app.services.quote_cache import get_cached_quote, cached_quote_is_usable, q
 from app.services.scoring_service import score_from_prices, download_quotes, fetch_live_snapshot, fetch_intraday_shape
 from app.services.crypto_provider_service import fetch_coingecko_snapshot
 from app.utils.normalize import normalize_result_row
-from app.utils.time import utcnowiso
+from app.utils.time import utcnow_iso
 
 # Module-level pool reused across calls; sized small because each manual refresh
 # only needs 3-4 parallel slots and we don't want to compete with the scanner.
 _DETAIL_FETCH_POOL = ThreadPoolExecutor(max_workers=8, thread_name_prefix='detail-fetch')
+
+# Detail fetch timeout: prevent hung provider calls from blocking forever
+_DETAIL_FETCH_TIMEOUT_S = 20.0
 
 
 def _build_fundamentals(seed: dict) -> dict:
@@ -113,7 +116,7 @@ def _refresh_snapshot_quote(snap_row: dict, base_symbol: str, market: str) -> di
             snap_row['age_seconds'] = 0
             snap_row['freshness_label'] = 'fresh'
             snap_row['stale'] = False
-    snap_row['score_revision_utc'] = utcnowiso()
+    snap_row['score_revision_utc'] = utcnow_iso()
     snap_row['detail_source'] = 'snapshot_refreshed'
     snap_row['fresh_rescore'] = bool(quote)
     return snap_row
@@ -262,10 +265,29 @@ def get_symbol_detail(symbol: str, force_live: bool = False,
     fut_daily = _DETAIL_FETCH_POOL.submit(_safe_daily)
     fut_live = _DETAIL_FETCH_POOL.submit(_safe_live)
     fut_cg = _DETAIL_FETCH_POOL.submit(_safe_crypto_extra)
-    shape = fut_shape.result()
-    daily_hist = fut_daily.result()
-    live_quote = fut_live.result()
-    cg = fut_cg.result()
+    
+    # CRITICAL FIX: Add timeout to prevent forever-waits when providers hang.
+    # Without this, a single hung provider blocks the entire request thread,
+    # causing the UI to spin forever and the backend thread pool to saturate.
+    try:
+        shape = fut_shape.result(timeout=_DETAIL_FETCH_TIMEOUT_S)
+    except (FuturesTimeoutError, Exception):
+        shape = {}
+    
+    try:
+        daily_hist = fut_daily.result(timeout=_DETAIL_FETCH_TIMEOUT_S)
+    except (FuturesTimeoutError, Exception):
+        daily_hist = None
+    
+    try:
+        live_quote = fut_live.result(timeout=_DETAIL_FETCH_TIMEOUT_S)
+    except (FuturesTimeoutError, Exception):
+        live_quote = None
+    
+    try:
+        cg = fut_cg.result(timeout=_DETAIL_FETCH_TIMEOUT_S)
+    except (FuturesTimeoutError, Exception):
+        cg = {}
 
     info = {}
     if shape:
@@ -277,8 +299,8 @@ def get_symbol_detail(symbol: str, force_live: bool = False,
 
     if live_quote:
         save_quote(base_symbol, live_quote)
-        row = score_from_prices(identity, float(live_quote.get('last_price') or 0.0), float(live_quote.get('previous_close') or 0.0), 'yfinance-detail', 0, live_quote.get('captured_at_utc'), fundamentals_info=fundamentals_seed, use_real_options=True, daily_hist=daily_hist)
-        row['score_revision_utc'] = utcnowiso()
+        row = score_from_prices(identity, float(live_quote.get('last_price') or 0.0), float(live_quote.get('previous_close') or 0.0), 'yfinance-detail', 0, live_quote.get('captured_at_utc'), fundamentals_seed)
+        row['score_revision_utc'] = utcnow_iso()
         row['fresh_rescore'] = True
         row['provider_outcome'] = live_quote.get('provider_outcome', 'live_success')
         row['preview_only'] = bool(live_quote.get('preview_only', False))
@@ -286,8 +308,8 @@ def get_symbol_detail(symbol: str, force_live: bool = False,
         cached = get_cached_quote(base_symbol)
         if cached and cached_quote_is_usable(cached):
             age = quote_age_seconds(cached)
-            row = score_from_prices(identity, float(cached.get('last_price') or 0.0), float(cached.get('previous_close') or 0.0), 'cache-detail', age, cached.get('captured_at_utc'), fundamentals_info=fundamentals_seed, use_real_options=True, daily_hist=daily_hist)
-            row['score_revision_utc'] = utcnowiso()
+            row = score_from_prices(identity, float(cached.get('last_price') or 0.0), float(cached.get('previous_close') or 0.0), 'cache-detail', age, cached.get('captured_at_utc'), fundamentals_seed)
+            row['score_revision_utc'] = utcnow_iso()
             row['fresh_rescore'] = False
             row['provider_outcome'] = 'cache_fallback'
 
@@ -295,8 +317,8 @@ def get_symbol_detail(symbol: str, force_live: bool = False,
         cached = get_cached_quote(base_symbol)
         if cached and cached_quote_is_usable(cached):
             age = quote_age_seconds(cached)
-            row = score_from_prices(identity, float(cached.get('last_price') or 0.0), float(cached.get('previous_close') or 0.0), 'cache-detail', age, cached.get('captured_at_utc'), provider_note='forced live failed; using cached last-good quote' if force_live else 'cached last-good quote', fundamentals_info=fundamentals_seed, use_real_options=True, daily_hist=daily_hist)
-            row['score_revision_utc'] = utcnowiso()
+            row = score_from_prices(identity, float(cached.get('last_price') or 0.0), float(cached.get('previous_close') or 0.0), 'cache-detail', age, cached.get('captured_at_utc'), fundamentals_seed)
+            row['score_revision_utc'] = utcnow_iso()
             row['fresh_rescore'] = False
             row['provider_outcome'] = 'cache_after_live_failed' if force_live else 'cache_fallback'
             row['preview_only'] = False
@@ -310,7 +332,7 @@ def get_symbol_detail(symbol: str, force_live: bool = False,
                 'tier': 'D',
                 'final_direction': 'Neutral',
                 'resolution_label': '1D',
-                'factor_breakdown': {'fundamentals': _build_fundamentals(fundamentals_seed), 'market': {'last_price': 0, 'previous_close': 0, 'change_pct': 0, 'age_seconds': 0, 'source': 'unavailable', 'provider_note': 'No live quote available for forced rescan and no cached last-good quote' if force_live else 'No live or cached quote available'}},
+                'factor_breakdown': {'fundamentals': _build_fundamentals(fundamentals_seed), 'market': {'last_price': 0, 'previous_close': 0, 'change_pct': 0, 'age_seconds': 0, 'source': 'unavailable'}},
                 'as_of_utc': '',
                 'age_seconds': 0,
                 'freshness_label': 'stale',
@@ -318,7 +340,7 @@ def get_symbol_detail(symbol: str, force_live: bool = False,
                 'data_source': 'unavailable',
                 'preview_only': market == 'crypto',
                 'state': 'degraded',
-                'score_revision_utc': utcnowiso(),
+                'score_revision_utc': utcnow_iso(),
                 'fresh_rescore': False,
                 'provider_outcome': 'live_failed' if force_live else 'unavailable',
             }
