@@ -256,6 +256,27 @@ def rotate_provider_counters() -> dict:
 # Database pruning
 # ---------------------------------------------------------------------------
 
+def _ensure_prediction_db_schema() -> None:
+    """Ensure the saved_predictions table has the resolved_at column.
+    
+    Migration for DBs created before the `resolved_at` column existed.
+    This prevents the "no such column: resolved_at" error during pruning.
+    """
+    pred_db = _pick(_PRED_DB_CANDIDATES)
+    if not pred_db or not pred_db.exists():
+        return
+    try:
+        with sqlite3.connect(str(pred_db)) as conn:
+            # Try to add the resolved_at column if it doesn't exist
+            try:
+                conn.execute("ALTER TABLE saved_predictions ADD COLUMN resolved_at TEXT")
+            except sqlite3.OperationalError as exc:
+                if 'duplicate column' not in str(exc).lower():
+                    log.warning('migration: resolved_at column check failed: %s', exc)
+    except sqlite3.Error as exc:
+        log.warning('migration: prediction_db schema check failed: %s', exc)
+
+
 def _prune_sqlite(
     db_path: Path,
     table: str,
@@ -301,8 +322,8 @@ def prune_databases() -> dict:
           * filings WHERE filing_date < (now - REGULATORY_RETENTION_DAYS)
           * awards WHERE action_date < (now - REGULATORY_RETENTION_DAYS)
       - saved_predictions.db:
-          * saved_predictions WHERE resolved_at IS NOT NULL
-            AND resolved_at < (now - PREDICTION_RETENTION_DAYS).
+          * saved_predictions WHERE evaluated_at IS NOT NULL
+            AND evaluated_at < (now - PREDICTION_RETENTION_DAYS).
             Open predictions are NEVER pruned.
 
     Returns a summary the UI can render.
@@ -336,16 +357,20 @@ def prune_databases() -> dict:
         summary['regulatory'] = {'db': None, 'note': 'regulatory.db not found'}
 
     # Saved predictions.
+    # First ensure the schema has the evaluated_at column
+    _ensure_prediction_db_schema()
+    
     pred_cutoff = (now - timedelta(days=PREDICTION_RETENTION_DAYS)).isoformat()
     pred_db = _pick(_PRED_DB_CANDIDATES)
     if pred_db:
-        # Only prune resolved predictions (resolved_at IS NOT NULL).
+        # Only prune evaluated predictions (evaluated_at IS NOT NULL).
+        # Use evaluated_at instead of resolved_at for consistency with the schema.
         deleted_preds = _prune_sqlite(
             pred_db,
             'saved_predictions',
             pred_cutoff,
-            'resolved_at',
-            extra_where='resolved_at IS NOT NULL',
+            'evaluated_at',
+            extra_where='evaluated_at IS NOT NULL',
         )
         summary['predictions'] = {
             'db': str(pred_db),
