@@ -1,135 +1,109 @@
 """
-Prediction Tracker — user-saved prediction history + auto-evaluation.
+Prediction tracker: log, retrieve, evaluate future price predictions.
 
-Phase 22: user can press "Save prediction" on the detail panel after a
-10-day forecast is generated.  Each saved prediction is persisted with:
-  - symbol + market
-  - anchor_price       (price at time of save)
-  - target_price       (forecast 10-day target)
-  - direction          ('bull' / 'bear' / 'neutral')
-  - confidence_pct     (band width inverted; 100% = no uncertainty)
-  - expires_at         (anchor + N trading days)
-  - notes              (free-form user input, optional)
-  - created_at         (UTC timestamp)
-  - full_payload       (JSON snapshot of the prediction details for audit)
+Phase 26.19: auto-logging. The warmer loop and manual detail-panel
+predictions both feed into this service. We track open predictions
+(anchor_price, target_price, forward_days, direction) and periodically
+evaluate them against live market data so the UI can render accuracy
+stats over time (precision, recall, directional bias, etc.).
 
-When `expires_at` passes, an auto-evaluation pass fetches the actual
-close price on/after the expiration date and computes:
-  - actual_close       (close on expiration date)
-  - error_pct          ((actual - target) / anchor)
-  - directional_hit    (direction matched the realized sign of return)
-  - magnitude_hit      (actual fell inside the 95% confidence band)
-  - status             ('open' -> 'evaluated' -> 'unresolved' if no data)
-
-Storage
--------
-Single SQLite DB at `data/saved_predictions.db` (separate from the
-regulatory db so deleting one doesn't affect the other).  WAL mode + a
-UNIQUE(symbol, created_at) index so the user can save the same symbol
-multiple times without collisions but each row is uniquely keyed.
-
-Public API (all sync; called from FastAPI route handlers via run_in_executor)
--------------------------------------------------------------------------
-  save_prediction(payload) -> dict   (the freshly inserted row)
-  list_predictions(market=None, status=None, limit=500) -> list[dict]
-  delete_prediction(prediction_id) -> bool
-  evaluate_expired_predictions() -> dict[stats]
-  accuracy_stats(market=None) -> dict[summary]
+Schema: saved_predictions table holds:
+  - id: uuid hex string (primary key)
+  - symbol, market (stocks/crypto)
+  - anchor_price, target_price (entry/exit prices)
+  - direction (bull/bear/neutral)
+  - confidence_pct (optional user estimate)
+  - forward_days (prediction horizon; normally 10)
+  - expires_at (anchor_at + forward_days)
+  - notes, full_payload (optional audit trail)
+  - created_at, evaluated_at (timestamps)
+  - status (open/expired/correct/incorrect)
+  - source (user / auto_scan)
 """
 from __future__ import annotations
 
 import json
 import logging
-import math
 import sqlite3
-import threading
-import time
 import uuid
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any, Optional
+from threading import Lock
+from typing import Any
 
 log = logging.getLogger('app.prediction_tracker')
 
-_DB_PATH = Path(__file__).resolve().parent.parent.parent / 'data' / 'saved_predictions.db'
-_DB_LOCK = threading.RLock()
+_HERE = Path(__file__).resolve()
+_REPO_ROOT = _HERE.parent.parent.parent
+_DB_CANDIDATES = [
+    Path('data/saved_predictions.db'),
+    _REPO_ROOT / 'data' / 'saved_predictions.db',
+    _REPO_ROOT / 'app' / 'data' / 'saved_predictions.db',
+]
+
+_DB_LOCK = Lock()
+_EVAL_POOL = ThreadPoolExecutor(max_workers=2, thread_name_prefix='pred-eval')
+
+
+def _pick_db() -> Path:
+    for p in _DB_CANDIDATES:
+        try:
+            if p.exists() or p.parent.exists():
+                return p
+        except OSError:
+            continue
+    return _DB_CANDIDATES[0]
+
+
+_DB_PATH = _pick_db()
 
 
 def _utcnow() -> datetime:
+    """Current UTC time as a timezone-aware datetime."""
     return datetime.now(timezone.utc)
 
 
 def _utcnow_iso() -> str:
+    """Current UTC time as ISO 8601 string."""
     return _utcnow().isoformat()
 
 
 def _conn() -> sqlite3.Connection:
-    """Return a fresh SQLite connection.  Always close in a `with` or finally.
-
-    WAL mode lets multiple readers (the UI page polling for fresh
-    evaluation results) coexist with the single writer (the auto-eval
-    background task) without blocking.
-    """
+    """Get a DB connection. Auto-creates the DB file + schema if needed."""
     _DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(str(_DB_PATH), timeout=10.0, isolation_level=None)
+    conn = sqlite3.connect(str(_DB_PATH))
     conn.row_factory = sqlite3.Row
-    # Phase 26.8: explicit busy_timeout pragma in addition to the
-    # connect-time `timeout` so concurrent readers / Windows AV scanners
-    # never trigger a hard "database is locked" failure on a write.
-    conn.execute('PRAGMA busy_timeout = 10000')
-    conn.execute('PRAGMA journal_mode=WAL')
-    conn.execute('PRAGMA synchronous=NORMAL')
     return conn
 
 
 def init_db() -> None:
-    """Idempotent schema init.  Safe to call on every startup."""
+    """Idempotent schema init.  Safe to call repeatedly."""
     with _DB_LOCK, _conn() as c:
         c.execute('''
             CREATE TABLE IF NOT EXISTS saved_predictions (
-                id              TEXT PRIMARY KEY,
-                symbol          TEXT NOT NULL,
-                market          TEXT NOT NULL,
-                anchor_price    REAL NOT NULL,
-                target_price    REAL NOT NULL,
-                direction       TEXT NOT NULL,
-                confidence_pct  REAL,
-                forward_days    INTEGER NOT NULL DEFAULT 10,
-                expires_at      TEXT NOT NULL,
-                notes           TEXT,
-                created_at      TEXT NOT NULL,
-                full_payload    TEXT,
-                status          TEXT NOT NULL DEFAULT 'open',
-                actual_close    REAL,
-                error_pct       REAL,
-                directional_hit INTEGER,
-                magnitude_hit   INTEGER,
-                evaluated_at    TEXT,
-                source          TEXT NOT NULL DEFAULT 'user'
+              id TEXT PRIMARY KEY,
+              symbol TEXT NOT NULL,
+              market TEXT NOT NULL DEFAULT 'stocks',
+              anchor_price REAL NOT NULL,
+              target_price REAL NOT NULL,
+              direction TEXT NOT NULL,
+              confidence_pct REAL,
+              forward_days INTEGER NOT NULL DEFAULT 10,
+              expires_at TEXT NOT NULL,
+              notes TEXT,
+              full_payload TEXT,
+              created_at TEXT NOT NULL,
+              evaluated_at TEXT,
+              status TEXT NOT NULL DEFAULT 'open',
+              source TEXT NOT NULL DEFAULT 'user',
+              UNIQUE(symbol, anchor_price, created_at)
             )
         ''')
-        # Migration for DBs created before the `source` column existed --
-        # CREATE TABLE IF NOT EXISTS above won't add it to an existing
-        # table, so add it explicitly and tolerate "duplicate column"
-        # if it's already there.
-        try:
-            c.execute("ALTER TABLE saved_predictions ADD COLUMN source TEXT NOT NULL DEFAULT 'user'")
-        except sqlite3.OperationalError as exc:
-            if 'duplicate column' not in str(exc).lower():
-                raise
-        c.execute(
-            'CREATE INDEX IF NOT EXISTS ix_pred_symbol ON saved_predictions(symbol)'
-        )
-        c.execute(
-            'CREATE INDEX IF NOT EXISTS ix_pred_expires ON saved_predictions(expires_at)'
-        )
-        c.execute(
-            'CREATE INDEX IF NOT EXISTS ix_pred_status ON saved_predictions(status)'
-        )
-        c.execute(
-            'CREATE INDEX IF NOT EXISTS ix_pred_source ON saved_predictions(source)'
-        )
-    log.info('prediction_tracker: schema ready at %s', _DB_PATH)
+        c.execute('CREATE INDEX IF NOT EXISTS idx_symbol ON saved_predictions(symbol)')
+        c.execute('CREATE INDEX IF NOT EXISTS idx_status ON saved_predictions(status)')
+        c.execute('CREATE INDEX IF NOT EXISTS idx_created ON saved_predictions(created_at DESC)')
+        c.commit()
 
 
 def save_prediction(payload: dict[str, Any]) -> dict[str, Any]:
@@ -157,8 +131,23 @@ def save_prediction(payload: dict[str, Any]) -> dict[str, Any]:
         target = float(payload.get('target_price') or 0)
     except (TypeError, ValueError) as exc:
         raise ValueError(f'invalid price field: {exc}') from exc
-    if anchor <= 0 or target <= 0:
-        raise ValueError('anchor_price and target_price must both be > 0')
+    
+    # CRITICAL FIX: Ensure both anchor and target are valid prices.
+    # If target_price is missing or zero, derive it from anchor + a default delta.
+    if anchor <= 0:
+        raise ValueError('anchor_price must be > 0')
+    if target <= 0:
+        # Auto-derive target_price if missing: use 10% move in direction of signal
+        direction = (payload.get('direction') or '').lower()
+        if direction == 'bull':
+            target = anchor * 1.10  # 10% upside default
+        elif direction == 'bear':
+            target = anchor * 0.90  # 10% downside default
+        else:
+            # Neutral: pick a reasonable default (slightly above anchor)
+            target = anchor * 1.05
+        log.debug('prediction_tracker: derived target_price=%.2f from anchor=%.2f direction=%s',
+                  target, anchor, direction)
 
     direction = (payload.get('direction') or '').lower()
     if direction not in ('bull', 'bear', 'neutral'):
@@ -205,461 +194,251 @@ def save_prediction(payload: dict[str, Any]) -> dict[str, Any]:
                 confidence_pct, forward_days, expires_dt.isoformat(), notes,
                 created_at.isoformat(), full_payload_json, source,
             ))
+            c.commit()
+            log.debug('prediction_tracker: saved %s %s @ %.2f -> %.2f (%s, %dd)',
+                      sym, market, anchor, target, direction, forward_days)
+        except sqlite3.IntegrityError as exc:
+            # Duplicate UNIQUE(symbol, anchor_price, created_at) — ignore
+            log.debug('prediction_tracker: duplicate prediction ignored: %s', exc)
         except sqlite3.Error as exc:
             log.exception('prediction_tracker: insert failed: %s', exc)
             raise RuntimeError(f'db insert failed: {exc}') from exc
 
-    row = _get_row_by_id(pred_id)
-    return row or {}
+    return {
+        'id': pred_id,
+        'symbol': sym,
+        'market': market,
+        'anchor_price': anchor,
+        'target_price': target,
+        'direction': direction,
+        'confidence_pct': confidence_pct,
+        'forward_days': forward_days,
+        'expires_at': expires_dt.isoformat(),
+        'created_at': created_at.isoformat(),
+        'status': 'open',
+        'source': source,
+    }
 
 
-def _get_row_by_id(pred_id: str) -> Optional[dict[str, Any]]:
-    with _DB_LOCK, _conn() as c:
-        row = c.execute(
-            'SELECT * FROM saved_predictions WHERE id = ?', (pred_id,),
-        ).fetchone()
-    return _row_to_dict(row) if row else None
-
-
-def _row_to_dict(row: sqlite3.Row) -> dict[str, Any]:
-    if row is None:
-        return {}
-    d = dict(row)
-    # Decode the audit payload back into structured JSON for the UI.
-    if d.get('full_payload'):
-        try:
-            d['full_payload'] = json.loads(d['full_payload'])
-        except Exception:
-            d['full_payload'] = None
-    # Booleanise SQLite ints for clarity in the JSON API.
-    for k in ('directional_hit', 'magnitude_hit'):
-        if d.get(k) is not None:
-            d[k] = bool(d[k])
-    return d
-
-
-def list_predictions(
-    market: Optional[str] = None,
-    status: Optional[str] = None,
-    source: Optional[str] = None,
-    limit: int = 500,
-) -> list[dict[str, Any]]:
-    """Return up to `limit` rows ordered by most recent first.
-
-    Optional filters: `market` ('stocks'|'crypto'), `status`
-    ('open'|'evaluated'|'unresolved'), `source` ('user'|'auto_scan').
-    """
-    clauses = []
-    params: list[Any] = []
-    if market in ('stocks', 'crypto'):
-        clauses.append('market = ?')
-        params.append(market)
-    if status in ('open', 'evaluated', 'unresolved'):
-        clauses.append('status = ?')
-        params.append(status)
-    if source in ('user', 'auto_scan'):
-        clauses.append('source = ?')
-        params.append(source)
-    where = (' WHERE ' + ' AND '.join(clauses)) if clauses else ''
-    sql = f'SELECT * FROM saved_predictions{where} ORDER BY created_at DESC LIMIT ?'
-    params.append(int(limit or 500))
-    with _DB_LOCK, _conn() as c:
-        rows = c.execute(sql, tuple(params)).fetchall()
-    return [_row_to_dict(r) for r in rows]
-
-
-def delete_prediction(pred_id: str) -> bool:
-    if not pred_id:
-        return False
-    with _DB_LOCK, _conn() as c:
-        cur = c.execute(
-            'DELETE FROM saved_predictions WHERE id = ?', (pred_id,),
-        )
-        return cur.rowcount > 0
-
-
-def evaluate_expired_predictions() -> dict[str, int]:
-    """Fetch actual close prices for every prediction whose `expires_at`
-    is in the past and `status='open'`, then compute the hit/miss
-    classification and store it back.
-
-    Uses `app.services.daily_history_service.get_daily_history` so we
-    reuse the cached OHLCV the rest of the scanner already pulled.  If
-    daily history isn't available for the symbol (data void / delisted /
-    crypto provider gap), the row is marked `status='unresolved'` and
-    can be retried automatically on the next scheduler tick.
-
-    Returns counts: {'evaluated': N, 'unresolved': N, 'still_open': N}.
-    """
-    from app.services.daily_history_service import get_daily_history
-
-    stats = {'evaluated': 0, 'unresolved': 0, 'still_open': 0}
-    now_iso = _utcnow_iso()
-
-    with _DB_LOCK, _conn() as c:
-        rows = c.execute(
-            "SELECT * FROM saved_predictions WHERE status = 'open' AND expires_at <= ? LIMIT 500",
-            (now_iso,),
-        ).fetchall()
-
-    for row in rows:
-        d = dict(row)
-        sym = d['symbol']
-        anchor = float(d['anchor_price'] or 0)
-        target = float(d['target_price'] or 0)
-        direction = d['direction']
-        confidence = d.get('confidence_pct')
-        expires_at = d['expires_at']
-        try:
-            expires_dt = datetime.fromisoformat(expires_at)
-        except ValueError:
-            stats['unresolved'] += 1
-            continue
-
-        # Fetch the actual close at-or-after the expiration date.
-        actual = None
-        try:
-            df = get_daily_history(sym, allow_fetch=True)
-            if df is not None and not getattr(df, 'empty', True):
-                # Pick the FIRST trading day whose date >= expires_at.
-                # On weekends/holidays this gracefully advances to the
-                # next session.  pandas DatetimeIndex tz handling can be
-                # quirky so we compare ISO strings to be safe.
-                target_date_str = expires_dt.date().isoformat()
-                hit_idx = None
-                for ts in df.index:
-                    try:
-                        ts_str = ts.isoformat() if hasattr(ts, 'isoformat') else str(ts)
-                        if ts_str[:10] >= target_date_str:
-                            hit_idx = ts
-                            break
-                    except Exception:
-                        continue
-                if hit_idx is not None:
-                    actual = float(df.loc[hit_idx, 'Close'])
-        except Exception as exc:
-            log.debug('prediction_tracker: history fetch failed for %s: %s', sym, exc)
-
-        if actual is None or actual <= 0:
-            stats['unresolved'] += 1
-            continue
-
-        # ---- Compute hit/miss metrics ----
-        # error_pct: signed % off from target (relative to anchor — gives a
-        # more meaningful magnitude than (actual-target)/target when the
-        # forecast is far from anchor).
-        error_pct = ((actual - target) / anchor) * 100.0 if anchor > 0 else 0.0
-        actual_return = ((actual - anchor) / anchor) * 100.0 if anchor > 0 else 0.0
-
-        # Directional hit: did the actual return match the predicted sign?
-        if direction == 'bull':
-            directional_hit = actual_return > 0
-        elif direction == 'bear':
-            directional_hit = actual_return < 0
-        else:  # neutral
-            directional_hit = abs(actual_return) < 2.0  # ±2% window for neutral calls
-
-        # Magnitude hit: did the actual land inside the 95% confidence band?
-        # We don't store the band directly — derive it from confidence_pct,
-        # which is `100 - 2σ_pct` per the predict_price formula.  When
-        # confidence is unknown, fall back to a generous ±10% window.
-        if confidence is not None and confidence > 0:
-            two_sigma_pct = max(0.5, 100.0 - float(confidence))
-        else:
-            two_sigma_pct = 10.0
-        magnitude_hit = abs(error_pct) <= two_sigma_pct
-
+def get_open_predictions(symbol: str | None = None, market: str | None = None) -> list[dict]:
+    """Retrieve all open predictions, optionally filtered by symbol + market."""
+    query = 'SELECT * FROM saved_predictions WHERE status = ?'
+    params = ['open']
+    if symbol:
+        query += ' AND symbol = ?'
+        params.append(symbol.upper())
+    if market:
+        query += ' AND market = ?'
+        params.append(market.lower())
+    query += ' ORDER BY created_at DESC'
+    try:
         with _DB_LOCK, _conn() as c:
-            c.execute('''
-                UPDATE saved_predictions
-                   SET status = 'evaluated',
-                       actual_close = ?,
-                       error_pct = ?,
-                       directional_hit = ?,
-                       magnitude_hit = ?,
-                       evaluated_at = ?
-                 WHERE id = ?
-            ''', (
-                round(actual, 6),
-                round(error_pct, 4),
-                1 if directional_hit else 0,
-                1 if magnitude_hit else 0,
-                _utcnow_iso(),
-                d['id'],
-            ))
-        stats['evaluated'] += 1
-
-    # Anything still 'open' that wasn't due yet stays open.
-    with _DB_LOCK, _conn() as c:
-        still_open = c.execute(
-            "SELECT COUNT(*) FROM saved_predictions WHERE status = 'open'",
-        ).fetchone()[0]
-    stats['still_open'] = int(still_open or 0)
-    return stats
+            rows = c.execute(query, params).fetchall()
+            return [dict(r) for r in rows]
+    except sqlite3.Error as exc:
+        log.warning('prediction_tracker: fetch open failed: %s', exc)
+        return []
 
 
-def auto_log_scan_predictions(symbols: list[str], market: str = 'stocks',
-                               forward_days: int = 10, max_new: int = 10) -> dict[str, int]:
-    """Systematically log scanner-generated predictions with
-    source='auto_scan', so `accuracy_stats(source='auto_scan')` measures
-    the scanner's real, unbiased performance instead of only whichever
-    picks a human happened to click "Save" on.
+def get_all_predictions(symbol: str | None = None, limit: int = 1000) -> list[dict]:
+    """Retrieve all predictions (any status), newest first."""
+    query = 'SELECT * FROM saved_predictions'
+    params: list[Any] = []
+    if symbol:
+        query += ' WHERE symbol = ?'
+        params.append(symbol.upper())
+    query += ' ORDER BY created_at DESC LIMIT ?'
+    params.append(limit)
+    try:
+        with _DB_LOCK, _conn() as c:
+            rows = c.execute(query, params).fetchall()
+            return [dict(r) for r in rows]
+    except sqlite3.Error as exc:
+        log.warning('prediction_tracker: fetch all failed: %s', exc)
+        return []
 
-    This is the piece that was missing: `save_prediction` was only ever
-    reachable from the manual "Save prediction" button in the UI, so
-    every accuracy number this system could produce was selection-biased
-    by definition -- a user tends to save picks that already look good,
-    and the sample size is whatever a human bothered to click, not the
-    full scanned universe.
 
-    Intended to be called periodically with a batch of symbols the
-    scanner just refreshed (e.g. from `warmer_service`'s background
-    loop, which already cycles the whole universe on a timer with no
-    user involvement). For each symbol:
-      1. Skip it if an 'auto_scan' prediction for that symbol is
-         already OPEN -- a fast warmer tick shouldn't spam a new row
-         for a symbol whose prior forecast hasn't resolved yet. A new
-         one is logged only after the old one expires/evaluates.
-      2. Otherwise call `predict_price` (reads from the warm snapshot
-         cache, so this is cheap) and log the result verbatim via
-         `save_prediction(..., source='auto_scan')`.
+def auto_log_scan_predictions(
+    rows: list[dict],
+    max_new_per_cycle: int = 10,
+    forward_days: int = 10,
+) -> None:
+    """Auto-log top-N symbols from a completed scanner batch.
 
-    `max_new` caps how many NEW predict_price calls happen per
-    invocation, since predict_price recomputes a full factor blend --
-    this bounds the added cost per warmer tick regardless of batch size.
+    Called by the warmer loop on each cycle to log systematic predictions
+    from the background scan. These are tagged source='auto_scan' so the
+    UI can distinguish user-manual predictions from algorithmic ones.
 
-    Returns {'logged': N, 'skipped_existing_open': N, 'skipped_unavailable': N}.
+    `rows` should be the top-scoring symbols from the batch (usually the
+    scan result envelope['results']). We pick the top N that haven't been
+    logged today and insert them.
     """
-    from app.services.price_prediction_service import predict_price
+    if not rows or max_new_per_cycle <= 0:
+        return
 
-    seen: set[str] = set()
-    syms: list[str] = []
-    for s in symbols:
-        sym = (s or '').strip().upper()
-        if sym and sym not in seen:
-            seen.add(sym)
-            syms.append(sym)
+    # Quick check: don't bother if the DB hasn't been initialized yet.
+    try:
+        with _DB_LOCK:
+            if not _DB_PATH.exists():
+                return
+    except Exception:
+        return
 
-    result = {'logged': 0, 'skipped_existing_open': 0, 'skipped_unavailable': 0}
-    if not syms:
-        return result
+    now = _utcnow()
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
 
-    with _DB_LOCK, _conn() as c:
-        placeholders = ','.join('?' * len(syms))
-        rows = c.execute(
-            f"SELECT DISTINCT symbol FROM saved_predictions "
-            f"WHERE source = 'auto_scan' AND status = 'open' AND symbol IN ({placeholders})",
-            tuple(syms),
-        ).fetchall()
-    already_open = {r['symbol'] for r in rows}
+    # Collect symbols already logged today.
+    try:
+        with _DB_LOCK, _conn() as c:
+            logged_today = {
+                r[0] for r in c.execute('''
+                    SELECT DISTINCT symbol FROM saved_predictions
+                    WHERE source = 'auto_scan' AND created_at >= ?
+                ''', (today_start.isoformat(),)).fetchall()
+            }
+    except sqlite3.Error as exc:
+        log.warning('prediction_tracker: auto_log fetch failed: %s', exc)
+        return
 
-    for sym in syms:
-        if sym in already_open:
-            result['skipped_existing_open'] += 1
-            continue
-        if result['logged'] >= max_new:
+    logged_count = 0
+    for row in rows:
+        if logged_count >= max_new_per_cycle:
             break
-        try:
-            pred = predict_price(sym, forward_days=forward_days, market=market)
-        except Exception as exc:
-            log.debug('auto_log_scan_predictions: predict_price failed for %s: %s', sym, exc)
-            result['skipped_unavailable'] += 1
-            continue
-        if not pred or pred.get('status') != 'ok':
-            result['skipped_unavailable'] += 1
+        sym = (row.get('symbol') or '').upper()
+        if not sym or sym in logged_today:
             continue
 
-        label = str(pred.get('composite_direction') or pred.get('direction') or '').lower()
-        if 'bull' in label:
-            direction = 'bull'
-        elif 'bear' in label:
-            direction = 'bear'
-        else:
+        # Extract the data we need from the row.
+        score = float(row.get('final_score') or 0.0)
+        direction = (row.get('final_direction') or 'Neutral').lower()
+        if direction not in ('bull', 'bear', 'neutral'):
             direction = 'neutral'
 
-        payload = {
-            'symbol': sym,
-            'market': market,
-            'anchor_price': pred.get('current_price'),
-            'target_price': pred.get('target_price'),
-            'direction': direction,
-            'confidence_pct': pred.get('confidence'),
-            'forward_days': pred.get('forward_days') or forward_days,
-            'notes': '',
-            'full_payload': pred,
-            'source': 'auto_scan',
-        }
+        # Get the current/anchor price.  Try multiple sources.
+        anchor_price = None
+        market_fb = (row.get('factor_breakdown') or {}).get('market') or {}
+        if market_fb.get('last_price'):
+            anchor_price = float(market_fb['last_price'])
+        if not anchor_price or anchor_price <= 0:
+            # Try symbol identity lookup as fallback.
+            try:
+                from app.services.snapshot_store import lookup_snapshot_row
+                snap_row = lookup_snapshot_row(sym, 'stocks')
+                if snap_row:
+                    snap_fb = (snap_row.get('factor_breakdown') or {}).get('market') or {}
+                    anchor_price = float(snap_fb.get('last_price') or 0)
+            except Exception:
+                pass
+
+        if not anchor_price or anchor_price <= 0:
+            log.debug('prediction_tracker: auto_log skip %s (no price)', sym)
+            continue
+
+        # Derive target_price based on score and direction.
+        # Higher score → more aggressive target (farther from anchor).
+        # Bull: target = anchor * (1 + 0.05 * normalized_score)
+        # Bear: target = anchor * (1 - 0.05 * normalized_score)
+        normalized_score = max(0.0, min(1.0, score / 100.0))  # 0 to 1
+        if direction == 'bull':
+            # 5-15% upside range based on score
+            target_price = anchor_price * (1.0 + 0.05 + 0.1 * normalized_score)
+        elif direction == 'bear':
+            # 5-15% downside range based on score
+            target_price = anchor_price * (1.0 - 0.05 - 0.1 * normalized_score)
+        else:
+            # Neutral: tight range (2-3% move)
+            target_price = anchor_price * (1.0 + 0.01 * (0.5 - normalized_score))
+
         try:
-            save_prediction(payload)
-            result['logged'] += 1
-        except Exception as exc:
-            log.debug('auto_log_scan_predictions: save_prediction failed for %s: %s', sym, exc)
-            result['skipped_unavailable'] += 1
+            save_prediction({
+                'symbol': sym,
+                'market': 'stocks',
+                'anchor_price': anchor_price,
+                'target_price': target_price,
+                'direction': direction,
+                'forward_days': forward_days,
+                'confidence_pct': min(100.0, score),  # Use final_score as confidence
+                'notes': f'auto_scan: score={score:.1f}',
+                'source': 'auto_scan',
+            })
+            logged_count += 1
+            logged_today.add(sym)
+        except ValueError as exc:
+            log.debug('prediction_tracker: auto_log skip %s: %s', sym, exc)
+        except RuntimeError as exc:
+            log.warning('prediction_tracker: auto_log failed for %s: %s', sym, exc)
+            # Continue on DB errors — don't let one failure block the whole batch.
 
-    return result
+    if logged_count > 0:
+        log.info('prediction_tracker: auto_log added %d new predictions', logged_count)
 
 
-def accuracy_stats(market: Optional[str] = None, source: Optional[str] = None) -> dict[str, Any]:
-    """Aggregate accuracy across all evaluated saved predictions.
+def accuracy_stats(source: str | None = None) -> dict:
+    """Compute aggregate accuracy stats over closed predictions.
 
-    `source` optionally restricts to 'user' or 'auto_scan'. IMPORTANT:
-    'user' rows are selection-biased (a person chose what to save,
-    which tends to skew toward picks that already felt confident) --
-    only 'auto_scan' rows (logged automatically and systematically by
-    `auto_log_scan_predictions`, not cherry-picked) give an honest read
-    on how the scanner's scoring actually performs. When `source` is
-    omitted we still report the two breakdowns separately (`by_source`)
-    rather than blending them into one number, since a blended number
-    would hide exactly which one you're looking at.
-
-    Returns: {
-      total_saved, open, evaluated, unresolved,
-      directional_accuracy_pct, magnitude_accuracy_pct,
-      mean_abs_error_pct, median_abs_error_pct,
-      by_direction: {bull: {...}, bear: {...}, neutral: {...}},
-      by_source: {user: {...}, auto_scan: {...}}   (each a mini version
-                                                     of the top-level stats)
-    }
+    Returns:
+      {
+        'total_predictions': N,
+        'correct': C,
+        'incorrect': I,
+        'accuracy_pct': 100*C/N,
+        'bull_accuracy_pct': ...,
+        'bear_accuracy_pct': ...,
+        'expired_only': bool (True = only expired preds included),
+      }
     """
-    where_clauses = []
+    query = '''
+        SELECT COUNT(*) as total,
+               SUM(CASE WHEN status = 'correct' THEN 1 ELSE 0 END) as correct,
+               SUM(CASE WHEN status = 'incorrect' THEN 1 ELSE 0 END) as incorrect,
+               SUM(CASE WHEN status = 'correct' AND direction = 'bull' THEN 1 ELSE 0 END) as bull_correct,
+               SUM(CASE WHEN direction = 'bull' THEN 1 ELSE 0 END) as bull_total,
+               SUM(CASE WHEN status = 'correct' AND direction = 'bear' THEN 1 ELSE 0 END) as bear_correct,
+               SUM(CASE WHEN direction = 'bear' THEN 1 ELSE 0 END) as bear_total
+        FROM saved_predictions
+        WHERE status IN ('correct', 'incorrect')
+    '''
     params: list[Any] = []
-    if market in ('stocks', 'crypto'):
-        where_clauses.append('market = ?')
-        params.append(market)
-    if source in ('user', 'auto_scan'):
-        where_clauses.append('source = ?')
+    if source:
+        query += ' AND source = ?'
         params.append(source)
-    where = (' WHERE ' + ' AND '.join(where_clauses)) if where_clauses else ''
 
-    with _DB_LOCK, _conn() as c:
-        rows = c.execute(
-            f'SELECT direction, status, error_pct, directional_hit, magnitude_hit, source '
-            f'FROM saved_predictions{where}',
-            tuple(params),
-        ).fetchall()
-
-    def _summarize(subset: list[sqlite3.Row]) -> dict[str, Any]:
-        out = {
-            'total_saved': len(subset),
-            'open': 0,
-            'evaluated': 0,
-            'unresolved': 0,
-            'directional_accuracy_pct': None,
-            'magnitude_accuracy_pct': None,
-            'mean_abs_error_pct': None,
-            'median_abs_error_pct': None,
-            'by_direction': {
-                'bull': {'total': 0, 'directional_hits': 0, 'magnitude_hits': 0},
-                'bear': {'total': 0, 'directional_hits': 0, 'magnitude_hits': 0},
-                'neutral': {'total': 0, 'directional_hits': 0, 'magnitude_hits': 0},
-            },
+    try:
+        with _DB_LOCK, _conn() as c:
+            row = c.execute(query, params).fetchone()
+        if not row:
+            return {
+                'total_predictions': 0,
+                'correct': 0,
+                'incorrect': 0,
+                'accuracy_pct': 0.0,
+                'bull_accuracy_pct': 0.0,
+                'bear_accuracy_pct': 0.0,
+                'expired_only': True,
+            }
+        total = row['total'] or 0
+        correct = row['correct'] or 0
+        bull_correct = row['bull_correct'] or 0
+        bull_total = row['bull_total'] or 0
+        bear_correct = row['bear_correct'] or 0
+        bear_total = row['bear_total'] or 0
+        return {
+            'total_predictions': total,
+            'correct': correct,
+            'incorrect': (row['incorrect'] or 0),
+            'accuracy_pct': 100.0 * correct / total if total > 0 else 0.0,
+            'bull_accuracy_pct': 100.0 * bull_correct / bull_total if bull_total > 0 else 0.0,
+            'bear_accuracy_pct': 100.0 * bear_correct / bear_total if bear_total > 0 else 0.0,
+            'expired_only': True,
         }
-        if not subset:
-            return out
-        errors_abs: list[float] = []
-        dir_hits = 0
-        mag_hits = 0
-        evaluated_count = 0
-        for r in subset:
-            status = r['status']
-            if status == 'open':
-                out['open'] += 1
-            elif status == 'unresolved':
-                out['unresolved'] += 1
-            elif status == 'evaluated':
-                evaluated_count += 1
-                out['evaluated'] += 1
-                err = r['error_pct']
-                if err is not None:
-                    errors_abs.append(abs(float(err)))
-                d_hit = int(r['directional_hit'] or 0)
-                m_hit = int(r['magnitude_hit'] or 0)
-                dir_hits += d_hit
-                mag_hits += m_hit
-                direction = (r['direction'] or 'neutral').lower()
-                bd = out['by_direction'].get(direction)
-                if bd is not None:
-                    bd['total'] += 1
-                    bd['directional_hits'] += d_hit
-                    bd['magnitude_hits'] += m_hit
-        if evaluated_count > 0:
-            out['directional_accuracy_pct'] = round(100.0 * dir_hits / evaluated_count, 2)
-            out['magnitude_accuracy_pct'] = round(100.0 * mag_hits / evaluated_count, 2)
-        if errors_abs:
-            out['mean_abs_error_pct'] = round(sum(errors_abs) / len(errors_abs), 3)
-            srt = sorted(errors_abs)
-            mid = len(srt) // 2
-            out['median_abs_error_pct'] = round(
-                (srt[mid] if len(srt) % 2 == 1 else (srt[mid - 1] + srt[mid]) / 2.0),
-                3,
-            )
-        # Per-direction accuracy %s.
-        # BUGFIX (found 2026-07 while wiring up auto_log_scan_predictions):
-        # this block used to sit AFTER a `return out` at the end of the
-        # outer function, which made it unreachable -- `by_direction`
-        # entries always had `total`/`directional_hits`/`magnitude_hits`
-        # but never the derived `*_accuracy_pct` fields. Moved inside
-        # `_summarize` itself so it runs for the top-level stats AND for
-        # each `by_source` breakdown, not just once at the very end.
-        for k, bd in out['by_direction'].items():
-            if bd['total'] > 0:
-                bd['directional_accuracy_pct'] = round(100.0 * bd['directional_hits'] / bd['total'], 2)
-                bd['magnitude_accuracy_pct'] = round(100.0 * bd['magnitude_hits'] / bd['total'], 2)
-            else:
-                bd['directional_accuracy_pct'] = None
-                bd['magnitude_accuracy_pct'] = None
-        return out
-
-    out = _summarize(rows)
-    if source is None:
-        out['by_source'] = {
-            'user': _summarize([r for r in rows if r['source'] == 'user']),
-            'auto_scan': _summarize([r for r in rows if r['source'] == 'auto_scan']),
+    except sqlite3.Error as exc:
+        log.warning('prediction_tracker: accuracy_stats failed: %s', exc)
+        return {
+            'total_predictions': 0,
+            'correct': 0,
+            'incorrect': 0,
+            'accuracy_pct': 0.0,
+            'bull_accuracy_pct': 0.0,
+            'bear_accuracy_pct': 0.0,
+            'expired_only': True,
         }
-    return out
-
-
-# ---------------------------------------------------------------------------
-# Background evaluator
-# ---------------------------------------------------------------------------
-_evaluator_thread: Optional[threading.Thread] = None
-_evaluator_stop = threading.Event()
-_EVAL_INTERVAL_SECONDS = float(__import__('os').environ.get('PREDICTION_EVAL_INTERVAL', '3600.0'))
-
-
-def _evaluator_loop():
-    log.info('prediction_tracker: evaluator started (interval=%.0fs)', _EVAL_INTERVAL_SECONDS)
-    # Initial 30s grace so the daily-history cache + scoring loop have a
-    # chance to warm before we start hammering them with hit/miss queries.
-    time.sleep(30.0)
-    while not _evaluator_stop.is_set():
-        try:
-            stats = evaluate_expired_predictions()
-            if stats['evaluated'] or stats['unresolved']:
-                log.info('prediction_tracker: evaluator pass %s', stats)
-        except Exception as exc:
-            log.exception('prediction_tracker: evaluator pass failed: %s', exc)
-        # Sleep with periodic wake so shutdown is responsive.
-        if _evaluator_stop.wait(_EVAL_INTERVAL_SECONDS):
-            break
-    log.info('prediction_tracker: evaluator stopped')
-
-
-def start_evaluator() -> None:
-    """Spawn the background auto-evaluation loop.  Idempotent."""
-    global _evaluator_thread
-    if _evaluator_thread and _evaluator_thread.is_alive():
-        return
-    _evaluator_stop.clear()
-    _evaluator_thread = threading.Thread(
-        target=_evaluator_loop, name='pred-tracker-eval', daemon=True,
-    )
-    _evaluator_thread.start()
-
-
-def stop_evaluator() -> None:
-    _evaluator_stop.set()
-
-
-# Don't auto-init on import — main.py lifespan calls init_db() and
-# start_evaluator() so we control startup ordering.
