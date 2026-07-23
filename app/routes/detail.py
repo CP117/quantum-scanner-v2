@@ -31,4 +31,11 @@ def stock_detail(
     mkt = normalize_market(market, default='stocks')
     fl = loose_bool(force_live, default=False)
     rf = loose_bool(require_fresh, default=False)
+    # Phase 28: record user interaction so the symbol is promoted to at least
+    # Tier 2 and protected from demotion for the next 5 minutes.
+    try:
+        from app.services.tier_manager import record_user_interaction
+        record_user_interaction(sym)
+    except Exception:  # noqa: BLE001
+        pass
     return get_symbol_detail(sym, force_live=fl, market=mkt, require_fresh=rf)

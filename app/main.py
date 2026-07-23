@@ -684,3 +684,66 @@ try:
     refresh_nasdaq_in_background()
 except Exception:
     pass
+
+# Phase 28: Tiered Universe Architecture
+# Initialise supporting services first, then start each scanner tier.
+try:
+    import logging as _log
+    _tier_log = _log.getLogger('app.startup')
+
+    # 1. GPU detection (must run before Tier 3 scanner so it knows the interval).
+    from app.services.gpu_acceleration import initialize as _gpu_init
+    _gpu_init()
+
+    # 2. Tier cache store (starts disk-flush daemon thread).
+    from app.services.tier_cache_store import initialize as _tc_init
+    _tc_init()
+
+    # 3. Tier manager (loads persisted state, starts flush thread).
+    from app.services.tier_manager import initialize as _tm_init, seed_universe
+    _tm_init()
+    # Seed all universe symbols into Tier 3 on first start (no-op for symbols
+    # that already have an assignment from the persisted state).
+    for _mkt in ('stocks', 'crypto'):
+        try:
+            seed_universe(_mkt)
+        except Exception as _seed_exc:  # noqa: BLE001
+            _tier_log.warning('tier_manager: seed_universe(%s) failed: %s', _mkt, _seed_exc)
+
+    # 4. Resilience watchdog.
+    from app.services.tier_resilience import start_watchdog
+    start_watchdog()
+
+    # 5. Restore watchlist pins into tier_manager.
+    try:
+        from app.services.watchlist_service import restore_pins_to_tier_manager
+        restore_pins_to_tier_manager()
+    except Exception as _pin_exc:  # noqa: BLE001
+        _tier_log.warning('watchlist_service: restore_pins failed: %s', _pin_exc)
+
+    # 6. Start scanner tiers.
+    from app.services.tier_1_active_scanner import start_tier1_scanner
+    from app.services.tier_2_monitor_scanner import start_tier2_scanner
+    from app.services.tier_3_background_scanner import start_tier3_scanner
+
+    _t1_started = start_tier1_scanner()
+    _t2_started = start_tier2_scanner()
+    _t3_started = start_tier3_scanner()
+    _tier_log.info(
+        'tiered scanner: T1=%s T2=%s T3=%s',
+        'ACTIVE' if _t1_started else 'skipped',
+        'ACTIVE' if _t2_started else 'skipped',
+        'ACTIVE' if _t3_started else 'skipped',
+    )
+
+    # 7. Mount tier-status and watchlist routes.
+    from app.routes.tier_status import router as tier_status_router
+    app.include_router(tier_status_router)
+    from app.routes.watchlist import router as watchlist_router, symbol_router
+    app.include_router(watchlist_router)
+    app.include_router(symbol_router)
+    _tier_log.info('tiered scanner: routes mounted (/api/tier-status, /api/watchlist, /api/symbol)')
+
+except Exception as _tier_exc:
+    import logging as _log
+    _log.getLogger('app.startup').exception('tiered scanner init failed: %s', _tier_exc)
