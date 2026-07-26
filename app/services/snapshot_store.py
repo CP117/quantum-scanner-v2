@@ -524,11 +524,13 @@ def mark_batch_completed(market: str, batch_index: int, total_batches: int, univ
       - Sweep wrap (`sweeps_completed += 1`) fires when the just-
         completed batch index equals `total_batches - 1`.
 
-    The wrap also resets `current_batch_index` back to 0 if the
-    pre-claim has run past total_batches (which it will, since the
-    pre-claim doesn't know how many batches are valid).
+    The wrap resets `current_batch_index` back to 0.  Over-claims
+    (parallel workers that claimed an index past total_batches) are
+    now prevented at the source in `_sweep_one_batch`, so no clamping
+    is needed here.
     """
     from app.utils.time import utcnow_iso
+    _do_gc = False
     with _locks.get(market, _locks['stocks']):
         meta = _snapshot_meta.setdefault(market, {})
         meta['last_batch_at'] = utcnow_iso()
@@ -549,24 +551,24 @@ def mark_batch_completed(market: str, batch_index: int, total_batches: int, univ
             # headline visibly cycles 0 → 12,301 → 0 → 12,301 ... on
             # every full sweep, never plateauing below the universe size.
             meta['current_sweep_scanned'] = 0
-            # Phase 26.33: force a full GC at the sweep boundary.  This
-            # moves the expensive gen-2 walk OUT of the scoring hot
-            # path and into a known-idle moment, eliminating the
-            # random 10%↔100% CPU spikes the user observed during
-            # pass 2+.  Cheap (~200-500 ms) and only fires once per
-            # ~12,000-symbol pass.
-            try:
-                from app.services.gc_service import collect_at_sweep_boundary
-                collect_at_sweep_boundary(reason=f'{market}_sweep_wrap')
-            except Exception:  # noqa: BLE001
-                pass
-        else:
-            # Keep current_batch_index in legal range — if a worker
-            # over-claimed (e.g. the universe shrunk mid-sweep), clamp
-            # it down so we don't process phantom batches.
-            cbi = int(meta.get('current_batch_index', 0))
-            if cbi >= meta['total_batches']:
-                meta['current_batch_index'] = cbi % meta['total_batches']
+            # Phase 26.33: schedule a full GC at the sweep boundary to move
+            # the expensive gen-2 walk out of the scoring hot path.
+            # IMPORTANT: set a flag here and run OUTSIDE the lock below.
+            # Previously the GC call was made while holding _locks[market],
+            # which blocked every snapshot read and write for the duration
+            # of the collection (200 ms – several seconds on large heaps).
+            # That was the root cause of the "scanner freezes at ~5,999
+            # symbols" stall the user observed.
+            _do_gc = True
+
+    # Run GC *after* releasing the market lock so snapshot reads and writes
+    # remain unblocked during the collection.
+    if _do_gc:
+        try:
+            from app.services.gc_service import collect_at_sweep_boundary
+            collect_at_sweep_boundary(reason=f'{market}_sweep_wrap')
+        except Exception:  # noqa: BLE001
+            pass
 
 
 def get_snapshot(market: str, limit: int = 1500, compact: bool = True,
@@ -1019,6 +1021,22 @@ def _sweep_one_batch(market: str) -> None:
     with _locks.get(market, _locks['stocks']):
         meta = _snapshot_meta.setdefault(market, {})
         batch_idx = int(meta.get('current_batch_index', 0))
+        last_total_batches = int(meta.get('total_batches', 0))
+        # Over-claim guard: with _PARALLEL_WORKERS > 1, the main loop can
+        # submit a new worker while an earlier worker is mid-flight for the
+        # sweep's final batches.  That new worker would claim a batch_idx
+        # equal to total_batches, which get_batch_slice wraps via modulo to
+        # batch 0 — re-scanning it before the sweep wrap fires.  This
+        # inflates current_sweep_scanned above universe_size and triggers
+        # the "scanning past the activated pool count" symptom.
+        #
+        # Fix: if batch_idx is already at or past the last known
+        # total_batches, the sweep wrap is imminent.  Return without
+        # claiming or scanning; the wrap will reset current_batch_index to
+        # 0 once the genuine final batch completes.
+        # (last_total_batches == 0 means first-ever boot sweep; allow any index.)
+        if last_total_batches > 0 and batch_idx >= last_total_batches:
+            return
         meta['current_batch_index'] = batch_idx + 1
         # First-sweep bootstrap check: has crypto EVER produced rows since
         # this process started?  If not, we ignore the activity gate below
