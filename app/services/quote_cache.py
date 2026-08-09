@@ -112,6 +112,12 @@ _FLUSHER_THREAD: threading.Thread | None = None
 _FLUSHER_STOP = threading.Event()
 _ATEXIT_REGISTERED = False
 
+# cache_status() TTL cache: result is valid for this many seconds so that
+# frequent UI polling (e.g. every 2-3 s) doesn't re-scan all 27 shard locks.
+_STATUS_CACHE_TTL_S = 10.0
+_STATUS_CACHE_LOCK = Lock()
+_STATUS_CACHE: dict = {"result": None, "at": 0.0}
+
 
 def _shard_for(symbol: str) -> str:
     """Return the shard key for a symbol. A-Z map to themselves; everything
@@ -492,6 +498,14 @@ def cached_quote_is_usable(cached: dict | None) -> bool:
 
 
 def cache_status() -> dict:
+    # Return a cached result if it was computed within the TTL window.  This
+    # prevents frequent UI polling (e.g. every 2-3 s) from re-scanning all 27
+    # shard locks and calling stat() on every shard file on each request.
+    now = time.monotonic()
+    with _STATUS_CACHE_LOCK:
+        if _STATUS_CACHE["result"] is not None and (now - _STATUS_CACHE["at"]) < _STATUS_CACHE_TTL_S:
+            return dict(_STATUS_CACHE["result"])
+
     # Build stats from the in-memory shard layer (_SHARD_MEM) for loaded shards
     # and from file-system metadata for all shards — no full shard deserialization.
     entry_count = 0
@@ -527,7 +541,7 @@ def cache_status() -> dict:
 
     with _DIRTY_LOCK:
         dirty_count = len(_DIRTY_SHARDS)
-    return {
+    result = {
         "cache_file_present": _SHARD_DIR.exists(),
         "cache_dir_present": _SHARD_DIR.exists(),
         "cache_entries": entry_count,
@@ -539,3 +553,7 @@ def cache_status() -> dict:
         "last_cache_symbol": (last_entry or {}).get("symbol"),
         "legacy_migrated": (_LEGACY_FILE.with_suffix(".json.migrated")).exists(),
     }
+    with _STATUS_CACHE_LOCK:
+        _STATUS_CACHE["result"] = result
+        _STATUS_CACHE["at"] = time.monotonic()
+    return dict(result)
