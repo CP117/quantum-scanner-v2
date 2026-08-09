@@ -1249,7 +1249,7 @@ const FF_METRIC_INFO = {
     impact: 'Component of the Lab composite multiplier.',
   },
   'lab_qi_certainty': {
-    label: 'QI Certainty',
+    label: 'Model Agreement',
     summary: 'Quantum-inspired interference fusion of fast-tier and GARCH-tier P(up) values.  Constructive interference when tiers agree, destructive when they disagree.',
     interpretation: '0 = total tier disagreement; 1 = perfect agreement at high conviction.',
     impact: 'Currently informational; not blended into the composite multiplier (it operates per-horizon).',
@@ -2160,7 +2160,7 @@ function _ffBlendedForecast(blk, lab, strategy, predictive) {
   if (labOn) {
     pushQ('vol_hmm_p_stressed', 'Vol HMM', lab.vol_hmm_p_stressed);
     pushQ('permutation_entropy', 'Perm entropy', lab.permutation_entropy);
-    pushQ('lab_qi_certainty', 'QI certainty', blk.lab_qi_certainty);
+    pushQ('lab_qi_certainty', 'Model agreement', blk.lab_qi_certainty);
   }
   if (stratOn) {
     pushQ('strategy_rqa_determinism', 'RQA determ.', strategy.rqa_determinism_pct);
@@ -2938,7 +2938,7 @@ function renderFutureForecastCard(detail) {
           ${_ffCellWrap('ssa_trend_slope_pct_per_day', `<span class="ff-label">SSA slope</span><span class="ff-value ${_ffCellColor('ssa_trend_slope_pct_per_day', Number(lab.ssa_trend_slope_pct_per_day || 0))}">${Number(lab.ssa_trend_slope_pct_per_day || 0).toFixed(3)}%/d</span>`, `${Number(lab.ssa_trend_slope_pct_per_day || 0).toFixed(3)}%/d`)}
           ${_ffCellWrap('vol_hmm_p_stressed', `<span class="ff-label">Vol HMM stressed</span><span class="ff-value ${_ffCellColor('vol_hmm_p_stressed', Number(lab.vol_hmm_p_stressed || 0.5))}">${(Number(lab.vol_hmm_p_stressed || 0.5)*100).toFixed(0)}%</span>`, `${(Number(lab.vol_hmm_p_stressed || 0.5)*100).toFixed(0)}%`)}
           ${_ffCellWrap('vol_hmm_p_stay_stressed', `<span class="ff-label">Stay stressed</span><span class="ff-value ${_ffCellColor('vol_hmm_p_stay_stressed', Number(lab.vol_hmm_p_stay_stressed || 0.5))}">${(Number(lab.vol_hmm_p_stay_stressed || 0.5)*100).toFixed(0)}%</span>`, `${(Number(lab.vol_hmm_p_stay_stressed || 0.5)*100).toFixed(0)}%`)}
-          ${(fast || garch) ? _ffCellWrap('lab_qi_certainty', `<span class="ff-label">QI certainty</span><span class="ff-value ${_ffCellColor('lab_qi_certainty', Number((fast || garch).lab_qi_certainty || 0))}">${(Number((fast || garch).lab_qi_certainty || 0)*100).toFixed(1)}%</span>`, `${(Number((fast || garch).lab_qi_certainty || 0)*100).toFixed(1)}%`) : ''}
+          ${(fast || garch) ? _ffCellWrap('lab_qi_certainty', `<span class="ff-label">Model agreement</span><span class="ff-value ${_ffCellColor('lab_qi_certainty', Number((fast || garch).lab_qi_certainty || 0))}">${(Number((fast || garch).lab_qi_certainty || 0)*100).toFixed(1)}%</span>`, `${(Number((fast || garch).lab_qi_certainty || 0)*100).toFixed(1)}%`) : ''}
           ${(fast || garch) ? _ffCellWrap('lab_rank_multiplier', `<span class="ff-label">Lab multiplier</span><span class="ff-value ${_ffCellColor('lab_rank_multiplier', Number((fast || garch).lab_rank_multiplier || 1))}">${Number((fast || garch).lab_rank_multiplier || 1).toFixed(3)}×</span>`, Number((fast || garch).lab_rank_multiplier || 1).toFixed(3)) : ''}
         </div>
       </div>`;

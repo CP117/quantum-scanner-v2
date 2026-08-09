@@ -22,9 +22,11 @@ numpy==2.4.5
 # --- Persistence ---
 aiosqlite==0.20.0
 orjson==3.11.9
+redis==5.2.1
 
 # --- PDF generation (downloadable metric guidebook, Phase 26.50) ---
 reportlab==4.5.1
 
 # --- Tests (optional but kept so `pytest` works out of the box) ---
 pytest==8.4.2
+fakeredis==2.30.1

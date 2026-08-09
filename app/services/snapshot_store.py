@@ -48,6 +48,25 @@ log = logging.getLogger('app.snapshot')
 
 
 # ---------------------------------------------------------------------------
+# Phase B — Snapshot State Store adapter helpers
+# ---------------------------------------------------------------------------
+
+def _get_snapshot_store():
+    """Lazy import to avoid circular deps; returns the process-wide store."""
+    from app.services.snapshot_state_store import get_snapshot_store
+    return get_snapshot_store()
+
+
+def _use_redis_snapshot() -> bool:
+    """Return True when USE_REDIS_SNAPSHOT=1 is set in config."""
+    try:
+        from app.config import settings
+        return settings.use_redis_snapshot
+    except Exception:  # noqa: BLE001
+        return False
+
+
+# ---------------------------------------------------------------------------
 # Phase 26.16 / Tier 1.1 — thinned-row LRU cache
 # ---------------------------------------------------------------------------
 # The compact `/api/scan/snapshot` payload requires clone-and-prune of every
@@ -477,9 +496,16 @@ def upsert_rows(market: str, rows: Iterable[dict]) -> int:
 
     # -- Phase A: snapshot `existing` under lock (fast O(batch) reads) -----
     lock = _locks.get(market, _locks['stocks'])
-    with lock:
-        bucket = _snapshot.setdefault(market, {})
-        existings: list[dict | None] = [bucket.get(sym) for sym, _ in valid]
+    _sstore = _get_snapshot_store()
+    _redis_mode = _use_redis_snapshot()
+    if _redis_mode:
+        # For Redis path: read existings from store outside the lock.
+        # The store has its own 100 ms read-through cache to limit round-trips.
+        existings: list[dict | None] = [_sstore.get_row(market, sym) for sym, _ in valid]
+    else:
+        with lock:
+            bucket = _snapshot.setdefault(market, {})
+            existings: list[dict | None] = [bucket.get(sym) for sym, _ in valid]
 
     # -- Phase B: merge computation outside the lock -----------------------
     # Phase 26.39 / 26.52: never demote a row from full-depth scoring back
@@ -495,13 +521,22 @@ def upsert_rows(market: str, rows: Iterable[dict]) -> int:
     accepted = 0
     with lock:
         bucket = _snapshot.setdefault(market, {})
+        _syms_before_evict: set | None = set(bucket.keys()) if _redis_mode else None
         for sym, row in valid:
-            bucket[sym] = row
+            _sstore.upsert(market, sym, row)
+            if _redis_mode:
+                # Keep a local replica so _evict_if_oversized can run in Python.
+                bucket[sym] = row
             accepted += 1
         evicted = _evict_if_oversized(market, bucket)
         if evicted:
             log.debug('snapshot bucket evicted %d rows (market=%s, post-evict=%d)',
                       evicted, market, len(bucket))
+            if _redis_mode and _syms_before_evict is not None:
+                # Sync evictions to Redis: remove symbols dropped from local bucket.
+                _written = {s for s, _ in valid}
+                for _esym in (_syms_before_evict | _written) - set(bucket.keys()):
+                    _sstore.delete_row(market, _esym)
         # Phase 26.37: any successful upsert (or eviction) reorders the
         # bucket relative to final_score, so bump the sorted-view cache
         # version.  A single int increment under the same lock — no
@@ -520,6 +555,12 @@ def upsert_rows(market: str, rows: Iterable[dict]) -> int:
         # scanned" headline reads from.  Reset to 0 inside
         # mark_batch_completed() when the sweep wraps.
         meta['current_sweep_scanned'] = int(meta.get('current_sweep_scanned', 0)) + accepted
+        if _redis_mode:
+            _sstore.set_meta(market, {
+                'rows_scored': meta['rows_scored'],
+                'evaluations_ever': meta['evaluations_ever'],
+                'current_sweep_scanned': meta['current_sweep_scanned'],
+            })
     return accepted
 
 
@@ -585,6 +626,9 @@ def mark_batch_completed(market: str, batch_index: int, total_batches: int, univ
             collect_at_sweep_boundary(reason=f'{market}_sweep_wrap')
         except Exception:  # noqa: BLE001
             pass
+    # Phase B: persist updated meta to Redis so other readers see fresh progress.
+    if _use_redis_snapshot():
+        _get_snapshot_store().set_meta(market, dict(_snapshot_meta.get(market, {})))
 
 
 def get_snapshot(market: str, limit: int = 1500, compact: bool = True,
@@ -621,6 +665,40 @@ def get_snapshot(market: str, limit: int = 1500, compact: bool = True,
     """
     market = market or 'stocks'
     limit = max(1, min(int(limit or 1500), 10000))
+
+    # Phase B: Redis fast path — delegate read to the store adapter.
+    # The Redis sorted set already maintains score-ordered membership so
+    # get_top_n() is O(log N + limit) with no in-process sort needed.
+    if _use_redis_snapshot():
+        _sstore = _get_snapshot_store()
+        meta = _sstore.get_meta(market)
+        all_results = _sstore.get_top_n(market, limit)
+        total_rows = _sstore.row_count(market)
+        if sort == 'predicted_volume_intensity':
+            all_results = sorted(
+                all_results,
+                key=lambda r: (-(r.get('predicted_volume_intensity_score') or 0.0),
+                               -(r.get('final_score') or 0.0)),
+            )
+        results: list = all_results[:limit]
+        if compact:
+            results = [_thin_compact_row(r) for r in results]
+        return {
+            'market': market,
+            'universe_size': meta.get('universe_size', 0),
+            'total_batches': meta.get('total_batches', 1),
+            'rows_scored': total_rows,
+            'evaluations_ever': meta.get('evaluations_ever', 0),
+            'current_sweep_scanned': meta.get('current_sweep_scanned', 0),
+            'sweeps_completed': meta.get('sweeps_completed', 0),
+            'last_batch_at': meta.get('last_batch_at'),
+            'last_full_sweep_at': meta.get('last_full_sweep_at'),
+            'current_batch_index': meta.get('current_batch_index', 0),
+            'results': results,
+            'results_truncated_to_top_n': limit if total_rows > limit else None,
+            'compact_mode': bool(compact),
+            'sort_mode': sort,
+        }
 
     # Phase 26.37: lock-light read path.
     #
@@ -748,6 +826,12 @@ def lookup_snapshot_row(symbol: str, market: str = 'stocks') -> dict | None:
         return None
     market = market or 'stocks'
     sym = symbol.upper()
+    if _use_redis_snapshot():
+        _sstore = _get_snapshot_store()
+        row = _sstore.get_row(market, sym)
+        if row is None and market != 'crypto':
+            row = _sstore.get_row('crypto', sym)
+        return row
     with _locks.get(market, _locks['stocks']):
         bucket = _snapshot.get(market, {})
         row = bucket.get(sym)
@@ -766,6 +850,11 @@ def lookup_snapshot_row(symbol: str, market: str = 'stocks') -> dict | None:
 
 def get_snapshot_meta(market: str | None = None) -> dict:
     """Lightweight progress probe (no result rows).  Used by /system/status."""
+    if _use_redis_snapshot():
+        _sstore = _get_snapshot_store()
+        if market:
+            return _sstore.get_meta(market)
+        return {m: _sstore.get_meta(m) for m in ('stocks', 'crypto')}
     if market:
         return dict(_snapshot_meta.get(market, {}))
     return {m: dict(_snapshot_meta.get(m, {})) for m in ('stocks', 'crypto')}
@@ -798,6 +887,8 @@ def apply_to_top_n(market: str, top_n: int, callback) -> int:
     top_n = max(0, int(top_n or 0))
     if top_n == 0:
         return 0
+    if _use_redis_snapshot():
+        return _get_snapshot_store().apply_to_top_n(market, top_n, callback)
     applied = 0
     with _locks.get(market, _locks['stocks']):
         bucket = _snapshot.get(market, {})
@@ -1414,7 +1505,11 @@ def invalidate_symbol(market: str, symbol: str) -> bool:
             # the sorted-view cache so the next /api/scan/snapshot poll
             # doesn't serve a stale list that still contains this sym.
             _invalidate_sorted_view(market)
+            if _use_redis_snapshot():
+                _get_snapshot_store().delete_row(market, symbol)
             return True
+        if _use_redis_snapshot():
+            return _get_snapshot_store().delete_row(market, symbol)
     return False
 
 
@@ -1432,6 +1527,8 @@ def clear_snapshot(market: str | None = None) -> None:
             # stale rows (clear is rare; we can afford the explicit pop).
             _invalidate_sorted_view(m)
             _sorted_view_cache.pop(m, None)
+            if _use_redis_snapshot():
+                _get_snapshot_store().clear(m)
     # Drop the thin-row LRU too — stale entries would otherwise leak
     # across clear/refill cycles (tests rely on this).
     _thin_cache_reset()

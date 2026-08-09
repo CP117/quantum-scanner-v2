@@ -1,4 +1,56 @@
-# Changelog — Predictive System Rework (2026-07)
+# Changelog — Predictive System Rework (2026-07 / 2026-08)
+
+---
+
+## Next Phase: `quantum_interference_certainty` rename and validation
+
+This pass closes the third item from the previous "still open" list.
+
+### Renamed `quantum_interference_certainty` → `model_agreement_certainty` (`app/services/lab_signals.py`)
+
+The old name implied a connection to quantum mechanics that does not exist.
+The math was already defensible (see below); only the framing was dishonest.
+
+**What the formula actually computes:**
+
+Each probability-of-up estimate is decomposed into a conviction magnitude
+`M = √(2·|p_up − 0.5|)` and a direction sign `d = sign(p_up − 0.5)`.
+The signed magnitudes are vector-summed and squared:
+
+```
+certainty = ((d_fast·M_fast + d_garch·M_garch) / √2)²,  clipped to [0, 1]
+```
+
+When both models agree directionally the magnitudes add and the output
+exceeds either model's individual certainty.  When they disagree they
+partially or fully cancel.  This is a standard signed-combination rule —
+no quantum physics involved.
+
+**Verified test cases** (all checked by `validate_model_agreement_certainty()`):
+
+| Case | Inputs | Output |
+|---|---|---|
+| Both strongly bullish | (0.80, 0.75) | 1.000 (clipped from 1.097) |
+| Both bearish (same magnitude) | (0.20, 0.25) | 1.000 |
+| Equal and opposite conviction | (0.75, 0.25) | 0.000 (exact cancellation) |
+| Partial disagreement | (0.70, 0.40) | ≈ 0.017 |
+| Single-model fallback | (0.80, None) | 0.600 = 2·|0.8−0.5| |
+| Both at 50 % (no signal) | (0.50, 0.50) | 0.000 |
+
+- Field key `lab_qi_certainty` kept for backward compatibility.
+- Old function name kept as a deprecated module-level alias so any
+  external notebooks/scripts don't break.
+- **UI label** changed from `"QI Certainty"` → `"Model Agreement"`
+  (`frontend/app.js`).
+- **Guidebook tip** reworded to remove "Tier alignment" / "quantum"
+  language (`app/services/guidebook_content.py`).
+- **New test file** `backend/tests/test_lab_signals_agreement.py`:
+  9 unit tests covering all six synthetic cases, output bounds, and
+  the backward-compat alias.  All pass without network access.
+
+---
+
+## Previous Pass (2026-07)
 
 This pass focused on auditing the scanner's predictive/scoring factors for
 methodological soundness and fixing what didn't hold up, rather than adding
