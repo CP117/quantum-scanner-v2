@@ -329,6 +329,115 @@ _locks: dict[str, threading.Lock] = {
     'crypto': threading.Lock(),
 }
 
+# ---------------------------------------------------------------------------
+# upsert_rows merge helpers — defined at module level so they are created
+# once rather than inside the hot loop under the market lock.
+# ---------------------------------------------------------------------------
+
+# Keys that the extended-factor / Pass-2 pipeline populates.
+# Whenever any of these is real on the OLD row and falsy on the NEW row,
+# the OLD value wins (Phase 26.52 UNIVERSAL extended-factor preservation).
+_EXT_FACTOR_KEYS: tuple[str, ...] = (
+    'trend_volume_delta',
+    'institutional_confluence',
+    'options_positioning',
+    'institutional_order_block',
+    'dark_pool_attraction',
+    'dark_pool_proxy',
+    'options_gamma',
+    'reaction_clustering',
+    'volume_sentiment',
+    'effort_vs_result',
+    'predictive_consensus',
+    'extended_factors',
+)
+
+# Phase 26.50: top-level fields stamped only by the priority lane; carry
+# forward when the scanner tick doesn't supply a fresh value.
+_PRIORITY_LANE_PRESERVE: tuple[str, ...] = (
+    'forward_metrics_garch',
+    'priority_lane_attached_at',
+    'priority_lane_tier',
+)
+
+# Overlay signals recomputed every cheap pass but may legitimately be None
+# when history is thin; preserve the last real value in that case.
+_OVERLAY_PRESERVE: tuple[str, ...] = (
+    'advanced_signals',
+    'lab_signals',
+    'strategy_signals',
+)
+
+
+def _is_real(v) -> bool:
+    """Return True if *v* carries a non-zero score or a non-empty payload.
+
+    Used by upsert_rows to decide whether to preserve the OLD extended-factor
+    value over the NEW one during the cheap→full merge.
+    """
+    if v is None:
+        return False
+    if isinstance(v, dict):
+        s = v.get('score')
+        if s is None:
+            # dict without a `score` field but with other meaningful keys
+            # still counts as real.
+            return len(v) > 0
+        return (isinstance(s, str) and s.strip() != '') or (isinstance(s, (int, float)) and s != 0)
+    if isinstance(v, (int, float)):
+        return v != 0
+    if isinstance(v, (list, tuple, str)):
+        return len(v) > 0
+    return True
+
+
+def _merge_row(row: dict, existing: dict) -> None:
+    """Apply in-place merge of *existing* bucket row onto the incoming *row*.
+
+    Called from upsert_rows OUTSIDE the market lock so that the lock is held
+    only for the fast dict reads/writes, not for the merge computation.
+
+    Implements Phase 26.39 / 26.52 extended-factor preservation and the
+    Phase 26.50 priority-lane / overlay carry-forward.
+    """
+    # -- extended-factor preservation (Phase 26.52) -------------------------
+    old_fb = existing.get('factor_breakdown') or {}
+    new_fb = row.get('factor_breakdown') or {}
+    old_mkt = old_fb.get('market') or {}
+    new_mkt = new_fb.get('market') or {}
+
+    merge_touched = False
+    for key in _EXT_FACTOR_KEYS:
+        if key not in old_mkt:
+            continue
+        old_v = old_mkt.get(key)
+        new_v = new_mkt.get(key)
+        if _is_real(old_v) and not _is_real(new_v):
+            new_mkt[key] = old_v
+            merge_touched = True
+
+    # Narratives + secondary composite: cheap pass never produces these,
+    # full pass does — carry forward.
+    if old_fb.get('factor_narratives') and not new_fb.get('factor_narratives'):
+        new_fb['factor_narratives'] = old_fb['factor_narratives']
+        merge_touched = True
+    if old_fb.get('secondary_composite') and not new_fb.get('secondary_composite'):
+        new_fb['secondary_composite'] = old_fb['secondary_composite']
+        merge_touched = True
+    if merge_touched and old_mkt:
+        new_fb['market'] = new_mkt
+        row['factor_breakdown'] = new_fb
+
+    # -- priority-lane GARCH overlay carry-forward (Phase 26.50) -----------
+    for fld in _PRIORITY_LANE_PRESERVE:
+        if existing.get(fld) and not row.get(fld):
+            row[fld] = existing[fld]
+
+    # -- overlay signals carry-forward --------------------------------------
+    for fld in _OVERLAY_PRESERVE:
+        if existing.get(fld) and row.get(fld) is None:
+            row[fld] = existing[fld]
+
 
 def upsert_rows(market: str, rows: Iterable[dict]) -> int:
     """Merge a freshly-scored batch into the snapshot.  Returns the post-merge
@@ -339,147 +448,54 @@ def upsert_rows(market: str, rows: Iterable[dict]) -> int:
     Phase 21: stamp each row with `_snapshot_refreshed_at` (monotonic) so the
     eviction pass can use it as the tiebreaker for score-weighted LRU.
     Cap the bucket size so multi-day runs don't grow process RSS unbounded.
+
+    Phase 29 (perf): lock hold time reduced via a two-phase approach.
+      Phase A (under lock, O(batch)): snapshot `existing` references for each
+        valid symbol so we know what to merge against.
+      Phase B (outside lock): run all per-row merge computation (_merge_row).
+      Phase C (under lock, O(batch + evict)): write merged rows, evict, and
+        update metadata.
+    This keeps the expensive factor-preservation logic off the critical section
+    so concurrent get_snapshot() / lookup_snapshot_row() calls are not blocked
+    for the duration of a 100-symbol merge.
     """
     market = market or 'stocks'
-    accepted = 0
     now_mono = time.monotonic()
-    with _locks.get(market, _locks['stocks']):
+
+    # -- pre-filter rows outside the lock -----------------------------------
+    # Stamp freshness and skip empties; collect valid (sym, row) pairs.
+    valid: list[tuple[str, dict]] = []
+    for row in rows:
+        sym = (row or {}).get('symbol')
+        if not sym:
+            continue
+        row['_snapshot_refreshed_at'] = now_mono
+        valid.append((sym, row))
+
+    if not valid:
+        return 0
+
+    # -- Phase A: snapshot `existing` under lock (fast O(batch) reads) -----
+    lock = _locks.get(market, _locks['stocks'])
+    with lock:
         bucket = _snapshot.setdefault(market, {})
-        for row in rows:
-            sym = (row or {}).get('symbol')
-            if not sym:
-                continue
-            row['_snapshot_refreshed_at'] = now_mono
-            # Phase 26.39: defense-in-depth — never demote a row from
-            # full-depth scoring back to cheap.  If the new row tagged
-            # itself `_score_depth='cheap'` and we already have a full
-            # row in the bucket, lift the existing extended factor
-            # families (institutional confluence, options positioning,
-            # IOB, reaction clustering, volume sentiment, etc.) onto
-            # the new row before storing.  The score and freshness
-            # still update normally — only the extended-factor block
-            # is preserved.  This stops the "composite breakdown bars
-            # blank intermittently" bug at the source even if a future
-            # caller forgets to pass `force_full_pass2=True`.
-            existing = bucket.get(sym)
-            # Phase 26.52 — UNIVERSAL extended-factor preservation.
-            # Previously this block was gated on
-            #   `row._score_depth == 'cheap' AND existing._score_depth == 'full'`
-            # which left D-ranked symbols (never promoted to Pass 2 —
-            # their `_score_depth` is always 'cheap') in the cold: their
-            # extended factors were never preserved between ticks, so
-            # institutional/options/dark-pool/etc dropped to zero on
-            # every refresh.
-            #
-            # The merge is now invariant under depth labels: we always
-            # preserve REAL non-zero extended-factor data when the
-            # incoming row supplies a falsy/zero value at the same key.
-            # When the new row genuinely improves on a factor (non-zero
-            # real value), it wins — no change to that path.  This
-            # never regresses the previous behaviour because:
-            #   * cheap-on-full merges were already preserving real data
-            #     under the previous gate.
-            #   * full-on-full merges replace real with real (still
-            #     wins because `_is_real(new_v)` is True).
-            #   * cheap-on-cheap with real data on either side is now
-            #     correctly merged — that's the new fix.
-            if existing is not None:
-                old_fb = existing.get('factor_breakdown') or {}
-                new_fb = row.get('factor_breakdown') or {}
-                old_mkt = old_fb.get('market') or {}
-                new_mkt = new_fb.get('market') or {}
-                # Keys that the extended-factor / Pass-2 pipeline populates.
-                # Whenever any of these is real on the OLD row and falsy
-                # on the NEW row, the OLD value wins.
-                _ext_factor_keys = (
-                    'trend_volume_delta',
-                    'institutional_confluence',
-                    'options_positioning',
-                    'institutional_order_block',
-                    'dark_pool_attraction',
-                    'dark_pool_proxy',
-                    'options_gamma',
-                    'reaction_clustering',
-                    'volume_sentiment',
-                    'effort_vs_result',
-                    'predictive_consensus',
-                    'extended_factors',
-                )
+        existings: list[dict | None] = [bucket.get(sym) for sym, _ in valid]
 
-                def _is_real(v):
-                    """A value is 'real' if it carries a non-zero score
-                    or a non-empty payload.  Used to decide preservation
-                    vs replacement on the merge."""
-                    if v is None:
-                        return False
-                    if isinstance(v, dict):
-                        s = v.get('score')
-                        if s is None:
-                            # dict without a `score` field but with
-                            # other meaningful keys still counts.
-                            return len(v) > 0
-                        return (isinstance(s, str) and s.strip() != '') or (isinstance(s, (int, float)) and s != 0)
-                    if isinstance(v, (int, float)):
-                        return v != 0
-                    if isinstance(v, (list, tuple, str)):
-                        return len(v) > 0
-                    return True
+    # -- Phase B: merge computation outside the lock -----------------------
+    # Phase 26.39 / 26.52: never demote a row from full-depth scoring back
+    # to cheap.  Preserve REAL non-zero extended-factor data when the
+    # incoming row supplies a falsy/zero value at the same key.
+    # Phase 26.50: carry forward priority-lane GARCH overlays and overlay
+    # signals that the cheap pass may have set to None this tick.
+    for (sym, row), existing in zip(valid, existings):
+        if existing is not None:
+            _merge_row(row, existing)
 
-                merge_touched = False
-                for key in _ext_factor_keys:
-                    if key not in old_mkt:
-                        continue
-                    old_v = old_mkt.get(key)
-                    new_v = new_mkt.get(key)
-                    if _is_real(old_v) and not _is_real(new_v):
-                        new_mkt[key] = old_v
-                        merge_touched = True
-                # Narratives + secondary composite: cheap pass never
-                # produces these, full pass does — carry forward.
-                if old_fb.get('factor_narratives') and not new_fb.get('factor_narratives'):
-                    new_fb['factor_narratives'] = old_fb['factor_narratives']
-                    merge_touched = True
-                if old_fb.get('secondary_composite') and not new_fb.get('secondary_composite'):
-                    new_fb['secondary_composite'] = old_fb['secondary_composite']
-                    merge_touched = True
-                if merge_touched and old_mkt:
-                    new_fb['market'] = new_mkt
-                    row['factor_breakdown'] = new_fb
-            # Phase 26.50 bugfix — preserve the priority-lane GARCH overlay
-            # across scanner ticks.  The scanner re-scores rows on every
-            # sweep but only the priority-lane attaches `forward_metrics_garch`.
-            # Without this carry-over, the GARCH block would be silently
-            # destroyed on the very next scanner tick, leaving every row
-            # showing "fast" tier in the leaderboard until the priority
-            # lane fired on it again (~12 s later if it ever did).
-            #
-            # The same problem affected filter changes (Bulls/Bears,
-            # intensity bands): newly-promoted rows would render fast-tier
-            # only because the GARCH block had been wiped on a previous
-            # tick before they made the cut.
-            #
-            # We carry forward any non-empty `forward_metrics_garch` from
-            # the OLD row when the NEW row didn't supply one.  Same for the
-            # higher-tier overlays the priority lane stamps on its rows.
-            if existing is not None:
-                _PRIORITY_LANE_PRESERVE = (
-                    'forward_metrics_garch',
-                    'priority_lane_attached_at',
-                    'priority_lane_tier',
-                )
-                for fld in _PRIORITY_LANE_PRESERVE:
-                    if existing.get(fld) and not row.get(fld):
-                        row[fld] = existing[fld]
-                # advanced/lab/strategy signals are RECOMPUTED on every
-                # cheap pass, but the cheap pass may legitimately set them
-                # to None if there's not enough history *this tick*.  If
-                # the new row sets one to None and the old row had real
-                # data, preserve the old.  (Real data is more useful than
-                # a transient None caused by a throttled provider.)
-                _OVERLAY_PRESERVE = ('advanced_signals', 'lab_signals', 'strategy_signals')
-                for fld in _OVERLAY_PRESERVE:
-                    if existing.get(fld) and row.get(fld) is None:
-                        row[fld] = existing[fld]
+    # -- Phase C: write results under lock (fast O(batch) writes) ----------
+    accepted = 0
+    with lock:
+        bucket = _snapshot.setdefault(market, {})
+        for sym, row in valid:
             bucket[sym] = row
             accepted += 1
         evicted = _evict_if_oversized(market, bucket)
