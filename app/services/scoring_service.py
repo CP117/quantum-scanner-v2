@@ -352,6 +352,13 @@ except Exception:  # pragma: no cover - numpy is a hard dependency anyway
     _NP_AVAILABLE = False
     _np = None  # type: ignore
 
+try:
+    import pandas as _pd  # type: ignore
+    _PD_AVAILABLE = True
+except Exception:  # pragma: no cover
+    _PD_AVAILABLE = False
+    _pd = None  # type: ignore
+
 
 def _to_float_array(values):
     """Convert an iterable of price/volume-like values into a float64 ndarray,
@@ -416,19 +423,20 @@ def _np_ema_scalar(values, length: int) -> float:
     """Vectorized EMA returning the FINAL scalar (matches legacy `_ema_series`).
 
     Uses the standard EMA recursion `ema[i] = α*v[i] + (1-α)*ema[i-1]`
-    seeded with `values[0]`. Implemented as a Python loop over a NumPy
-    array — it's already O(N) and the per-step work is negligible; the big
-    win is `_np_ema_full` below, which the rs_ratio call site uses.
+    seeded with `values[0]` (adjust=False). Delegates to pandas ewm() which
+    runs the recursion in compiled C — substantially faster than a Python loop
+    for arrays of any length.
     """
     arr = _to_float_array(values)
     if arr is None:
         return _ema_series(values, length)
     if arr.size == 0:
         return 0.0
+    if _PD_AVAILABLE:
+        return float(_pd.Series(arr).ewm(span=length, adjust=False).mean().iloc[-1])
+    # Fallback: pure-Python loop when pandas is unavailable.
     alpha = 2.0 / (length + 1.0)
     ema = float(arr[0])
-    # `arr[1:]` is contiguous; the loop is tight but still Python — fine
-    # for the lengths we use (<=100).
     for v in arr[1:]:
         ema = alpha * float(v) + (1.0 - alpha) * ema
     return ema
@@ -448,10 +456,17 @@ def _np_ema_full(values, length: int):
     at position `i` (because EMA only depends on the previous EMA value,
     not the window length per se). So we can compute the entire series in
     one O(N) pass.
+
+    Delegates to pandas ewm(adjust=False) which runs the recursion in
+    compiled C — substantially faster than a Python loop.
     """
     arr = _to_float_array(values)
     if arr is None or arr.size == 0:
         return _np.empty(0, dtype=_np.float64) if _NP_AVAILABLE else []
+    if _PD_AVAILABLE:
+        result = _pd.Series(arr).ewm(span=length, adjust=False).mean().to_numpy()
+        return result
+    # Fallback: pure-Python loop when pandas is unavailable.
     alpha = 2.0 / (length + 1.0)
     one_minus = 1.0 - alpha
     out = _np.empty(arr.size, dtype=_np.float64)
