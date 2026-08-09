@@ -60,6 +60,8 @@ _composite_scores: Dict[str, float] = {}
 _pinned_symbols: Set[str] = set()
 # symbols promoted due to user interaction (temporary T2 bump)
 _user_interaction_symbols: Dict[str, float] = {}  # symbol → expires_at (monotonic)
+# reverse index: tier → set[symbol] — eliminates O(N) scans in get_tier_symbols / get_status
+_tier_members: Dict[int, Set[str]] = {TIER_1: set(), TIER_2: set(), TIER_3: set()}
 
 _state_lock = threading.Lock()
 
@@ -90,6 +92,10 @@ def _load_state() -> None:
         _last_promoted_at = {k: float(v) for k, v in (data.get('last_promoted') or {}).items()}
         _composite_scores = {k: float(v) for k, v in (data.get('scores') or {}).items()}
         _pinned_symbols = set(data.get('pinned') or [])
+        # Rebuild reverse index from loaded assignments.
+        _tier_members.update({TIER_1: set(), TIER_2: set(), TIER_3: set()})
+        for _sym, _tier in _tier_assignments.items():
+            _tier_members[_tier].add(_sym)
         log.info('tier_manager: loaded state for %d symbols from %s', len(_tier_assignments), fp)
     except Exception:  # noqa: BLE001
         log.warning('tier_manager: failed to load state from disk (fresh start)', exc_info=True)
@@ -136,7 +142,7 @@ def get_tier(symbol: str) -> int:
 def get_tier_symbols(tier: int) -> list[str]:
     """Return all symbols currently assigned to *tier*."""
     with _state_lock:
-        return [s for s, t in _tier_assignments.items() if t == tier]
+        return list(_tier_members.get(tier, ()))
 
 
 def get_all_tiers() -> Dict[str, int]:
@@ -186,6 +192,8 @@ def promote(symbol: str, reason: str = 'score') -> bool:
             return False  # in cooldown
         new_tier = current - 1
         _tier_assignments[sym] = new_tier
+        _tier_members[current].discard(sym)
+        _tier_members[new_tier].add(sym)
         _last_promoted_at[sym] = time.monotonic()
     log.info('tier_manager: %s promoted T%d → T%d (%s)', sym, current, new_tier, reason)
     return True
@@ -215,6 +223,8 @@ def demote(symbol: str, reason: str = 'score') -> bool:
         if sym in _pinned_symbols:
             new_tier = max(new_tier, TIER_2)
         _tier_assignments[sym] = new_tier
+        _tier_members[current].discard(sym)
+        _tier_members[new_tier].add(sym)
     log.info('tier_manager: %s demoted T%d → T%d (%s)', sym, current, new_tier, reason)
     return True
 
@@ -285,6 +295,11 @@ def rebalance(market: str = 'stocks') -> dict:
 
     promoted = demoted = unchanged = 0
     with _state_lock:
+        # Prune expired user-interaction entries so the dict doesn't grow forever.
+        _now = time.monotonic()
+        for _s in [s for s, exp in _user_interaction_symbols.items() if _now >= exp]:
+            del _user_interaction_symbols[_s]
+
         for sym, target in target_tiers.items():
             current = _tier_assignments.get(sym, TIER_3)
             if current == target:
@@ -292,6 +307,8 @@ def rebalance(market: str = 'stocks') -> dict:
                 continue
             if target < current:  # promote
                 if sym not in promotions_on_cooldown_snapshot:
+                    _tier_members[current].discard(sym)
+                    _tier_members[target].add(sym)
                     _tier_assignments[sym] = target
                     _last_promoted_at[sym] = time.monotonic()
                     promoted += 1
@@ -303,6 +320,8 @@ def rebalance(market: str = 'stocks') -> dict:
                 ui_exp = _user_interaction_symbols.get(sym, 0.0)
                 if time.monotonic() < ui_exp:
                     continue
+                _tier_members[current].discard(sym)
+                _tier_members[target].add(sym)
                 _tier_assignments[sym] = target
                 demoted += 1
                 log.debug('rebalance: demote %s T%d→T%d', sym, current, target)
@@ -358,6 +377,8 @@ def pin_symbol(symbol: str) -> None:
         current = _tier_assignments.get(sym, TIER_3)
     if current == TIER_3:
         with _state_lock:
+            _tier_members[TIER_3].discard(sym)
+            _tier_members[TIER_2].add(sym)
             _tier_assignments[sym] = TIER_2
             _last_promoted_at[sym] = time.monotonic()
         log.info('tier_manager: %s pinned and promoted T3→T2', sym)
@@ -409,6 +430,7 @@ def seed_universe(market: str = 'stocks') -> int:
             sym = (row.get('symbol') or '').upper()
             if sym and sym not in _tier_assignments:
                 _tier_assignments[sym] = TIER_3
+                _tier_members[TIER_3].add(sym)
                 new_count += 1
     log.info('tier_manager: seeded %d new symbols → Tier 3 (market=%s)', new_count, market)
     return new_count
@@ -421,9 +443,9 @@ def seed_universe(market: str = 'stocks') -> int:
 def get_status() -> dict:
     """Return a snapshot of tier sizes and top symbols per tier."""
     with _state_lock:
-        t1 = [s for s, t in _tier_assignments.items() if t == TIER_1]
-        t2 = [s for s, t in _tier_assignments.items() if t == TIER_2]
-        t3 = [s for s, t in _tier_assignments.items() if t == TIER_3]
+        t1 = list(_tier_members[TIER_1])
+        t2 = list(_tier_members[TIER_2])
+        t3 = list(_tier_members[TIER_3])
         pinned = list(_pinned_symbols)
         scores_snap = dict(_composite_scores)
 

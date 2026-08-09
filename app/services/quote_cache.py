@@ -492,30 +492,50 @@ def cached_quote_is_usable(cached: dict | None) -> bool:
 
 
 def cache_status() -> dict:
-    data = load_quote_cache()
-    last = None
-    if data:
-        last = sorted(data.values(), key=lambda x: x.get("captured_at_utc", ""))[-1]
-    # Report shard stats so operators can see the shard layout in /system/status.
+    # Build stats from the in-memory shard layer (_SHARD_MEM) for loaded shards
+    # and from file-system metadata for all shards — no full shard deserialization.
+    entry_count = 0
     shard_sizes: dict[str, int] = {}
+    last_entry: dict | None = None
+
     for shard in list(string.ascii_uppercase) + ["_"]:
+        # File size: a single stat() call, no read.
         path = _shard_path(shard)
         if path.exists():
             try:
                 shard_sizes[shard] = path.stat().st_size
             except Exception:
                 pass
+
+        # Entry count / last-entry timestamp: use in-memory layer if loaded.
+        lock = _SHARD_LOCKS.get(shard)
+        if lock is None:
+            continue
+        with lock:
+            mem = _SHARD_MEM.get(shard)
+        if mem is not None:
+            entry_count += len(mem)
+            if mem:
+                try:
+                    candidate = max(mem.values(), key=lambda x: x.get("captured_at_utc", ""))
+                    if last_entry is None or (
+                        candidate.get("captured_at_utc", "") > last_entry.get("captured_at_utc", "")
+                    ):
+                        last_entry = candidate
+                except Exception:
+                    pass
+
     with _DIRTY_LOCK:
         dirty_count = len(_DIRTY_SHARDS)
     return {
         "cache_file_present": _SHARD_DIR.exists(),
         "cache_dir_present": _SHARD_DIR.exists(),
-        "cache_entries": len(data),
+        "cache_entries": entry_count,
         "cache_shards_present": len(shard_sizes),
         "cache_shard_total_bytes": sum(shard_sizes.values()),
         "cache_dirty_shards": dirty_count,
         "cache_serializer": "orjson" if _HAS_ORJSON else "stdlib-json",
-        "last_cache_write_utc": (last or {}).get("captured_at_utc"),
-        "last_cache_symbol": (last or {}).get("symbol"),
+        "last_cache_write_utc": (last_entry or {}).get("captured_at_utc"),
+        "last_cache_symbol": (last_entry or {}).get("symbol"),
         "legacy_migrated": (_LEGACY_FILE.with_suffix(".json.migrated")).exists(),
     }

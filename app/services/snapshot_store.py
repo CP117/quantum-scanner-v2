@@ -787,12 +787,20 @@ def apply_to_top_n(market: str, top_n: int, callback) -> int:
         bucket = _snapshot.get(market, {})
         if not bucket:
             return 0
-        # Sort references by final_score desc and take the top N.
-        ordered = sorted(
-            bucket.values(),
-            key=lambda r: float(r.get('final_score') or 0),
-            reverse=True,
-        )[:top_n]
+        # Reuse the sorted-view cache to avoid a redundant O(N log N) sort.
+        sort_version = _bucket_version.get(market, 0)
+        cached = _sorted_view_cache.get(market)
+        if cached is not None and cached[0] == sort_version:
+            ordered = cached[1][:top_n]
+        else:
+            # Cache miss: sort, publish, then take top N.
+            all_sorted = sorted(
+                bucket.values(),
+                key=lambda r: float(r.get('final_score') or 0),
+                reverse=True,
+            )
+            _sorted_view_cache[market] = (sort_version, all_sorted)
+            ordered = all_sorted[:top_n]
         for row in ordered:
             try:
                 callback(row)

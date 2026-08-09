@@ -551,22 +551,35 @@ def options_positioning_factor(symbol: str, last_price: float) -> dict:
             if df is None or len(df) == 0:
                 continue
             cols = set(df.columns)
-            for _, row in df.iterrows():
-                strike = safe_float(row['strike']) if 'strike' in cols else 0.0
-                oi = safe_float(row['openInterest']) if 'openInterest' in cols else 0.0
-                vol = safe_float(row['volume']) if 'volume' in cols else 0.0
-                premium = safe_float(row['lastPrice']) if 'lastPrice' in cols else 0.0
-                iv = safe_float(row['impliedVolatility']) if 'impliedVolatility' in cols else 0.0
-                if strike <= 0 or (oi <= 0 and vol <= 0):
-                    continue
-                weight = max(0.0, oi * 0.65 + vol * 0.35) * max(0.01, premium)
-                rec = {'expiry': exp, 'days': days, 'bucket': bucket, 'side': side_name, 'strike': strike, 'oi': oi, 'vol': vol, 'premium': premium, 'iv': iv, 'weight': weight}
+            # Vectorized extraction — avoid per-row Python overhead of iterrows().
+            strike_col = df['strike'] if 'strike' in cols else None
+            oi_col = df['openInterest'].fillna(0).astype(float) if 'openInterest' in cols else None
+            vol_col = df['volume'].fillna(0).astype(float) if 'volume' in cols else None
+            prem_col = df['lastPrice'].fillna(0).astype(float) if 'lastPrice' in cols else None
+            iv_col = df['impliedVolatility'].fillna(0).astype(float) if 'impliedVolatility' in cols else None
+            if strike_col is None:
+                continue
+            strike_v = strike_col.fillna(0).astype(float)
+            oi_v = oi_col if oi_col is not None else strike_v * 0
+            vol_v = vol_col if vol_col is not None else strike_v * 0
+            prem_v = prem_col if prem_col is not None else strike_v * 0
+            iv_v = iv_col if iv_col is not None else strike_v * 0
+            weight_v = (oi_v * 0.65 + vol_v * 0.35).clip(lower=0) * prem_v.clip(lower=0.01)
+            # Filter: strike > 0 AND (oi > 0 OR vol > 0)
+            mask = (strike_v > 0) & ((oi_v > 0) | (vol_v > 0))
+            for idx in strike_v[mask].index:
+                rec = {
+                    'expiry': exp, 'days': days, 'bucket': bucket, 'side': side_name,
+                    'strike': float(strike_v[idx]), 'oi': float(oi_v[idx]),
+                    'vol': float(vol_v[idx]), 'premium': float(prem_v[idx]),
+                    'iv': float(iv_v[idx]), 'weight': float(weight_v[idx]),
+                }
                 buckets[bucket].append(rec)
                 all_records.append(rec)
                 if side_name == 'call':
-                    total_call_w += weight
+                    total_call_w += rec['weight']
                 else:
-                    total_put_w += weight
+                    total_put_w += rec['weight']
 
     def summarize(records: list[dict]) -> dict:
         if not records:

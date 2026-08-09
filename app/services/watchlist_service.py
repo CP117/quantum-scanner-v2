@@ -233,11 +233,14 @@ def _maybe_unpin(symbol: str, user_id: str) -> None:
     sym = symbol.upper()
     with _db_lock:
         conn = _get_conn()
-        rows = conn.execute(
-            "SELECT symbols_json FROM user_watchlists WHERE user_id = ?",
-            (user_id,),
-        ).fetchall()
-    still_in_wl = any(sym in json.loads(r['symbols_json'] or '[]') for r in rows)
+        # Single query: count watchlists for this user that contain the symbol.
+        # Cheaper than loading all symbols_json rows and deserializing each one.
+        row = conn.execute(
+            "SELECT COUNT(*) AS cnt FROM user_watchlists"
+            " WHERE user_id = ? AND instr(symbols_json, ?) > 0",
+            (user_id, f'"{sym}"'),
+        ).fetchone()
+    still_in_wl = bool(row and row['cnt'])
     # Only unpin from explicit-pin watchlist if not in any watchlist
     if not still_in_wl:
         try:
@@ -292,9 +295,18 @@ def get_pinned_symbols(user_id: str = 'default') -> list[str]:
 
 
 def is_pinned(symbol: str, user_id: str = 'default') -> bool:
-    """Return True if *symbol* is pinned by *user_id*."""
+    """Return True if *symbol* is pinned by *user_id*.
+
+    Delegates to the in-memory set in tier_manager (O(1)) rather than
+    making a SQLite round-trip; falls back to the DB query if the import
+    fails (e.g., during tests that mock the module).
+    """
     sym = symbol.upper()
-    return sym in get_pinned_symbols(user_id)
+    try:
+        from app.services import tier_manager
+        return tier_manager.is_pinned(sym)
+    except Exception:  # noqa: BLE001
+        return sym in get_pinned_symbols(user_id)
 
 
 def _upsert_pinned_watchlist(symbol: str, user_id: str, add: bool) -> None:
