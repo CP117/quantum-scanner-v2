@@ -352,6 +352,13 @@ except Exception:  # pragma: no cover - numpy is a hard dependency anyway
     _NP_AVAILABLE = False
     _np = None  # type: ignore
 
+try:
+    import pandas as _pd  # type: ignore
+    _PD_AVAILABLE = True
+except Exception:  # pragma: no cover
+    _PD_AVAILABLE = False
+    _pd = None  # type: ignore
+
 
 def _to_float_array(values):
     """Convert an iterable of price/volume-like values into a float64 ndarray,
@@ -416,19 +423,20 @@ def _np_ema_scalar(values, length: int) -> float:
     """Vectorized EMA returning the FINAL scalar (matches legacy `_ema_series`).
 
     Uses the standard EMA recursion `ema[i] = α*v[i] + (1-α)*ema[i-1]`
-    seeded with `values[0]`. Implemented as a Python loop over a NumPy
-    array — it's already O(N) and the per-step work is negligible; the big
-    win is `_np_ema_full` below, which the rs_ratio call site uses.
+    seeded with `values[0]` (adjust=False). Delegates to pandas ewm() which
+    runs the recursion in compiled C — substantially faster than a Python loop
+    for arrays of any length.
     """
     arr = _to_float_array(values)
     if arr is None:
         return _ema_series(values, length)
     if arr.size == 0:
         return 0.0
+    if _PD_AVAILABLE:
+        return float(_pd.Series(arr).ewm(span=length, adjust=False).mean().iloc[-1])
+    # Fallback: pure-Python loop when pandas is unavailable.
     alpha = 2.0 / (length + 1.0)
     ema = float(arr[0])
-    # `arr[1:]` is contiguous; the loop is tight but still Python — fine
-    # for the lengths we use (<=100).
     for v in arr[1:]:
         ema = alpha * float(v) + (1.0 - alpha) * ema
     return ema
@@ -448,10 +456,17 @@ def _np_ema_full(values, length: int):
     at position `i` (because EMA only depends on the previous EMA value,
     not the window length per se). So we can compute the entire series in
     one O(N) pass.
+
+    Delegates to pandas ewm(adjust=False) which runs the recursion in
+    compiled C — substantially faster than a Python loop.
     """
     arr = _to_float_array(values)
     if arr is None or arr.size == 0:
         return _np.empty(0, dtype=_np.float64) if _NP_AVAILABLE else []
+    if _PD_AVAILABLE:
+        result = _pd.Series(arr).ewm(span=length, adjust=False).mean().to_numpy()
+        return result
+    # Fallback: pure-Python loop when pandas is unavailable.
     alpha = 2.0 / (length + 1.0)
     one_minus = 1.0 - alpha
     out = _np.empty(arr.size, dtype=_np.float64)
@@ -551,22 +566,35 @@ def options_positioning_factor(symbol: str, last_price: float) -> dict:
             if df is None or len(df) == 0:
                 continue
             cols = set(df.columns)
-            for _, row in df.iterrows():
-                strike = safe_float(row['strike']) if 'strike' in cols else 0.0
-                oi = safe_float(row['openInterest']) if 'openInterest' in cols else 0.0
-                vol = safe_float(row['volume']) if 'volume' in cols else 0.0
-                premium = safe_float(row['lastPrice']) if 'lastPrice' in cols else 0.0
-                iv = safe_float(row['impliedVolatility']) if 'impliedVolatility' in cols else 0.0
-                if strike <= 0 or (oi <= 0 and vol <= 0):
-                    continue
-                weight = max(0.0, oi * 0.65 + vol * 0.35) * max(0.01, premium)
-                rec = {'expiry': exp, 'days': days, 'bucket': bucket, 'side': side_name, 'strike': strike, 'oi': oi, 'vol': vol, 'premium': premium, 'iv': iv, 'weight': weight}
+            # Vectorized extraction — avoid per-row Python overhead of iterrows().
+            strike_col = df['strike'] if 'strike' in cols else None
+            oi_col = df['openInterest'].fillna(0).astype(float) if 'openInterest' in cols else None
+            vol_col = df['volume'].fillna(0).astype(float) if 'volume' in cols else None
+            prem_col = df['lastPrice'].fillna(0).astype(float) if 'lastPrice' in cols else None
+            iv_col = df['impliedVolatility'].fillna(0).astype(float) if 'impliedVolatility' in cols else None
+            if strike_col is None:
+                continue
+            strike_v = strike_col.fillna(0).astype(float)
+            oi_v = oi_col if oi_col is not None else strike_v * 0
+            vol_v = vol_col if vol_col is not None else strike_v * 0
+            prem_v = prem_col if prem_col is not None else strike_v * 0
+            iv_v = iv_col if iv_col is not None else strike_v * 0
+            weight_v = (oi_v * 0.65 + vol_v * 0.35).clip(lower=0) * prem_v.clip(lower=0.01)
+            # Filter: strike > 0 AND (oi > 0 OR vol > 0)
+            mask = (strike_v > 0) & ((oi_v > 0) | (vol_v > 0))
+            for idx in strike_v[mask].index:
+                rec = {
+                    'expiry': exp, 'days': days, 'bucket': bucket, 'side': side_name,
+                    'strike': float(strike_v[idx]), 'oi': float(oi_v[idx]),
+                    'vol': float(vol_v[idx]), 'premium': float(prem_v[idx]),
+                    'iv': float(iv_v[idx]), 'weight': float(weight_v[idx]),
+                }
                 buckets[bucket].append(rec)
                 all_records.append(rec)
                 if side_name == 'call':
-                    total_call_w += weight
+                    total_call_w += rec['weight']
                 else:
-                    total_put_w += weight
+                    total_put_w += rec['weight']
 
     def summarize(records: list[dict]) -> dict:
         if not records:

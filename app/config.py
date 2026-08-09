@@ -27,7 +27,6 @@ class Settings(BaseModel):
     warmer_enabled: bool = _env_bool("WARMERENABLED", True)
     warmer_interval_seconds: int = int(os.getenv("WARMERINTERVALSECONDS", "20"))
     provider_min_request_gap_ms: int = int(os.getenv("PROVIDERMINREQUESTGAPMS", "120"))
-    provider_budget_per_minute: int = int(os.getenv("PROVIDERBUDGETPERMINUTE", "300"))
     active_scan_limit: int = int(os.getenv("ACTIVESCANLIMIT", "100"))
     # Phase 27: automatic, unbiased prediction logging. The warmer loop
     # already cycles through the whole universe on a timer -- this piggybacks

@@ -48,8 +48,29 @@ from app.utils.time import utcnow_iso
 
 log = logging.getLogger('app.watchlist_service')
 
-_db_lock = threading.Lock()
-_conn: Optional[sqlite3.Connection] = None
+# ---------------------------------------------------------------------------
+# Connection strategy
+# ---------------------------------------------------------------------------
+# SQLite in WAL mode supports multiple concurrent readers plus one writer.
+# Previously a single shared connection (_conn) was protected by a single
+# _db_lock, which serialised ALL operations — both reads and writes —
+# completely negating WAL's reader-concurrency benefit.
+#
+# Fix (Phase 29, issue #3d):
+#   * Per-thread connections via threading.local() so that concurrent reads
+#     from the HTTP handler thread, the Tier-1 scanner thread, and the
+#     priority-lane thread never block each other.  SQLite WAL allows all of
+#     them to read simultaneously without writer interference.
+#   * _db_write_lock (threading.Lock) serialises write transactions.
+#     Read-only paths acquire no lock at all — they use their own connection.
+#
+# Each thread opens its own sqlite3 connection to the same database file.
+# SQLite in WAL mode is safe for this pattern (MRSW — multiple readers,
+# single writer).  Connections are created lazily and cached on the thread.
+
+_thread_local = threading.local()
+_db_write_lock = threading.Lock()   # held only by write paths
+
 
 # ---------------------------------------------------------------------------
 # DB helpers
@@ -68,16 +89,17 @@ def _db_path() -> Path:
 
 
 def _get_conn() -> sqlite3.Connection:
-    global _conn
-    if _conn is not None:
-        return _conn
+    """Return a per-thread SQLite connection, creating it on first use."""
+    conn: Optional[sqlite3.Connection] = getattr(_thread_local, 'conn', None)
+    if conn is not None:
+        return conn
     db = _db_path()
     conn = sqlite3.connect(str(db), check_same_thread=False)
     conn.row_factory = sqlite3.Row
     conn.execute('PRAGMA journal_mode=WAL')
     conn.execute('PRAGMA synchronous=NORMAL')
     _ensure_schema(conn)
-    _conn = conn
+    _thread_local.conn = conn
     return conn
 
 
@@ -113,7 +135,7 @@ def create_watchlist(name: str, user_id: str = 'default') -> dict:
     if not name or not name.strip():
         raise ValueError('Watchlist name must not be empty')
     now = utcnow_iso()
-    with _db_lock:
+    with _db_write_lock:
         conn = _get_conn()
         cur = conn.execute(
             'INSERT INTO user_watchlists (user_id, name, created_at, symbols_json) VALUES (?, ?, ?, ?)',
@@ -128,7 +150,7 @@ def create_watchlist(name: str, user_id: str = 'default') -> dict:
 
 def delete_watchlist(watchlist_id: int, user_id: str = 'default') -> bool:
     """Delete a watchlist.  Returns True if deleted, False if not found."""
-    with _db_lock:
+    with _db_write_lock:
         conn = _get_conn()
         cur = conn.execute(
             'DELETE FROM user_watchlists WHERE id = ? AND user_id = ?',
@@ -140,22 +162,20 @@ def delete_watchlist(watchlist_id: int, user_id: str = 'default') -> bool:
 
 def list_watchlists(user_id: str = 'default') -> list[dict]:
     """Return all watchlists for *user_id* (excluding internal __pinned__)."""
-    with _db_lock:
-        conn = _get_conn()
-        rows = conn.execute(
-            "SELECT * FROM user_watchlists WHERE user_id = ? AND name != '__pinned__' ORDER BY id",
-            (user_id,),
-        ).fetchall()
+    conn = _get_conn()
+    rows = conn.execute(
+        "SELECT * FROM user_watchlists WHERE user_id = ? AND name != '__pinned__' ORDER BY id",
+        (user_id,),
+    ).fetchall()
     return [_row_to_dict(r) for r in rows]
 
 
 def _get_watchlist(watchlist_id: int, user_id: str) -> Optional[dict]:
-    with _db_lock:
-        conn = _get_conn()
-        row = conn.execute(
-            'SELECT * FROM user_watchlists WHERE id = ? AND user_id = ?',
-            (watchlist_id, user_id),
-        ).fetchone()
+    conn = _get_conn()
+    row = conn.execute(
+        'SELECT * FROM user_watchlists WHERE id = ? AND user_id = ?',
+        (watchlist_id, user_id),
+    ).fetchone()
     return _row_to_dict(row) if row else None
 
 
@@ -164,7 +184,7 @@ def add_symbol(watchlist_id: int, symbol: str, user_id: str = 'default') -> dict
     sym = symbol.upper().strip()
     if not sym:
         raise ValueError('Symbol must not be empty')
-    with _db_lock:
+    with _db_write_lock:
         conn = _get_conn()
         row = conn.execute(
             'SELECT * FROM user_watchlists WHERE id = ? AND user_id = ?',
@@ -196,7 +216,7 @@ def add_symbol(watchlist_id: int, symbol: str, user_id: str = 'default') -> dict
 def remove_symbol(watchlist_id: int, symbol: str, user_id: str = 'default') -> dict:
     """Remove *symbol* from watchlist *watchlist_id*.  Returns updated watchlist."""
     sym = symbol.upper().strip()
-    with _db_lock:
+    with _db_write_lock:
         conn = _get_conn()
         row = conn.execute(
             'SELECT * FROM user_watchlists WHERE id = ? AND user_id = ?',
@@ -231,13 +251,15 @@ def get_symbols(watchlist_id: int, user_id: str = 'default') -> list[str]:
 def _maybe_unpin(symbol: str, user_id: str) -> None:
     """Unpin *symbol* if it doesn't appear in any watchlist for *user_id*."""
     sym = symbol.upper()
-    with _db_lock:
-        conn = _get_conn()
-        rows = conn.execute(
-            "SELECT symbols_json FROM user_watchlists WHERE user_id = ?",
-            (user_id,),
-        ).fetchall()
-    still_in_wl = any(sym in json.loads(r['symbols_json'] or '[]') for r in rows)
+    conn = _get_conn()
+    # Single query: count watchlists for this user that contain the symbol.
+    # Cheaper than loading all symbols_json rows and deserializing each one.
+    row = conn.execute(
+        "SELECT COUNT(*) AS cnt FROM user_watchlists"
+        " WHERE user_id = ? AND instr(symbols_json, ?) > 0",
+        (user_id, f'"{sym}"'),
+    ).fetchone()
+    still_in_wl = bool(row and row['cnt'])
     # Only unpin from explicit-pin watchlist if not in any watchlist
     if not still_in_wl:
         try:
@@ -277,12 +299,11 @@ def unpin_symbol(symbol: str, user_id: str = 'default') -> dict:
 
 def get_pinned_symbols(user_id: str = 'default') -> list[str]:
     """Return all symbols currently pinned by *user_id*."""
-    with _db_lock:
-        conn = _get_conn()
-        row = conn.execute(
-            "SELECT symbols_json FROM user_watchlists WHERE user_id = ? AND name = '__pinned__'",
-            (user_id,),
-        ).fetchone()
+    conn = _get_conn()
+    row = conn.execute(
+        "SELECT symbols_json FROM user_watchlists WHERE user_id = ? AND name = '__pinned__'",
+        (user_id,),
+    ).fetchone()
     if row is None:
         return []
     try:
@@ -292,14 +313,23 @@ def get_pinned_symbols(user_id: str = 'default') -> list[str]:
 
 
 def is_pinned(symbol: str, user_id: str = 'default') -> bool:
-    """Return True if *symbol* is pinned by *user_id*."""
+    """Return True if *symbol* is pinned by *user_id*.
+
+    Delegates to the in-memory set in tier_manager (O(1)) rather than
+    making a SQLite round-trip; falls back to the DB query if the import
+    fails (e.g., during tests that mock the module).
+    """
     sym = symbol.upper()
-    return sym in get_pinned_symbols(user_id)
+    try:
+        from app.services import tier_manager
+        return tier_manager.is_pinned(sym)
+    except Exception:  # noqa: BLE001
+        return sym in get_pinned_symbols(user_id)
 
 
 def _upsert_pinned_watchlist(symbol: str, user_id: str, add: bool) -> None:
     """Add or remove *symbol* from the internal __pinned__ watchlist row."""
-    with _db_lock:
+    with _db_write_lock:
         conn = _get_conn()
         row = conn.execute(
             "SELECT * FROM user_watchlists WHERE user_id = ? AND name = '__pinned__'",
@@ -338,16 +368,16 @@ def restore_pins_to_tier_manager() -> None:
     """Restore persisted pins into the tier_manager after startup."""
     try:
         from app.services import tier_manager
-        with _db_lock:
-            conn = _get_conn()
-            rows = conn.execute(
-                "SELECT symbols_json FROM user_watchlists WHERE name = '__pinned__'"
-            ).fetchall()
+        conn = _get_conn()
+        rows = conn.execute(
+            "SELECT symbols_json FROM user_watchlists WHERE name = '__pinned__'"
+        ).fetchall()
+        total = 0
         for row in rows:
             syms = json.loads(row['symbols_json'] or '[]')
+            total += len(syms)
             for sym in syms:
                 tier_manager.pin_symbol(sym)
-        log.info('watchlist_service: restored %d pinned symbols to tier_manager',
-                 sum(len(json.loads(r['symbols_json'] or '[]')) for r in rows))
+        log.info('watchlist_service: restored %d pinned symbols to tier_manager', total)
     except Exception:  # noqa: BLE001
         log.warning('watchlist_service: failed to restore pins', exc_info=True)
