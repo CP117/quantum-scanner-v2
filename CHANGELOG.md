@@ -2,7 +2,130 @@
 
 ---
 
-## Next Phase: `quantum_interference_certainty` rename and validation
+## Next Phase: Bucket 4 — composite weight refitting infrastructure
+
+This pass addresses the first item from the previous "still open" list:
+hand-picked M/Q/T/S composite weights that had never been fit to tracked
+outcomes.
+
+Three concrete gaps were closed:
+
+### 1. Fixed factor-score logging gap (`app/services/prediction_tracker_service.py`)
+
+`auto_log_scan_predictions` was inserting predictions with no record of
+the M/Q/T/S scores that produced them.  Without the scores there is nothing
+to regress against, so no weight fitting is possible regardless of how many
+predictions accumulate.
+
+- Scored rows from the warmer are now passed as full dicts (not stripped to
+  plain symbol strings — that was a pre-existing bug fixed here too).
+- `full_payload` now includes `factor_scores: {momentum, quality, trend,
+  stability, exit_risk}` and `algo_weights_at_log` for every auto_scan row.
+- `market` and `max_new` parameters added (the warmer was already passing
+  them but the old signature didn't accept them → silent kwarg errors).
+- Plain symbol strings are still accepted for backward compatibility:
+  they are resolved via the snapshot store before the score extraction step.
+
+### 2. Added missing `evaluate_expired_predictions` (`prediction_tracker_service.py`)
+
+The `/api/predictions/evaluate` route called `tracker.evaluate_expired_predictions`
+but the function did not exist — an AttributeError at runtime for every caller.
+
+The new implementation:
+- Pulls all `status='open'` rows whose `expires_at` has passed.
+- Looks up the current price from the snapshot/quote cache (no network calls).
+- Marks `status='correct'` if price moved in the predicted direction (bull →
+  price > anchor; bear → price < anchor), `status='incorrect'` otherwise.
+- Rows for which no cached price is available are left `open` and retried on
+  the next call.
+- `neutral` predictions (no directional signal to grade) are marked `expired`.
+
+This is intentionally minimal: the real signal is directional, not magnitude.
+
+### 3. Built weight optimizer (`app/services/weight_optimizer_service.py`)
+
+A new service that fits the blending weights
+
+    final_score = w_m·momentum + w_q·quality + w_t·trend + w_s·stability
+
+against the historical record of closed `auto_scan` predictions using
+walk-forward cross-validated logistic regression.
+
+**Math:**  We model `p(correct | x) = σ((x·w − T) / T)` where `x` is the
+four factor scores, `w` is on the probability simplex (wᵢ ≥ 0, Σwᵢ = 1),
+and `T = 50` brings the 0–100 score scale into a ±2 logit range.  Minimizing
+binary cross-entropy with projected gradient descent and simplex projection
+(O(n log n) algorithm) finds optimal weights without requiring any external
+ML library — pure numpy-free Python.
+
+**Walk-forward protocol:**  60 % burn-in, then slide one step at a time
+training only on strictly earlier rows and predicting the next.  Final
+accuracy is the fraction of held-out steps where the model called the
+correct label.
+
+**Conservative thresholds:**
+- Returns `recommendation='insufficient_data'` when fewer than 50 closed
+  predictions with factor scores are available.  (The warmer logs ≤10/day,
+  so this needs ~5 days of deployment before the first meaningful fit.)
+- Reports `recommendation='keep'` unless fitted weights beat the current
+  hand-picked weights by ≥ 2 pp.
+- Does NOT automatically write weights back; the comparison is logged and
+  returned so the operator can review before touching `scoring_service.py`.
+
+**Reality-breaker placeholder:**  `fit_reality_breaker_weights()` is defined
+but returns `None` because the four sub-factor z-scores (LCC, QPII, LLVE,
+TRS) are not yet stored in the prediction log.  Closing that logging gap is
+a future task.
+
+### 4. Wired optimizer to background warmer (`app/services/warmer_service.py`)
+
+The optimizer runs in a daemon thread every 500 warmer cycles (approximately
+daily at typical tick rates), storing the result in `warmer_status()` under
+`last_weight_optimizer` for operator inspection.  The daemon thread approach
+ensures the optimizer never blocks a warmer tick even if the DB is slow.
+
+### Verified test cases — all 24 pass (no network access required)
+
+| Test | What it checks |
+|---|---|
+| `test_extract_labelled_rows_correct/incorrect` | factor scores + binary label extraction |
+| `test_extract_labelled_rows_skips_all_zeros` | unfilled rows discarded |
+| `test_extract_labelled_rows_skips_open` | only closed rows used |
+| `test_extract_labelled_rows_skips_bad_payload` | JSON errors handled silently |
+| `test_project_simplex_*` (3 cases) | simplex projection correctness |
+| `test_walk_forward_fit_separable` | WF accuracy > 65 % on momentum-only signal |
+| `test_walk_forward_fit_output_is_simplex` | fitted weights sum to 1, all ≥ 0 |
+| `test_walk_forward_eval_current_weights` | current weights score in [0, 1] |
+| `test_walk_forward_eval_vs_fit_on_known_signal` | fitted not worse than current by > 5 pp |
+| `test_fit_mqts_insufficient_data` | N < 50 → `insufficient_data` |
+| `test_fit_mqts_sufficient_data_structure` | N ≥ 50 → correct keys, simplex, acc in [0,1] |
+| `test_evaluate_expired_bull_correct/incorrect` | directional grading |
+| `test_evaluate_expired_bear_correct` | bear direction |
+| `test_evaluate_expired_no_price_leaves_open` | no price → row stays open |
+| `test_auto_log_stores_factor_scores` | M/Q/T/S stored in full_payload |
+| `test_auto_log_accepts_symbol_strings` | plain strings don't crash |
+| `test_safe_rating_score_*` (3 cases) | score extraction helpers |
+
+---
+
+## What's still open after this pass
+
+- **Accumulate real outcome data**: the optimizer needs ≥50 closed `auto_scan`
+  predictions with factor scores.  This requires ~5 days of live scanner
+  operation after deploying this pass.  Run `GET /api/predictions/evaluate`
+  (or wait for the warmer's refit cycle) to score expired predictions, then
+  inspect `warmer_status().last_weight_optimizer` for the recommendation.
+- **Reality-breaker weight fitting**: the four sub-factor z-scores (LCC, QPII,
+  LLVE, TRS) that feed `compute_reality_breaker_multiplier` are not yet stored
+  in the prediction log.  Adding that logging gap is the next concrete task.
+- **Coverage of new consensus score** on the real universe (how often a symbol
+  gets a validated driver/GEX view vs. returning 0.0) — requires live data.
+- **Real historical backtests** of the reworked factors — requires accumulated
+  `auto_scan` outcome data.
+
+---
+
+## Previous Pass: `quantum_interference_certainty` rename and validation
 
 This pass closes the third item from the previous "still open" list.
 

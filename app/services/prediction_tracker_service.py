@@ -259,30 +259,42 @@ def get_all_predictions(symbol: str | None = None, limit: int = 1000) -> list[di
 
 
 def auto_log_scan_predictions(
-    rows: list[dict],
+    rows: 'list[dict] | list[str]',
     max_new_per_cycle: int = 10,
     forward_days: int = 10,
-) -> None:
+    market: str = 'stocks',
+    # alias used by the warmer loop (max_new=10)
+    max_new: int | None = None,
+) -> int:
     """Auto-log top-N symbols from a completed scanner batch.
 
     Called by the warmer loop on each cycle to log systematic predictions
     from the background scan. These are tagged source='auto_scan' so the
     UI can distinguish user-manual predictions from algorithmic ones.
 
-    `rows` should be the top-scoring symbols from the batch (usually the
-    scan result envelope['results']). We pick the top N that haven't been
-    logged today and insert them.
+    `rows` should be the scored scan result rows (dicts with
+    'symbol', 'final_score', 'final_direction', 'factor_breakdown').
+    The warmer may also pass a plain list of symbol strings — those are
+    looked up in the snapshot store to recover the full row.
+
+    Bucket 4 addition: the M/Q/T/S factor scores are extracted from
+    factor_breakdown.ratings and stored in full_payload so the weight
+    optimizer can later fit against them once predictions have closed.
+
+    Returns the number of new predictions logged.
     """
+    if max_new is not None:
+        max_new_per_cycle = max_new
     if not rows or max_new_per_cycle <= 0:
-        return
+        return 0
 
     # Quick check: don't bother if the DB hasn't been initialized yet.
     try:
         with _DB_LOCK:
             if not _DB_PATH.exists():
-                return
+                return 0
     except Exception:
-        return
+        return 0
 
     now = _utcnow()
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -298,10 +310,28 @@ def auto_log_scan_predictions(
             }
     except sqlite3.Error as exc:
         log.warning('prediction_tracker: auto_log fetch failed: %s', exc)
-        return
+        return 0
+
+    # Normalise rows: plain symbol strings → dicts via snapshot lookup.
+    norm_rows: list[dict] = []
+    for item in rows:
+        if isinstance(item, str):
+            sym_str = item.strip().upper()
+            if not sym_str:
+                continue
+            snap: dict | None = None
+            try:
+                from app.services.snapshot_store import lookup_snapshot_row
+                snap = lookup_snapshot_row(sym_str, market) or {}
+            except Exception:
+                snap = {}
+            snap.setdefault('symbol', sym_str)
+            norm_rows.append(snap)
+        elif isinstance(item, dict):
+            norm_rows.append(item)
 
     logged_count = 0
-    for row in rows:
+    for row in norm_rows:
         if logged_count >= max_new_per_cycle:
             break
         sym = (row.get('symbol') or '').upper()
@@ -323,7 +353,7 @@ def auto_log_scan_predictions(
             # Try symbol identity lookup as fallback.
             try:
                 from app.services.snapshot_store import lookup_snapshot_row
-                snap_row = lookup_snapshot_row(sym, 'stocks')
+                snap_row = lookup_snapshot_row(sym, market)
                 if snap_row:
                     snap_fb = (snap_row.get('factor_breakdown') or {}).get('market') or {}
                     anchor_price = float(snap_fb.get('last_price') or 0)
@@ -349,10 +379,23 @@ def auto_log_scan_predictions(
             # Neutral: tight range (2-3% move)
             target_price = anchor_price * (1.0 + 0.01 * (0.5 - normalized_score))
 
+        # Bucket 4: extract M/Q/T/S factor scores for weight-optimizer use.
+        # These are stored in full_payload so evaluate_expired_predictions
+        # can later pull them out and the weight optimizer can fit against them.
+        ratings = (row.get('factor_breakdown') or {}).get('ratings') or {}
+        factor_scores: dict[str, float | None] = {
+            'momentum': _safe_rating_score(ratings.get('momentum')),
+            'quality':  _safe_rating_score(ratings.get('quality')),
+            'trend':    _safe_rating_score(ratings.get('trend')),
+            'stability': _safe_rating_score(ratings.get('stability')),
+            'exit_risk': _safe_rating_score(ratings.get('exit_risk')),
+        }
+        algo_weights = (row.get('factor_breakdown') or {}).get('weights') or {}
+
         try:
             save_prediction({
                 'symbol': sym,
-                'market': 'stocks',
+                'market': market,
                 'anchor_price': anchor_price,
                 'target_price': target_price,
                 'direction': direction,
@@ -360,6 +403,12 @@ def auto_log_scan_predictions(
                 'confidence_pct': min(100.0, score),  # Use final_score as confidence
                 'notes': f'auto_scan: score={score:.1f}',
                 'source': 'auto_scan',
+                'full_payload': {
+                    'factor_scores': factor_scores,
+                    'algo_weights_at_log': algo_weights,
+                    'final_score': score,
+                    'direction': direction,
+                },
             })
             logged_count += 1
             logged_today.add(sym)
@@ -371,6 +420,120 @@ def auto_log_scan_predictions(
 
     if logged_count > 0:
         log.info('prediction_tracker: auto_log added %d new predictions', logged_count)
+    return logged_count
+
+
+def _safe_rating_score(rating: dict | None) -> float | None:
+    """Extract the numeric score from a ratings sub-dict, or None."""
+    if not rating or not isinstance(rating, dict):
+        return None
+    v = rating.get('score')
+    try:
+        return float(v) if v is not None else None
+    except (TypeError, ValueError):
+        return None
+
+
+def evaluate_expired_predictions() -> dict:
+    """Score any open predictions whose window has elapsed.
+
+    For each open row past its expires_at timestamp, look up the
+    current cached price for the symbol.  If the price moved in the
+    predicted direction (bull → price > anchor; bear → price < anchor)
+    mark status='correct', otherwise status='incorrect'.  Rows where no
+    price can be obtained are left 'open' for the next evaluation pass.
+
+    Intentionally minimal: the real signal is directional (did price go
+    up or down?), not magnitude.  We are not trying to grade target
+    levels — that would add false precision at this stage.
+
+    Returns {evaluated: N, correct: C, incorrect: I, still_open: S}.
+    """
+    now = _utcnow()
+    try:
+        with _DB_LOCK, _conn() as c:
+            open_rows = c.execute('''
+                SELECT id, symbol, market, anchor_price, direction, expires_at
+                FROM saved_predictions
+                WHERE status = 'open' AND expires_at <= ?
+            ''', (now.isoformat(),)).fetchall()
+    except sqlite3.Error as exc:
+        log.warning('prediction_tracker: evaluate_expired fetch failed: %s', exc)
+        return {'evaluated': 0, 'correct': 0, 'incorrect': 0, 'still_open': 0}
+
+    evaluated = correct = incorrect = still_open = 0
+    for row in open_rows:
+        pred_id   = row['id']
+        sym       = row['symbol']
+        mkt       = row['market']
+        anchor    = float(row['anchor_price'] or 0)
+        direction = (row['direction'] or '').lower()
+        if anchor <= 0:
+            # Malformed row — mark expired so it doesn't linger.
+            _update_prediction_status(pred_id, 'expired')
+            evaluated += 1
+            continue
+
+        current_px = _lookup_current_price(sym, mkt)
+        if current_px is None:
+            still_open += 1
+            continue
+
+        if direction == 'bull':
+            outcome = 'correct' if current_px > anchor else 'incorrect'
+        elif direction == 'bear':
+            outcome = 'correct' if current_px < anchor else 'incorrect'
+        else:
+            # Neutral: always counts as 'expired' — no directional signal to grade.
+            outcome = 'expired'
+
+        _update_prediction_status(pred_id, outcome)
+        evaluated += 1
+        if outcome == 'correct':
+            correct += 1
+        elif outcome == 'incorrect':
+            incorrect += 1
+
+    log.info(
+        'prediction_tracker: evaluate_expired: %d evaluated (%d correct, %d incorrect), %d still open',
+        evaluated, correct, incorrect, still_open,
+    )
+    return {'evaluated': evaluated, 'correct': correct, 'incorrect': incorrect, 'still_open': still_open}
+
+
+def _update_prediction_status(pred_id: str, status: str) -> None:
+    now_iso = _utcnow().isoformat()
+    try:
+        with _DB_LOCK, _conn() as c:
+            c.execute(
+                "UPDATE saved_predictions SET status=?, evaluated_at=? WHERE id=?",
+                (status, now_iso, pred_id),
+            )
+            c.commit()
+    except sqlite3.Error as exc:
+        log.warning('prediction_tracker: status update failed for %s: %s', pred_id, exc)
+
+
+def _lookup_current_price(symbol: str, market: str) -> float | None:
+    """Best-effort price lookup from snapshot cache — no network calls."""
+    try:
+        from app.services.snapshot_store import lookup_snapshot_row
+        snap = lookup_snapshot_row(symbol, market)
+        if snap:
+            fb = (snap.get('factor_breakdown') or {}).get('market') or {}
+            px = fb.get('last_price')
+            if px:
+                return float(px)
+    except Exception:
+        pass
+    try:
+        from app.services.quote_cache import get_cached_quote
+        q = get_cached_quote(symbol)
+        if q and q.get('price'):
+            return float(q['price'])
+    except Exception:
+        pass
+    return None
 
 
 def accuracy_stats(source: str | None = None) -> dict:
