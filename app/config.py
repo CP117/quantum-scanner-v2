@@ -83,5 +83,18 @@ class Settings(BaseModel):
     tier_error_window_seconds: float = float(os.getenv("TIER_ERROR_WINDOW_SECONDS", "600.0"))
     tier_watchdog_stall_seconds: float = float(os.getenv("TIER_WATCHDOG_STALL_SECONDS", "300.0"))
 
+    # ---------------------------------------------------------------------------
+    # Phase A — Externalized Tier State (Redis)
+    # ---------------------------------------------------------------------------
+    # Set USE_REDIS_STATE=1 to route tier/score reads-writes through Redis.
+    # Default is 0 (in-memory only) to preserve single-process behaviour.
+    use_redis_state: bool = _env_bool("USE_REDIS_STATE", False)
+    redis_host: str = os.getenv("REDIS_HOST", "localhost")
+    redis_port: int = int(os.getenv("REDIS_PORT", "6379"))
+    redis_db: int = int(os.getenv("REDIS_DB", "0"))
+    redis_password: str = os.getenv("REDIS_PASSWORD", "")
+    # Namespace prefix for all tier-manager Redis keys.
+    redis_tier_prefix: str = os.getenv("REDIS_TIER_PREFIX", "qs:tier")
+
 
 settings = Settings()

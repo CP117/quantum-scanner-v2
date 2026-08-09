@@ -30,6 +30,7 @@ import os
 import threading
 import time
 from collections import defaultdict
+from app.services.tier_state_store import get_store
 from pathlib import Path
 from typing import Dict, Optional, Set
 
@@ -81,10 +82,44 @@ def _state_file_path() -> Path:
 
 
 def _load_state() -> None:
-    """Load persisted tier assignments from disk on startup (best-effort)."""
+    """Load persisted tier assignments from the active state store on startup (best-effort).
+
+    When USE_REDIS_STATE=1:
+      - If Redis is empty and tier_state.json exists, seed Redis from the file.
+      - Then load from Redis into local dicts.
+    When USE_REDIS_STATE=0:
+      - Load from tier_state.json into local dicts (backward-compatible).
+    """
+    global _tier_assignments, _last_promoted_at, _composite_scores, _pinned_symbols
+    store = get_store()
+    fp = _state_file_path()
+    from app.services.tier_state_store import RedisStateStore
+    if isinstance(store, RedisStateStore):
+        try:
+            store.bootstrap_from_file(fp)
+            loaded_tiers = store.all_tiers()
+            loaded_scores = store.all_scores()
+            _tier_assignments = loaded_tiers
+            _composite_scores = loaded_scores
+            # Bulk-load into InMemoryStateStore mirror so all_tiers() is consistent.
+            _tier_members.update({TIER_1: set(), TIER_2: set(), TIER_3: set()})
+            for _sym, _tier in _tier_assignments.items():
+                _tier_members[_tier].add(_sym)
+            log.info(
+                'tier_manager: loaded state for %d symbols from Redis',
+                len(_tier_assignments),
+            )
+        except Exception:  # noqa: BLE001
+            log.warning('tier_manager: Redis load failed — falling back to disk', exc_info=True)
+            _load_state_from_file(fp)
+    else:
+        _load_state_from_file(fp)
+
+
+def _load_state_from_file(fp) -> None:
+    """Helper: load tier state from disk into local dicts."""
     global _tier_assignments, _last_promoted_at, _composite_scores, _pinned_symbols
     try:
-        fp = _state_file_path()
         if not fp.exists():
             return
         data = json.loads(fp.read_text(encoding='utf-8'))
@@ -97,12 +132,16 @@ def _load_state() -> None:
         for _sym, _tier in _tier_assignments.items():
             _tier_members[_tier].add(_sym)
         log.info('tier_manager: loaded state for %d symbols from %s', len(_tier_assignments), fp)
+        # Mirror into the in-memory store so store reads are consistent.
+        store = get_store()
+        if _tier_assignments or _composite_scores:
+            store.bulk_load(_tier_assignments, _composite_scores)
     except Exception:  # noqa: BLE001
         log.warning('tier_manager: failed to load state from disk (fresh start)', exc_info=True)
 
 
 def _save_state() -> None:
-    """Persist current state to disk (best-effort, called from flush thread)."""
+    """Persist current state to disk and (when enabled) to the state store."""
     try:
         fp = _state_file_path()
         fp.parent.mkdir(parents=True, exist_ok=True)
@@ -115,6 +154,12 @@ def _save_state() -> None:
                 'saved_at': time.time(),
             }
         fp.write_text(json.dumps(data, separators=(',', ':')), encoding='utf-8')
+        # Sync to the external store (no-op for InMemoryStateStore).
+        try:
+            store = get_store()
+            store.bulk_load(data['assignments'], data['scores'])
+        except Exception:  # noqa: BLE001
+            log.debug('tier_manager: store sync failed during flush', exc_info=True)
     except Exception:  # noqa: BLE001
         log.debug('tier_manager: flush to disk failed', exc_info=True)
 
@@ -134,9 +179,15 @@ def get_tier(symbol: str) -> int:
     """Return the current tier (1, 2, or 3) for *symbol*.
 
     Defaults to Tier 3 if the symbol has never been assigned.
+    When USE_REDIS_STATE=1 the store provides a 100 ms TTL read-through
+    cache so this stays fast inside hot per-symbol loops.
     """
-    with _state_lock:
-        return _tier_assignments.get(symbol.upper(), TIER_3)
+    sym = symbol.upper()
+    result = get_store().get_tier(sym)
+    if result is not None:
+        return result
+    # Unknown symbol — default to Tier 3 (mirrors legacy behaviour).
+    return TIER_3
 
 
 def get_tier_symbols(tier: int) -> list[str]:
@@ -147,16 +198,23 @@ def get_tier_symbols(tier: int) -> list[str]:
 
 def get_all_tiers() -> Dict[str, int]:
     """Return a snapshot of all tier assignments (symbol → tier)."""
-    with _state_lock:
-        return dict(_tier_assignments)
+    store = get_store()
+    from app.services.tier_state_store import InMemoryStateStore
+    if isinstance(store, InMemoryStateStore):
+        # Fast path: read directly from local dict under lock.
+        with _state_lock:
+            return dict(_tier_assignments)
+    return store.all_tiers()
 
 
 def update_composite_score(symbol: str, score: float) -> None:
     """Record the latest composite score for a symbol and timestamp its scoring."""
     sym = symbol.upper()
+    _score = float(score)
     with _state_lock:
-        _composite_scores[sym] = float(score)
+        _composite_scores[sym] = _score
         _last_scored_at[sym] = time.monotonic()
+    get_store().set_score(sym, _score)
 
 
 # ---------------------------------------------------------------------------
@@ -195,6 +253,7 @@ def promote(symbol: str, reason: str = 'score') -> bool:
         _tier_members[current].discard(sym)
         _tier_members[new_tier].add(sym)
         _last_promoted_at[sym] = time.monotonic()
+    get_store().set_tier(sym, new_tier)
     log.info('tier_manager: %s promoted T%d → T%d (%s)', sym, current, new_tier, reason)
     return True
 
@@ -225,6 +284,7 @@ def demote(symbol: str, reason: str = 'score') -> bool:
         _tier_assignments[sym] = new_tier
         _tier_members[current].discard(sym)
         _tier_members[new_tier].add(sym)
+    get_store().set_tier(sym, new_tier)
     log.info('tier_manager: %s demoted T%d → T%d (%s)', sym, current, new_tier, reason)
     return True
 
@@ -313,6 +373,7 @@ def rebalance(market: str = 'stocks') -> dict:
                     _last_promoted_at[sym] = time.monotonic()
                     promoted += 1
                     log.debug('rebalance: promote %s T%d→T%d', sym, current, target)
+                    get_store().set_tier(sym, target)
             else:  # demote
                 # Protect pinned + user-interacted.
                 if sym in pinned_snapshot:
@@ -325,6 +386,7 @@ def rebalance(market: str = 'stocks') -> dict:
                 _tier_assignments[sym] = target
                 demoted += 1
                 log.debug('rebalance: demote %s T%d→T%d', sym, current, target)
+                get_store().set_tier(sym, target)
 
     log.info(
         'tier_manager: rebalance market=%s promoted=%d demoted=%d unchanged=%d',
@@ -381,6 +443,7 @@ def pin_symbol(symbol: str) -> None:
             _tier_members[TIER_2].add(sym)
             _tier_assignments[sym] = TIER_2
             _last_promoted_at[sym] = time.monotonic()
+        get_store().set_tier(sym, TIER_2)
         log.info('tier_manager: %s pinned and promoted T3→T2', sym)
 
 
@@ -432,6 +495,7 @@ def seed_universe(market: str = 'stocks') -> int:
                 _tier_assignments[sym] = TIER_3
                 _tier_members[TIER_3].add(sym)
                 new_count += 1
+                get_store().set_tier(sym, TIER_3)
     log.info('tier_manager: seeded %d new symbols → Tier 3 (market=%s)', new_count, market)
     return new_count
 
