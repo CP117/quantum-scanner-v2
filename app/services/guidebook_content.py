@@ -193,9 +193,9 @@ TIPS_AND_TRICKS = [
     "the tails are doing real work — trust the CF call and shrink your size if you're "
     "going against it.",
     "If the regime label says 'mean-reverting' but the Hurst exponent is above 0.55, "
-    "you have conflicting evidence.  Drop a half size or wait one tick.  Tier alignment "
-    "(`lab_qi_certainty`) above 0.30 means the fast and GARCH tiers agree — high "
-    "conviction signal.",
+    "you have conflicting evidence.  Drop a half size or wait one tick.  Model agreement "
+    "(`lab_qi_certainty`) above 0.30 means the fast and GARCH probability estimates "
+    "point the same direction — a higher-conviction signal.",
     "Vol HMM saying 'stressed regime' with `p_stay_stressed` above 0.6 means the storm "
     "isn't passing soon.  Pair-trades and theta strategies tend to work in that regime; "
     "directional momentum strategies suffer.",

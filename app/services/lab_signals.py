@@ -380,24 +380,38 @@ def approximate_entropy(returns: np.ndarray, m: int = _APEN_M,
 
 
 # ---------------------------------------------------------------------------
-# 7) Quantum-inspired interference rank
+# 7) Directional agreement certainty
 # ---------------------------------------------------------------------------
 
-def quantum_interference_certainty(p_up_fast: float, p_up_garch: float | None) -> float:
-    """Phase-aware blend of two p_up amplitudes.
+def model_agreement_certainty(p_up_fast: float, p_up_garch: float | None) -> float:
+    """Measure how strongly two probability-of-up estimates agree.
 
-    Model:
-        Each tier contributes an amplitude  A = √(2·|p_up - 0.5|).
-        Sign of (p_up - 0.5) acts as the phase (+1 = bullish, −1 = bearish).
-        Combined amplitude = (A_fast · sign_fast + A_garch · sign_garch) / √2
-        Combined certainty = |amplitude|², clipped to [0, 1].
+    Each estimate is decomposed into a conviction magnitude and a
+    direction:
+        magnitude  M = √(2·|p_up − 0.5|)          ∈ [0, 1]
+        direction  d = sign(p_up − 0.5)            ∈ {−1, 0, +1}
 
-    When both tiers agree directionally the amplitudes add
-    constructively → boosted certainty.  When they disagree they
-    cancel destructively → lower certainty than either tier alone.
+    The signed magnitudes are vector-summed and the result is squared
+    to produce the output:
+        certainty = ((d_fast·M_fast + d_garch·M_garch) / √2)²,
+                    clipped to [0, 1].
 
-    If only the fast tier is available (no GARCH overlay) we
-    degenerate to the fast-tier certainty.
+    Agreement behaviour:
+      - Both strongly bullish (e.g. 0.8 / 0.75): output ≈ 1.0
+        (magnitudes add, product exceeds 1 → clipped).
+      - Both bearish by the same amount as the bullish case: same output.
+      - Equal and opposite conviction (e.g. 0.75 / 0.25): output = 0.0
+        (magnitudes cancel exactly).
+      - Partial disagreement: output is between 0 and the weaker model's
+        single-model certainty.
+
+    Single-model fallback (p_up_garch is None):
+        certainty = M_fast² = 2·|p_up_fast − 0.5|,
+        which is 0 at 50 % and 1 at 0 % or 100 % confidence.
+
+    Field key `lab_qi_certainty` is kept for backward compatibility;
+    the UI label was updated to "Model Agreement" in this pass.
+    See validate_model_agreement_certainty() for measured test-case values.
     """
     p_fast = max(0.0, min(1.0, float(p_up_fast)))
     a_fast = math.sqrt(max(0.0, 2.0 * abs(p_fast - 0.5)))
@@ -409,6 +423,69 @@ def quantum_interference_certainty(p_up_fast: float, p_up_garch: float | None) -
     sign_g = 1.0 if p_g > 0.5 else (-1.0 if p_g < 0.5 else 0.0)
     combined = (a_fast * sign_fast + a_g * sign_g) / math.sqrt(2.0)
     return float(max(0.0, min(1.0, combined * combined)))
+
+
+# Backward-compatible alias — old name kept so any external callers
+# (notebooks, scripts) don't break; not re-exported from __init__.
+quantum_interference_certainty = model_agreement_certainty
+
+
+def validate_model_agreement_certainty() -> dict:
+    """Verify key properties of model_agreement_certainty with
+    deterministic synthetic inputs.
+
+    All expected values are derived analytically from the formula and
+    were confirmed by running this function. No network or market data
+    required.
+
+    Returns a dict with one entry per case: {'pass': bool, 'got': float,
+    'expected': float}.  An 'all_pass' key summarises the suite.
+
+    Measured values (all confirmed):
+      both_agree_bullish        → 1.000 (clipped from 1.097)
+      both_agree_bearish        → 1.000 (clipped from 1.097)
+      perfect_cancel            → 0.000
+      partial_disagree          → 0.017 (≈ (0.1853/√2)²)
+      single_model_fallback     → 0.600  (= 2·|0.8−0.5|)
+      at_50pct_certainty_zero   → 0.000
+    """
+    results: dict = {}
+
+    def _check(name: str, p_fast: float, p_garch: float | None,
+                expected: float, tol: float = 1e-9) -> None:
+        got = model_agreement_certainty(p_fast, p_garch)
+        results[name] = {'pass': abs(got - expected) <= tol, 'got': round(got, 6),
+                         'expected': round(expected, 6)}
+
+    # Both strongly bullish — magnitudes add, product clips to 1.
+    # a_fast = √(2·0.30) ≈ 0.7746, a_g = √(2·0.25) ≈ 0.7071
+    # combined = (0.7746 + 0.7071)/√2 ≈ 1.0477  →  squared ≈ 1.097  →  clipped 1.0
+    _check('both_agree_bullish',  0.80, 0.75, 1.0)
+
+    # Symmetric bearish case — same magnitudes, same direction → same output.
+    _check('both_agree_bearish',  0.20, 0.25, 1.0)
+
+    # Perfect equal-and-opposite conviction — magnitudes cancel exactly.
+    # a_fast = a_g = √0.5 ≈ 0.7071; (0.7071 − 0.7071)/√2 = 0
+    _check('perfect_cancel',      0.75, 0.25, 0.0)
+
+    # Partial disagreement: fast bullish 0.7, garch bearish 0.4.
+    # a_fast = √(2·0.20) ≈ 0.6325, a_g = √(2·0.10) ≈ 0.4472
+    # combined = (0.6325 − 0.4472)/√2 ≈ 0.1310  →  squared ≈ 0.01717
+    import math as _m
+    a_f = _m.sqrt(2.0 * 0.20)
+    a_g = _m.sqrt(2.0 * 0.10)
+    expected_partial = ((a_f - a_g) / _m.sqrt(2.0)) ** 2
+    _check('partial_disagree',    0.70, 0.40, round(expected_partial, 9), tol=1e-9)
+
+    # Single-model fallback: certainty = 2·|p−0.5| = 2·0.30 = 0.60.
+    _check('single_model_fallback', 0.80, None, 0.60, tol=1e-9)
+
+    # At 50 % confidence there is no signal — output must be 0.
+    _check('at_50pct_certainty_zero', 0.50, 0.50, 0.0)
+
+    results['all_pass'] = all(v['pass'] for v in results.values() if isinstance(v, dict))
+    return results
 
 
 # ---------------------------------------------------------------------------
@@ -685,7 +762,7 @@ def enrich_horizon_block_lab(
     matter.
 
     Fields added:
-        lab_qi_certainty        Quantum-interference fused certainty [0,1]
+        lab_qi_certainty        Directional agreement certainty [0,1]
         lab_rsv_upside_share    Realized semi-var upside share [0,1]
         lab_perm_entropy        Permutation entropy [0,1]
         lab_apen                Approximate entropy
@@ -703,7 +780,7 @@ def enrich_horizon_block_lab(
     if other_tier_block:
         p_up_other = float(other_tier_block.get('p_up_cf') or other_tier_block.get('p_up') or 0.5)
 
-    qi = quantum_interference_certainty(p_up_fast, p_up_other)
+    qi = model_agreement_certainty(p_up_fast, p_up_other)
 
     # Composite lab multiplier — blends signals into a single
     # [0.6, 1.4]-scaled multiplier.  Stocks with predictable patterns
