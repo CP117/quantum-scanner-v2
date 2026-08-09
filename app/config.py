@@ -96,5 +96,14 @@ class Settings(BaseModel):
     # Namespace prefix for all tier-manager Redis keys.
     redis_tier_prefix: str = os.getenv("REDIS_TIER_PREFIX", "qs:tier")
 
+    # ---------------------------------------------------------------------------
+    # Phase B — Externalized Snapshot Store (Redis)
+    # ---------------------------------------------------------------------------
+    # Set USE_REDIS_SNAPSHOT=1 to route snapshot reads/writes through Redis.
+    # Default is 0 (in-memory only) to preserve single-process behaviour.
+    use_redis_snapshot: bool = _env_bool("USE_REDIS_SNAPSHOT", False)
+    # Namespace prefix for all snapshot Redis keys.
+    redis_snapshot_prefix: str = os.getenv("REDIS_SNAPSHOT_PREFIX", "qs:snap")
+
 
 settings = Settings()

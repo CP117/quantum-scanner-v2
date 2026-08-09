@@ -29,3 +29,4 @@ reportlab==4.5.1
 
 # --- Tests (optional but kept so `pytest` works out of the box) ---
 pytest==8.4.2
+fakeredis==2.30.1
