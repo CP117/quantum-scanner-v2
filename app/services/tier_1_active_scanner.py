@@ -114,6 +114,15 @@ def _run_tick(
 
     # Get current Tier 1 symbol list from tier_manager.
     tier1_syms = tier_manager.get_tier_symbols(TIER_1)
+    # Promotions enqueue a refresh intent before this scanner sees its next
+    # interval.  The Tier 1 list remains authoritative, while the FIFO drain
+    # makes an intent observable and protects against a transition race.
+    try:
+        from app.services.tier_cache_policy import take_tier1_refresh_requests
+        requested = take_tier1_refresh_requests(limit=len(tier1_syms) or 100)
+        tier1_syms = list(dict.fromkeys([*requested, *tier1_syms]))
+    except Exception:
+        pass
     if not tier1_syms:
         # Fallback: use the current snapshot top-100 if tier_manager hasn't
         # assigned anything yet.
@@ -130,7 +139,15 @@ def _run_tick(
         seed_rows.append(dict(seed))
 
     # Full-depth scoring with force_full_pass2=True.
-    scored = score_symbol_rows(seed_rows, force_full_pass2=True)
+    from app.config import settings
+    from app.services.provider_session import provider_priority
+    with provider_priority(TIER_1):
+        scored = score_symbol_rows(
+            seed_rows,
+            force_full_pass2=True,
+            tier1_options_refresh=True,
+            max_quote_age_seconds=settings.tier_1_quote_max_age_seconds,
+        )
     if scored:
         # Tag rows as Tier 1 and update composite scores in tier_manager.
         for row in scored:

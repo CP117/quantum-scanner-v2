@@ -1,3 +1,17 @@
+"""Preset parsing and precompiled scanner filters.
+
+Preset definitions are declarative data.  They are validated and turned into
+cached filter pipelines without evaluating strings as Python expressions.
+"""
+from __future__ import annotations
+
+import copy
+import threading
+from collections import OrderedDict
+from collections.abc import Callable
+
+from app.config import settings
+from app.services.memory_store import stable_fingerprint
 
 SCANNER_PRESETS = {
     "all": {"label": "All ranked", "directions": [], "tiers": [], "exclude_preview": False, "min_score": 0},
@@ -81,12 +95,80 @@ SCANNER_PRESETS = {
     },
 }
 
+_PRESET_COMPILER_VERSION = 'v1'
+_preset_cache_lock = threading.Lock()
+_parsed_presets: dict[str, tuple[str, dict]] = {}
+_compiled_filters: OrderedDict[str, Callable[[list[dict]], list[dict]]] = OrderedDict()
+
+
+def _is_declarative(value: object) -> bool:
+    """Accept only JSON-like preset data; executable values are never valid."""
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return True
+    if isinstance(value, list):
+        return all(_is_declarative(item) for item in value)
+    if isinstance(value, dict):
+        return all(isinstance(key, str) and _is_declarative(item) for key, item in value.items())
+    return False
+
+
+def _parse_preset(preset: str | None) -> tuple[str, dict]:
+    """Return a copy of a validated declarative preset, cached by its content."""
+    requested = preset or 'all'
+    name_candidate = requested.strip()
+    name = name_candidate if name_candidate in SCANNER_PRESETS else 'all'
+    definition = SCANNER_PRESETS[name]
+    if not isinstance(definition, dict) or not _is_declarative(definition):
+        raise ValueError(f'invalid scanner preset definition: {name}')
+    fingerprint = stable_fingerprint({
+        'compiler': _PRESET_COMPILER_VERSION, 'preset': name, 'definition': definition,
+    })
+    with _preset_cache_lock:
+        cached = _parsed_presets.get(name)
+        if cached and cached[0] == fingerprint:
+            return requested, copy.deepcopy(cached[1])
+        parsed = copy.deepcopy(definition)
+        _parsed_presets[name] = (fingerprint, parsed)
+        return requested, copy.deepcopy(parsed)
+
+
+def _compile_filter_pipeline(filters: dict) -> Callable[[list[dict]], list[dict]]:
+    """Compile a stable filter configuration once and retain a bounded pipeline."""
+    if not isinstance(filters, dict) or not _is_declarative(filters):
+        raise ValueError('scanner filters must be declarative JSON-like values')
+    frozen_filters = copy.deepcopy(filters)
+    fingerprint = stable_fingerprint({
+        'compiler': _PRESET_COMPILER_VERSION, 'filters': frozen_filters,
+    })
+    with _preset_cache_lock:
+        cached = _compiled_filters.get(fingerprint)
+        if cached is not None:
+            _compiled_filters.move_to_end(fingerprint)
+            return cached
+
+        # Deliberately close over validated data rather than interpreting any
+        # field as code. `_apply_filters_uncached` is the existing explicit
+        # predicate implementation, preserving every established filter rule.
+        pipeline = lambda rows: _apply_filters_uncached(rows, frozen_filters)
+        _compiled_filters[fingerprint] = pipeline
+        max_entries = max(1, settings.scanner_preset_cache_max_entries)
+        while len(_compiled_filters) > max_entries:
+            _compiled_filters.popitem(last=False)
+        return pipeline
+
+
+def clear_compiled_presets() -> None:
+    """Clear parsed definitions and pipelines after an explicit admin refresh."""
+    with _preset_cache_lock:
+        _parsed_presets.clear()
+        _compiled_filters.clear()
+
 
 def resolve_filters(preset: str | None, direction: str | None = None,
                     tier: str | None = None, min_score: float | None = None,
                     market: str | None = None) -> dict:
-    base = dict(SCANNER_PRESETS.get((preset or 'all').strip(), SCANNER_PRESETS['all']))
-    base['preset'] = preset or 'all'
+    requested, base = _parse_preset(preset)
+    base['preset'] = requested
     # Phase 26.70: apply market-specific overrides.  `crypto_overrides`
     # is a dict of {filter_key: value | None} where None DELETES the key
     # from the resolved filter (used to drop stock-only gates like
@@ -254,7 +336,7 @@ def sort_rows(rows: list[dict], sort_by: str | None = None, descending: bool = T
     return sorted(rows, key=lambda r: row_factor_metric(r, key), reverse=descending)
 
 
-def apply_filters(rows: list[dict], filters: dict) -> list[dict]:
+def _apply_filters_uncached(rows: list[dict], filters: dict) -> list[dict]:
     # Phase 26.70: if the preset was disabled for this market
     # (e.g. `expiration-pin` on crypto → no options market), short-
     # circuit to an empty result instead of returning noise.
@@ -389,3 +471,8 @@ def apply_filters(rows: list[dict], filters: dict) -> list[dict]:
             continue
         out.append(row)
     return out
+
+
+def apply_filters(rows: list[dict], filters: dict) -> list[dict]:
+    """Apply a previously validated, content-fingerprinted filter pipeline."""
+    return _compile_filter_pipeline(filters)(rows)

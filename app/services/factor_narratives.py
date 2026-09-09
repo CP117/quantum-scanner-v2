@@ -20,7 +20,19 @@ Design rules:
 """
 from __future__ import annotations
 
+import math
 from typing import Any
+
+
+_NARRATIVE_TEMPLATE_VERSION = "factor-narratives-v1"
+_NARRATIVE_TEMPLATE_CONFIG = {
+    "families": (
+        "trend_volume_delta", "institutional_confluence", "options_positioning",
+        "institutional_order_block", "dark_pool_proxy", "volume_sentiment",
+        "reaction_clustering",
+    ),
+    "max_characters": 220,
+}
 
 
 def _num(value: Any, default: float = 0.0) -> float:
@@ -344,12 +356,63 @@ _GENERATORS = [
 ]
 
 
+def _complete_narrative_inputs(families: object) -> bool:
+    """Reject warming, malformed, and non-finite factor payloads from cache."""
+    if not isinstance(families, dict):
+        return False
+    incomplete_statuses = {
+        "insufficient_history", "unavailable", "symbol_unavailable",
+        "no_expirations", "options_unavailable",
+    }
+    complete_statuses = {"implemented", "implemented_from_icm", "inferred"}
+    for key, _ in _GENERATORS:
+        family = families.get(key)
+        if not isinstance(family, dict):
+            return False
+        status = str(family.get("status") or "").lower()
+        if status in incomplete_statuses or status not in complete_statuses:
+            return False
+        score = family.get("directional_score") if key == "volume_sentiment" else family.get("score")
+        try:
+            if not math.isfinite(float(score)) or not 0.0 <= float(score) <= 100.0:
+                return False
+        except (TypeError, ValueError):
+            return False
+    return True
+
+
+def _valid_narrative_payload(payload: object) -> bool:
+    if not isinstance(payload, dict) or set(payload) != {key for key, _ in _GENERATORS}:
+        return False
+    return all(
+        isinstance(narrative, dict)
+        and all(isinstance(narrative.get(field), str) for field in ("cell_text", "detail_text", "prediction"))
+        for narrative in payload.values()
+    )
+
+
 def build_factor_narratives(families: dict) -> dict:
     """Given the full {family_key: family_payload} dict, return a parallel
     dict of {family_key: {cell_text, detail_text, prediction}}.
 
     Output is safe to serialise as JSON and never raises.
     """
+    cacheable = _complete_narrative_inputs(families)
+    cache_dimensions = None
+    fingerprint = None
+    if cacheable:
+        from app.services.memory_store import memory_store, stable_fingerprint
+
+        cache_dimensions = {"template_version": _NARRATIVE_TEMPLATE_VERSION}
+        fingerprint = stable_fingerprint({
+            "families": families,
+            "template_version": _NARRATIVE_TEMPLATE_VERSION,
+            "template_config": _NARRATIVE_TEMPLATE_CONFIG,
+        })
+        cached = memory_store.get("narratives", cache_dimensions, fingerprint=fingerprint)
+        if _valid_narrative_payload(cached):
+            return cached
+
     out: dict[str, dict[str, str]] = {}
     if not isinstance(families, dict):
         return out
@@ -363,4 +426,18 @@ def build_factor_narratives(families: dict) -> dict:
                 "detail_text": "Internal error generating the narrative for this factor family.",
                 "prediction": "N/A",
             }
+    if cacheable and cache_dimensions is not None and fingerprint is not None and _valid_narrative_payload(out):
+        from app.config import settings
+        from app.services.memory_store import memory_store, stable_fingerprint
+
+        memory_store.set(
+            "narratives", cache_dimensions, out,
+            ttl_seconds=settings.narrative_cache_ttl_seconds,
+            fingerprint=fingerprint,
+            provenance={
+                "template_version": _NARRATIVE_TEMPLATE_VERSION,
+                "template_config_fingerprint": stable_fingerprint(_NARRATIVE_TEMPLATE_CONFIG),
+                "input_validation": "complete",
+            },
+        )
     return out

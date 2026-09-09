@@ -1,6 +1,9 @@
 
 import json
+import logging
 from pathlib import Path
+from app.config import settings
+from app.services.memory_store import memory_store
 from app.services.crypto_provider_service import fetch_coingecko_catalog, refresh_coingecko_catalog_in_background
 
 DATAFILE = Path(__file__).resolve().parent.parent.parent / 'data' / 'cached_universe.json'
@@ -18,6 +21,25 @@ LEVERAGED_DATAFILE = Path(__file__).resolve().parent.parent.parent / 'data' / 'l
 _universe_cache = None
 _crypto_universe_cache = None
 _variant_cache: dict | None = None
+
+
+def _universe_metadata_dimensions(market: str) -> dict:
+    """Stable identity for a fully materialized active-universe definition."""
+    normalized_market = 'crypto' if market == 'crypto' else 'stocks'
+    return {
+        'source': 'active_universe',
+        'universe_definition': f'grouped-v{ACTIVE_SCHEMA_VERSION}',
+        'market': normalized_market,
+    }
+
+
+def _universe_source_timestamp(market: str) -> float | None:
+    """Best-effort source provenance without making metadata loading fragile."""
+    source = CRYPTO_DATAFILE if market == 'crypto' else DATAFILE
+    try:
+        return source.stat().st_mtime
+    except OSError:
+        return None
 
 
 def _load_variant_config() -> dict:
@@ -138,9 +160,23 @@ def load_universe(market: str = 'stocks'):
     section near the bottom of this module for the group catalog, the
     active-set persistence, and the build functions.
     """
-    if market == 'crypto':
-        return build_active_crypto_universe()
-    return build_active_stock_universe()
+    normalized_market = 'crypto' if market == 'crypto' else 'stocks'
+    builder = build_active_crypto_universe if normalized_market == 'crypto' else build_active_stock_universe
+    source_timestamp = _universe_source_timestamp(normalized_market)
+    # Tier scanners and startup routes can request the same static universe at
+    # once.  MemoryStore's per-key single-flight prevents duplicate catalog
+    # merges while leaving all disk/provider work outside its lock.
+    return memory_store.get_or_compute(
+        'universe_metadata',
+        _universe_metadata_dimensions(normalized_market),
+        builder,
+        ttl_seconds=settings.universe_metadata_ttl_seconds,
+        source_timestamp=source_timestamp,
+        provenance={
+            'source_timestamp': source_timestamp,
+            'source': 'active_universe',
+        },
+    )
 
 
 def bust_universe_cache() -> None:
@@ -149,6 +185,7 @@ def bust_universe_cache() -> None:
     _universe_cache = None
     _full_stock_catalog_cache = None
     _stock_group_cache = None
+    memory_store.invalidate_domain('universe_metadata')
 
 
 def bust_crypto_universe_cache() -> None:
@@ -162,6 +199,7 @@ def bust_crypto_universe_cache() -> None:
     _crypto_universe_cache = None
     _crypto_catalog_cache = None
     _crypto_group_cache = None
+    memory_store.invalidate_domain('universe_metadata')
 
 def get_universe(market: str = 'stocks'):
     return load_universe(market)
@@ -690,6 +728,11 @@ def is_crypto_active() -> bool:
 
 def set_group_active(market: str, key: str, active: bool) -> dict:
     market = 'crypto' if market == 'crypto' else 'stocks'
+    builder = build_active_crypto_universe if market == 'crypto' else build_active_stock_universe
+    previous_symbols = {
+        (row.get('symbol') or '').upper() for row in builder()
+        if row.get('symbol')
+    }
     st = _load_active_state()
     cur = set(get_active_keys(market))
     valid = {g['key'] for g in (_stock_groups() if market == 'stocks' else _crypto_groups())}
@@ -702,8 +745,26 @@ def set_group_active(market: str, key: str, active: bool) -> dict:
         cur.discard(key)
     st[market] = cur
     _save_active_state()
+    # Keep direct service callers consistent with the route-level invalidation.
+    # The group definitions themselves are still valid; only their active union
+    # must be rebuilt.
+    memory_store.invalidate_domain('universe_metadata')
+    current_symbols = {
+        (row.get('symbol') or '').upper() for row in builder()
+        if row.get('symbol')
+    }
+    removed_symbols = previous_symbols - current_symbols
+    if removed_symbols:
+        try:
+            from app.services.tier_cache_policy import invalidate_symbol_artifacts
+            for symbol in removed_symbols:
+                invalidate_symbol_artifacts(symbol, remove_tier_state=True)
+        except Exception:
+            logging.getLogger('app.universe').debug(
+                'failed to invalidate removed universe symbols', exc_info=True,
+            )
     return {'ok': True, 'market': market, 'key': key, 'active': active,
-            'active_keys': sorted(cur)}
+            'active_keys': sorted(cur), 'invalidated_symbols': len(removed_symbols)}
 
 
 def list_universe_groups(market: str = 'stocks') -> list[dict]:

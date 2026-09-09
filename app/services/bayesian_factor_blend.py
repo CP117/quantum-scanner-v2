@@ -47,6 +47,8 @@ intraday).
 from __future__ import annotations
 
 from dataclasses import dataclass
+import math
+from typing import Any
 
 
 # Per-factor drift coefficients in percent per period when the factor
@@ -124,6 +126,59 @@ class BayesianBlend:
 # on thin/noisy inputs.  Calibrated so a single high-quality factor
 # yields ~0.7x shrinkage; full 7-factor agreement yields ~1.0x.
 _SHRINKAGE_REFERENCE_PRECISION = 5.0
+_BAYESIAN_PRIOR_MODEL_VERSION = "bayesian-factor-prior-v1"
+_BAYESIAN_PRIOR_MODEL_CONFIG = {
+    "factor_drift_bps": _FACTOR_DRIFT_BPS,
+    "confidence_ratio": _FACTOR_CONF_RATIO,
+    "shrinkage_reference_precision": _SHRINKAGE_REFERENCE_PRECISION,
+}
+
+
+def _valid_cache_context(
+    factor_scores: dict[str, float | None],
+    regulatory_signal: dict | None,
+    *,
+    symbol: str | None,
+    segment: str | None,
+    source_history: list[float] | None,
+    history_validated: bool,
+) -> bool:
+    """Only cache a posterior backed by a complete, validated history."""
+    if not history_validated or not isinstance(symbol, str) or not symbol.strip():
+        return False
+    if not isinstance(segment, str) or not segment.strip():
+        return False
+    if not isinstance(source_history, list) or len(source_history) < 20:
+        return False
+    try:
+        if not all(math.isfinite(float(value)) and float(value) > 0 for value in source_history):
+            return False
+        for name, score in factor_scores.items():
+            if name in _FACTOR_DRIFT_BPS and score is not None:
+                if not math.isfinite(float(score)) or not 0.0 <= float(score) <= 100.0:
+                    return False
+        if regulatory_signal:
+            for name in ("score_delta", "weight"):
+                value = regulatory_signal.get(name)
+                if value is not None and not math.isfinite(float(value)):
+                    return False
+    except (AttributeError, TypeError, ValueError):
+        return False
+    return any(name in _FACTOR_DRIFT_BPS and score is not None for name, score in factor_scores.items())
+
+
+def _valid_blend(value: object) -> bool:
+    if not isinstance(value, BayesianBlend) or value.n_factors_used <= 0:
+        return False
+    values = (
+        value.posterior_drift_per_period_pct,
+        value.posterior_sigma_per_period_pct,
+        value.posterior_precision,
+        value.total_drift_horizon_pct,
+        value.total_sigma_horizon_pct,
+        value.shrinkage_factor,
+    )
+    return all(math.isfinite(item) for item in values) and len(value.contributions) == value.n_factors_used
 
 
 def blend_factors_for_drift(
@@ -132,6 +187,11 @@ def blend_factors_for_drift(
     horizon: int,
     is_intraday: bool,
     regulatory_signal: dict | None = None,
+    *,
+    symbol: str | None = None,
+    segment: str | None = None,
+    source_history: list[float] | None = None,
+    history_validated: bool = False,
 ) -> BayesianBlend:
     """Compute the Bayesian posterior drift over the requested horizon.
 
@@ -151,6 +211,36 @@ def blend_factors_for_drift(
     Returns: BayesianBlend with everything the upstream prediction
     service needs to plug into the probit direction map + price target.
     """
+    cacheable = _valid_cache_context(
+        factor_scores, regulatory_signal, symbol=symbol, segment=segment,
+        source_history=source_history, history_validated=history_validated,
+    )
+    cache_dimensions: dict[str, Any] | None = None
+    cache_fingerprint: str | None = None
+    if cacheable:
+        from app.services.memory_store import memory_store, stable_fingerprint
+
+        normalized_symbol = memory_store.normalize_symbol(symbol or "")
+        history_fingerprint = stable_fingerprint(source_history)
+        cache_dimensions = {
+            "symbol": normalized_symbol,
+            "segment": segment.strip().lower(),
+            "model_version": _BAYESIAN_PRIOR_MODEL_VERSION,
+            "horizon": int(horizon),
+            "is_intraday": bool(is_intraday),
+        }
+        cache_fingerprint = stable_fingerprint({
+            "source_history": history_fingerprint,
+            "factor_scores": factor_scores,
+            "regulatory_signal": regulatory_signal,
+            "model_config": _BAYESIAN_PRIOR_MODEL_CONFIG,
+        })
+        cached = memory_store.get(
+            "bayesian_priors", cache_dimensions, fingerprint=cache_fingerprint,
+        )
+        if _valid_blend(cached):
+            return cached
+
     contributions: list[FactorContribution] = []
     sum_precision = 0.0
     sum_weighted_drift = 0.0
@@ -250,7 +340,7 @@ def blend_factors_for_drift(
     total_drift = post_drift * horizon
     total_sigma = post_sigma * (horizon ** 0.5)
 
-    return BayesianBlend(
+    result = BayesianBlend(
         posterior_drift_per_period_pct=post_drift,
         posterior_sigma_per_period_pct=post_sigma,
         posterior_precision=sum_precision,
@@ -260,6 +350,23 @@ def blend_factors_for_drift(
         contributions=final_contribs,
         shrinkage_factor=shrinkage,
     )
+    if cacheable and cache_dimensions is not None and cache_fingerprint is not None and _valid_blend(result):
+        from app.config import settings
+        from app.services.memory_store import memory_store
+
+        memory_store.set(
+            "bayesian_priors", cache_dimensions, result,
+            ttl_seconds=settings.bayesian_prior_ttl_seconds,
+            fingerprint=cache_fingerprint,
+            provenance={
+                "model_version": _BAYESIAN_PRIOR_MODEL_VERSION,
+                "model_config_fingerprint": stable_fingerprint(_BAYESIAN_PRIOR_MODEL_CONFIG),
+                "history_fingerprint": stable_fingerprint(source_history),
+                "history_validation": "complete",
+                "segment": segment,
+            },
+        )
+    return result
 
 
 def normal_cdf(z: float) -> float:

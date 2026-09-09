@@ -661,7 +661,9 @@ def _direction_label_from_p_up(p_up: float) -> str:
 
 def _compute_one_horizon_fast(factor_scores: dict[str, float], atr_per_unit_pct: float,
                               regulatory_signal: dict | None,
-                              horizon_units: int, is_intraday: bool) -> dict[str, Any]:
+                              horizon_units: int, is_intraday: bool, *,
+                              symbol: str | None = None, segment: str | None = None,
+                              source_history: list[float] | None = None) -> dict[str, Any]:
     """Single-horizon forward block.  Pure math, no I/O.  ~50 µs.
 
     ATR is treated as the per-unit-time sigma proxy.  For daily
@@ -681,6 +683,10 @@ def _compute_one_horizon_fast(factor_scores: dict[str, float], atr_per_unit_pct:
         horizon=horizon_units,
         is_intraday=is_intraday,
         regulatory_signal=regulatory_signal,
+        symbol=symbol,
+        segment=segment,
+        source_history=source_history,
+        history_validated=bool(source_history and len(source_history) >= 20),
     )
     drift_h = blend.total_drift_horizon_pct
     sigma_h = sigma_per_unit_pct * math.sqrt(max(1, horizon_units))
@@ -728,7 +734,9 @@ _SESSION_HORIZON_PARAMS = {
 def _compute_session_horizon_fast(factor_scores: dict[str, float],
                                    atr_per_unit_pct: float,
                                    regulatory_signal: dict | None,
-                                   kind: str) -> dict[str, Any]:
+                                   kind: str, *, symbol: str | None = None,
+                                   segment: str | None = None,
+                                   source_history: list[float] | None = None) -> dict[str, Any]:
     """Overnight / weekend gap-hold forward block.
 
     Empirical session structure baked into the constants:
@@ -751,6 +759,10 @@ def _compute_session_horizon_fast(factor_scores: dict[str, float],
         horizon=1,
         is_intraday=False,
         regulatory_signal=regulatory_signal,
+        symbol=symbol,
+        segment=segment,
+        source_history=source_history,
+        history_validated=bool(source_history and len(source_history) >= 20),
     )
     mu_day = blend.total_drift_horizon_pct
     sigma_day = atr_per_unit_pct
@@ -786,7 +798,10 @@ def _attach_session_horizons(out: dict[str, Any], *,
                              regulatory_signal: dict | None,
                              advanced_signals, lab_signals, strategy_signals,
                              predictive_signals,
-                             fast_blocks: dict | None = None) -> dict[str, Any]:
+                             fast_blocks: dict | None = None,
+                             symbol: str | None = None,
+                             segment: str | None = None,
+                             source_history: list[float] | None = None) -> dict[str, Any]:
     """Append fully-enriched overnight + weekend blocks to `out`.
 
     Called AFTER the canonical-horizon multiscale/TRS recompute so those
@@ -802,6 +817,7 @@ def _attach_session_horizons(out: dict[str, Any], *,
                        ('forward_weekend', 'weekend')):
         block = _compute_session_horizon_fast(
             factor_scores, atr_pct, regulatory_signal, kind,
+            symbol=symbol, segment=segment, source_history=source_history,
         )
         enrich_horizon_block(
             horizon_block=block, advanced=advanced_signals,
@@ -895,6 +911,9 @@ def attach_forward_metrics_fast(row: dict, regulatory_signal: dict | None = None
             regulatory_signal=regulatory_signal,
             horizon_units=units,
             is_intraday=is_intraday,
+            symbol=symbol,
+            segment=_market_kind,
+            source_history=closes,
         )
         # Overlay the advanced-math signals.
         enrich_horizon_block(
@@ -987,6 +1006,7 @@ def attach_forward_metrics_fast(row: dict, regulatory_signal: dict | None = None
         regulatory_signal=regulatory_signal,
         advanced_signals=advanced_signals, lab_signals=lab_signals,
         strategy_signals=strategy_signals, predictive_signals=predictive_signals,
+        symbol=symbol, segment=_market_kind, source_history=closes,
     )
     # Stamp the per-symbol bundles (advanced + lab + strategy + predictive).
     attach_per_symbol_signals(row, advanced_signals)
@@ -1089,6 +1109,9 @@ def attach_forward_metrics_garch(row: dict, symbol: str, market: str = 'stocks')
                 regulatory_signal=None,
                 horizon_units=units,
                 is_intraday=is_intraday,
+                symbol=symbol,
+                segment=market,
+                source_history=closes,
             )
             block['tier'] = 'garch-mixed'
         else:
@@ -1100,6 +1123,10 @@ def attach_forward_metrics_garch(row: dict, symbol: str, market: str = 'stocks')
                 horizon=units,
                 is_intraday=False,
                 regulatory_signal=None,
+                symbol=symbol,
+                segment=market,
+                source_history=closes,
+                history_validated=len(closes) >= 20,
             )
             drift_h = blend.total_drift_horizon_pct
             z = (drift_h / sigma_h) if sigma_h > 0 else 0.0
@@ -1218,6 +1245,7 @@ def attach_forward_metrics_garch(row: dict, symbol: str, market: str = 'stocks')
         advanced_signals=advanced_signals, lab_signals=lab_signals,
         strategy_signals=strategy_signals, predictive_signals=predictive_signals,
         fast_blocks=fast_blocks,
+        symbol=symbol, segment=market, source_history=closes,
     )
     # Refresh the per-symbol bundles on the row.
     attach_per_symbol_signals(row, advanced_signals)

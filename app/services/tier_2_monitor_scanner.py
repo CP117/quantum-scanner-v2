@@ -112,7 +112,9 @@ def _score_batch(
             seed = universe_meta.get(sym.upper()) or {'symbol': sym.upper(), '_tier': TIER_2}
             seed_rows.append(dict(seed))
         try:
-            scored = score_symbol_rows(seed_rows)
+            from app.services.provider_session import provider_priority
+            with provider_priority(TIER_2):
+                scored = score_symbol_rows(seed_rows)
             for row in scored:
                 sym = (row.get('symbol') or '').upper()
                 if sym:

@@ -22,6 +22,9 @@ from typing import Any
 
 import pandas as pd
 
+from app.config import settings
+from app.services.memory_store import memory_store
+
 # Small helper to keep env-var lookups uniform.
 def _os_env(key: str, default: str) -> str:
     return os.environ.get(key, default)
@@ -253,7 +256,6 @@ def _call_with_timeout(fn, *args, timeout: float | None = None, **kwargs):
 # meaningfully on a 3-min cadence and the previous TTL was causing huge
 # rate-limit-skip churn — every cache eviction triggered a fresh multi-HTTP
 # fetch for the same symbol within minutes.
-_TTL_SECONDS = 600
 _MIN_GAP_SECONDS = 0.75     # rate limit per request to the same host (Yahoo options endpoint)
 _MAX_CONCURRENT_INFLIGHT = 2  # parallel option-chain fetches in flight
 _FAIL_COOLDOWN = 600        # 10 min cooldown after a transient fetch failure
@@ -269,7 +271,7 @@ _YAHOO_MAX_EXPIRATIONS_CAP = 2  # never make more than 2 HTTP roundtrips to Yaho
 # In-process cache & throttling
 # ---------------------------------------------------------------------------
 _lock = Lock()
-_cache: dict[str, tuple[float, dict | None]] = {}
+_cache: dict[tuple[str, int, str], tuple[float, dict | None]] = {}
 _last_request_ts: float = 0.0
 _inflight: int = 0
 
@@ -339,11 +341,11 @@ def prune_expired_state() -> dict[str, int]:
     pruned_fail = 0
     pruned_skip = 0
     with _lock:
-        # _cache TTL is _TTL_SECONDS; entries older than 2x TTL
+        # Entries older than 2x the configured TTL are definitely safe to
         # are definitely safe to drop (a refetch will fill them again).
-        cutoff_cache = 2 * _TTL_SECONDS
+        cutoff_cache = 2 * _cache_ttl_seconds()
         stale_keys = [
-            sym for sym, (ts, _payload) in _cache.items()
+            key for key, (ts, _payload) in _cache.items()
             if (now - ts) > cutoff_cache
         ]
         for k in stale_keys:
@@ -382,6 +384,45 @@ def prune_expired_state() -> dict[str, int]:
 
 def _now() -> float:
     return time.monotonic()
+
+
+def _cache_ttl_seconds() -> float:
+    return max(0.0, float(settings.options_chain_cache_ttl_seconds))
+
+
+def _cache_key(symbol: str, max_expirations: int, provider_id: str = 'resolved') -> tuple[str, int, str]:
+    """Partition payloads by provider and the expiration selection that shapes them."""
+    return (
+        (symbol or '').strip().upper(),
+        max(1, int(max_expirations)),
+        (provider_id or 'resolved').strip().lower(),
+    )
+
+
+def _memory_cache_dimensions(provider_id: str, symbol: str, max_expirations: int) -> dict[str, object]:
+    """Contract-complete key dimensions for a provider's chain payload."""
+    return {
+        'provider_id': (provider_id or '').strip().lower(),
+        'symbol': (symbol or '').strip().upper(),
+        'expiration_selection': {'max_expirations': max(1, int(max_expirations))},
+        # No result-shaping filters are currently accepted by this service.
+        # Keep the dimension explicit so adding one cannot cross-contaminate
+        # existing entries.
+        'filters': {},
+    }
+
+
+def _remember_resolved(
+    symbol: str,
+    max_expirations: int,
+    payload: dict | None,
+) -> dict | None:
+    """Maintain the legacy fast lookup without caching provider failures."""
+    if not payload:
+        return None
+    with _lock:
+        _cache[_cache_key(symbol, max_expirations)] = (_now(), dict(payload))
+    return dict(payload)
 
 
 def _options_gamma_level_label(score: float) -> str:
@@ -519,8 +560,13 @@ def _can_make_request_now() -> bool:
     return True
 
 
-def get_real_options_positioning(symbol: str, last_price: float, *,
-                                  max_expirations: int = _DEFAULT_MAX_EXPIRATIONS) -> dict | None:
+def get_real_options_positioning(
+    symbol: str,
+    last_price: float,
+    *,
+    max_expirations: int = _DEFAULT_MAX_EXPIRATIONS,
+    max_cache_age_seconds: float | None = None,
+) -> dict | None:
     """Return a fully-shaped options_positioning payload from real chain data,
     or None if every source is unavailable / cooldown active / throttled.
 
@@ -534,20 +580,43 @@ def get_real_options_positioning(symbol: str, last_price: float, *,
     sym = (symbol or '').upper()
     if not sym or last_price <= 0:
         return None
+    max_age = _cache_ttl_seconds() if max_cache_age_seconds is None else max(0.0, max_cache_age_seconds)
+    with _lock:
+        cached = _cache.get(_cache_key(sym, max_expirations))
+        if cached and (_now() - cached[0] <= max_age) and cached[1] is not None:
+            _stats['cache_hits'] += 1
+            return dict(cached[1])
 
     # 1) PRIMARY: CBOE delayed quotes. Single HTTP, full chain, free Greeks.
     try:
         from app.services.providers import cboe_options_provider as _cboe
+        cboe_dimensions = _memory_cache_dimensions('cboe', sym, max_expirations)
+        cached_cboe = memory_store.get('options_chains', cboe_dimensions, provider_id='cboe')
+        cached_cboe_age = memory_store.age_seconds(
+            'options_chains', cboe_dimensions, provider_id='cboe',
+        )
+        if cached_cboe is not None and (cached_cboe_age is None or cached_cboe_age <= max_age):
+            with _lock:
+                _stats['cache_hits'] += 1
+            return _remember_resolved(sym, max_expirations, cached_cboe)
         with _lock:
             _stats['cboe_attempts'] += 1
             _stats['attempts'] += 1
         cboe_payload = _cboe.get_options_positioning(sym, last_price,
                                                      max_expirations=max_expirations)
         if cboe_payload:
+            source_timestamp = time.time()
+            memory_store.set(
+                'options_chains', cboe_dimensions, cboe_payload,
+                ttl_seconds=_cache_ttl_seconds(), provider_id='cboe',
+                source_timestamp=source_timestamp,
+                provenance={'provider_id': 'cboe', 'source_timestamp': source_timestamp,
+                            'expiration_selection': cboe_dimensions['expiration_selection']},
+            )
             with _lock:
                 _stats['cboe_hits'] += 1
                 _stats['hits_real'] += 1
-            return cboe_payload
+            return _remember_resolved(sym, max_expirations, cboe_payload)
         # CBOE returned None - either symbol not listed, no data, or transient.
         # Record a miss and fall through to Yahoo.
         with _lock:
@@ -562,11 +631,15 @@ def get_real_options_positioning(symbol: str, last_price: float, *,
 
     # 2) FALLBACK: Yahoo Finance via yfinance.
     yahoo_max_exp = min(max_expirations, _YAHOO_MAX_EXPIRATIONS_CAP)
-    return _get_yahoo_options_positioning(sym, last_price, max_expirations=yahoo_max_exp)
+    payload = _get_yahoo_options_positioning(
+        sym, last_price, max_expirations=yahoo_max_exp, max_cache_age_seconds=max_age,
+    )
+    return _remember_resolved(sym, max_expirations, payload)
 
 
 def _get_yahoo_options_positioning(symbol: str, last_price: float, *,
-                                   max_expirations: int = _DEFAULT_MAX_EXPIRATIONS) -> dict | None:
+                                   max_expirations: int = _DEFAULT_MAX_EXPIRATIONS,
+                                   max_cache_age_seconds: float | None = None) -> dict | None:
     """Yahoo Finance options-chain fetch (the original implementation, now
     used as a fallback after CBOE).
     """
@@ -576,6 +649,8 @@ def _get_yahoo_options_positioning(symbol: str, last_price: float, *,
         return None
 
     now = _now()
+    max_age = _cache_ttl_seconds() if max_cache_age_seconds is None else max(0.0, max_cache_age_seconds)
+    yahoo_dimensions = _memory_cache_dimensions('yahoo', sym, max_expirations)
 
     with _lock:
         cooldown = _fail_until.get(sym, 0)
@@ -590,13 +665,22 @@ def _get_yahoo_options_positioning(symbol: str, last_price: float, *,
                 _stats['fetch_error_skips'] += 1
             return None
         # Cache check first
-        cached = _cache.get(sym)
-        if cached and (now - cached[0] <= _TTL_SECONDS):
+        cache_key = _cache_key(sym, max_expirations, 'yahoo')
+        cached = _cache.get(cache_key)
+        if cached and (now - cached[0] <= max_age):
             payload = cached[1]
             if payload is not None:
                 _stats['cache_hits'] += 1
                 return dict(payload)
             return None
+        cached_memory = memory_store.get('options_chains', yahoo_dimensions, provider_id='yahoo')
+        cached_memory_age = memory_store.age_seconds(
+            'options_chains', yahoo_dimensions, provider_id='yahoo',
+        )
+        if cached_memory is not None and (cached_memory_age is None or cached_memory_age <= max_age):
+            _stats['cache_hits'] += 1
+            _cache[cache_key] = (now, dict(cached_memory))
+            return dict(cached_memory)
         if not _can_make_request_now():
             _stats['throttle_skips'] += 1
             return None
@@ -678,7 +762,16 @@ def _get_yahoo_options_positioning(symbol: str, last_price: float, *,
     finally:
         with _lock:
             _inflight = max(0, _inflight - 1)
-            _cache[sym] = (_now(), payload)
+            _cache[cache_key] = (_now(), payload)
+        if payload:
+            source_timestamp = time.time()
+            memory_store.set(
+                'options_chains', yahoo_dimensions, payload,
+                ttl_seconds=_cache_ttl_seconds(), provider_id='yahoo',
+                source_timestamp=source_timestamp,
+                provenance={'provider_id': 'yahoo', 'source_timestamp': source_timestamp,
+                            'expiration_selection': yahoo_dimensions['expiration_selection']},
+            )
 
     return dict(payload) if payload else None
 
@@ -693,6 +786,20 @@ def clear_cache() -> None:
             _stats[k] = 0
         _last_request_ts = 0.0
         _inflight = 0
+    memory_store.invalidate_domain('options_chains')
+
+
+def invalidate_cached_chains(symbol: str | None = None) -> int:
+    """Clear chain payloads while retaining provider cooldown/failure state."""
+    normalized = (symbol or '').strip().upper()
+    with _lock:
+        keys = [
+            key for key in _cache
+            if not normalized or key[0] == normalized
+        ]
+        for key in keys:
+            del _cache[key]
+    return memory_store.invalidate_symbol(normalized, domains={'options_chains'}) if normalized else memory_store.invalidate_domain('options_chains')
 
 
 # ---------------------------------------------------------------------------
@@ -722,6 +829,7 @@ def prefetch_options_chains(
     max_expirations: int = _DEFAULT_MAX_EXPIRATIONS,
     max_workers: int | None = None,
     timeout_seconds: float | None = None,
+    tier1_target_age_seconds: float | None = None,
 ) -> dict[str, str]:
     """Pre-warm `_cache` for a batch of symbols in parallel.
 
@@ -737,6 +845,8 @@ def prefetch_options_chains(
         timeout_seconds: wall-time cap before bailing — pending workers
             continue in the background but the function returns early.
             Defaults to MRD_OPTIONS_PREFETCH_TIMEOUT (default 8 s).
+        tier1_target_age_seconds: when supplied, Tier 1 refreshes only
+            entries older than this target, rather than every scan tick.
 
     Returns:
         A dict {symbol: outcome} where outcome is 'hit', 'miss', 'cached',
@@ -758,8 +868,9 @@ def prefetch_options_chains(
             if not sym_u or not px or px <= 0:
                 continue
             # Already cached AND fresh -> noop.
-            cached = _cache.get(sym_u)
-            if cached and (now - cached[0] <= _TTL_SECONDS):
+            cached = _cache.get(_cache_key(sym_u, max_expirations))
+            target_age = _cache_ttl_seconds() if tier1_target_age_seconds is None else max(0.0, tier1_target_age_seconds)
+            if cached and (now - cached[0] <= target_age):
                 outcomes[sym_u] = 'cached'
                 continue
             # Symbol-level cooldown still active -> noop.
@@ -774,7 +885,10 @@ def prefetch_options_chains(
     def _fetch_one(sym_px):
         sym_u, px = sym_px
         try:
-            payload = get_real_options_positioning(sym_u, px, max_expirations=max_expirations)
+            payload = get_real_options_positioning(
+                sym_u, px, max_expirations=max_expirations,
+                max_cache_age_seconds=tier1_target_age_seconds,
+            )
             return sym_u, ('hit' if payload else 'miss')
         except Exception as exc:  # noqa: BLE001
             log.debug('prefetch_options_chains worker raised for %s: %s', sym_u, exc)

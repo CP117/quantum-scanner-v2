@@ -59,6 +59,11 @@ from typing import Any
 
 import pandas as pd
 
+# The canonical resident frame is never handed to callers directly.  Pandas
+# Copy-on-Write keeps shallow views cheap on cache hits while isolating any
+# accidental caller mutation from the shared history data.
+pd.options.mode.copy_on_write = True
+
 try:
     import orjson as _orjson
     _HAS_ORJSON = True
@@ -79,6 +84,8 @@ _MAX_INFLIGHT = 12
 _FAIL_COOLDOWN = 600         # 10 minutes after a failure
 _DEFAULT_PERIOD = '90d'
 _DEFAULT_INTERVAL = '1d'
+_DEFAULT_ADJUSTMENT_MODE = 'raw'
+_DEFAULT_SESSION = 'regular'
 
 _DATA_DIR = Path(__file__).resolve().parent.parent.parent / 'data'
 # Legacy monolithic file — migrated to shards on first read.
@@ -652,6 +659,11 @@ def clear_cache() -> None:
         _inflight = 0
         _dirty_shards.clear()
     _records_cache.clear()
+    try:
+        from app.services.memory_store import memory_store
+        memory_store.invalidate_domain('daily_history')
+    except Exception:
+        pass
 
 
 def invalidate(symbol: str) -> bool:
@@ -662,6 +674,10 @@ def invalidate(symbol: str) -> bool:
     sym = (symbol or '').upper()
     if not sym:
         return False
+    # Durable shards are a valid restart fallback, but not for a symbol that
+    # was explicitly removed.  Load once so the subsequent dirty flush writes
+    # the removal instead of allowing a future disk read to resurrect it.
+    _ensure_disk_loaded()
     removed = False
     with _lock:
         if sym in _cache:
@@ -671,6 +687,11 @@ def invalidate(symbol: str) -> bool:
             del _fail_until[sym]
         if removed:
             _dirty_shards.add(_shard_key(sym))
+    try:
+        from app.services.memory_store import memory_store
+        removed = bool(memory_store.invalidate_symbol(sym, domains={'daily_history'})) or removed
+    except Exception:
+        pass
     if removed:
         _records_cache.pop(sym, None)
     with _prefetch_seen_lock:
@@ -719,7 +740,72 @@ def _now() -> float:
     return time.monotonic()
 
 
-def get_daily_history(symbol: str, allow_fetch: bool = True, blocking: bool = False) -> Any:
+def _history_dimensions(
+    symbol: str,
+    provider_id: str,
+    interval: str,
+    period: str,
+    adjustment_mode: str,
+    session: str,
+) -> dict[str, str]:
+    """Cache identity for normalized OHLCV data; every dimension is material."""
+    return {
+        'symbol': symbol.upper(),
+        'provider_id': provider_id,
+        'interval': interval,
+        'lookback': period,
+        'adjustment_mode': adjustment_mode,
+        'session': session,
+    }
+
+
+def _copy_history(df):
+    """Return a Copy-on-Write view of the canonical resident history frame."""
+    try:
+        return df.copy(deep=False) if df is not None else None
+    except AttributeError:
+        return df
+
+
+def _history_source_timestamp(df: Any) -> float:
+    """Use the latest normalized bar time as provenance, falling back to now."""
+    try:
+        index = getattr(df, "index", None)
+        if index is not None and len(index):
+            timestamp = pd.Timestamp(index.max())
+            if timestamp.tzinfo is None:
+                timestamp = timestamp.tz_localize("UTC")
+            return timestamp.timestamp()
+    except (TypeError, ValueError, OverflowError):
+        pass
+    return time.time()
+
+
+def _history_priority(symbol: str) -> int:
+    try:
+        from app.services.memory_store import PRIORITY_TIER_1, PRIORITY_TIER_2, PRIORITY_TIER_3
+        from app.services.tier_manager import TIER_1, TIER_2, get_tier
+        tier = get_tier(symbol)
+        if tier == TIER_1:
+            return PRIORITY_TIER_1
+        if tier == TIER_2:
+            return PRIORITY_TIER_2
+        return PRIORITY_TIER_3
+    except Exception:
+        return 2
+
+
+def get_daily_history(
+    symbol: str,
+    allow_fetch: bool = True,
+    blocking: bool = False,
+    *,
+    provider_id: str | None = None,
+    interval: str = _DEFAULT_INTERVAL,
+    period: str = _DEFAULT_PERIOD,
+    adjustment_mode: str = _DEFAULT_ADJUSTMENT_MODE,
+    session: str = _DEFAULT_SESSION,
+) -> Any:
     """Return a yfinance daily-history DataFrame or None.
 
     Always cached for `_TTL_SECONDS`; throttled per-request; cooled-down
@@ -741,7 +827,33 @@ def get_daily_history(symbol: str, allow_fetch: bool = True, blocking: bool = Fa
     sym = (symbol or '').upper()
     if not sym:
         return None
-    _ensure_disk_loaded()
+    # A caller can request a known provider. Automatic requests probe the
+    # source-specific resident entries in the same order as the fetch path.
+    providers = [provider_id] if provider_id else ['yfinance']
+    if provider_id is None and sym.endswith('-USD'):
+        providers.append('cryptocompare')
+    try:
+        from app.services.memory_store import memory_store
+        for source in providers:
+            dimensions = _history_dimensions(sym, source, interval, period, adjustment_mode, session)
+            cached_memory = memory_store.get_daily_history(dimensions, provider_id=source)
+            if cached_memory is not None:
+                return cached_memory
+    except Exception as exc:
+        log.debug('daily_history memory cache unavailable for %s: %s', sym, exc)
+
+    uses_legacy_shape = (
+        provider_id is None
+        and interval == _DEFAULT_INTERVAL
+        and period == _DEFAULT_PERIOD
+        and adjustment_mode == _DEFAULT_ADJUSTMENT_MODE
+        and session == _DEFAULT_SESSION
+    )
+    # The existing shard format has only a symbol key. It is intentionally
+    # retained only for the legacy default request shape until its durable
+    # schema can be migrated with source/version metadata.
+    if uses_legacy_shape:
+        _ensure_disk_loaded()
 
     while True:
         now = _now()
@@ -750,14 +862,14 @@ def get_daily_history(symbol: str, allow_fetch: bool = True, blocking: bool = Fa
             if cd and now < cd:
                 _stats['cooldown_skips'] += 1
                 return None
-            cached = _cache.get(sym)
+            cached = _cache.get(sym) if uses_legacy_shape else None
             if cached and (now - cached[0] <= _TTL_SECONDS):
                 # Phase 26.60: LRU touch — move this symbol to the
                 # most-recently-used end so it survives eviction while
                 # the scanner is actively touching it.
                 _cache.move_to_end(sym)
                 _stats['cache_hits'] += 1
-                return cached[1]
+                return _copy_history(cached[1])
             if not allow_fetch:
                 return None
             if _inflight >= _MAX_INFLIGHT:
@@ -778,55 +890,79 @@ def get_daily_history(symbol: str, allow_fetch: bool = True, blocking: bool = Fa
         # Sleep outside the lock so other workers can proceed.
         time.sleep(min(0.2, wait_s))
 
-    df = None
-    try:
-        import yfinance as yf
-        # Phase 26.35: yf.Ticker(...).history() does NOT honor a timeout
-        # parameter — Yahoo can hang the underlying socket for tens of
-        # minutes when rate-limiting.  Route the call through the same
-        # batch-download timeout executor so the dh-worker is freed at
-        # a known ceiling and the cascade can fall through to
-        # CryptoCompare (for crypto) or just record an error (for stocks).
-        from app.services.scoring_service import (
-            _yf_download_with_timeout as _yf_with_timeout,  # noqa: F401
-        )
-        # Direct submit pattern — we want a fresh call each time, not
-        # reuse the download-specific wrapper.  Use a local executor
-        # snapshot to avoid the wrapper's logging noise on the per-symbol
-        # path.
-        from concurrent.futures import TimeoutError as _DhFTimeout
-        from app.services.scoring_service import _YF_BATCH_EXECUTOR, _YF_BATCH_EXECUTOR_LOCK
-        with _YF_BATCH_EXECUTOR_LOCK:
-            _executor = _YF_BATCH_EXECUTOR
-        _fut = _executor.submit(
-            lambda: yf.Ticker(sym).history(
-                period=_DEFAULT_PERIOD, interval=_DEFAULT_INTERVAL,
-                auto_adjust=False, prepost=False,
-            )
-        )
-        try:
-            df = _fut.result(timeout=20.0)
-        except _DhFTimeout:
-            log.debug('daily_history yfinance.history timed out for %s after 20s', sym)
-            df = None
-        if df is None or getattr(df, 'empty', True):
-            df = None
-        else:
-            with _lock:
-                _stats['hits_real'] += 1
-    except Exception as exc:  # noqa: BLE001
-        log.debug('daily_history fetch failed for %s: %s', sym, exc)
+    return _fetch_daily_history(
+        sym, allow_fetch, blocking, provider_id, interval, period, adjustment_mode, session,
+        inflight_reserved=True,
+    )
+
+
+def _fetch_daily_history(
+    sym: str,
+    allow_fetch: bool,
+    blocking: bool,
+    provider_id: str | None,
+    interval: str,
+    period: str,
+    adjustment_mode: str,
+    session: str,
+    *,
+    inflight_reserved: bool = False,
+) -> Any:
+    """Fetch and normalize history outside cache locks after request admission."""
+    global _last_request_ts, _inflight
+    if not allow_fetch:
+        return None
+    if not inflight_reserved:
         with _lock:
-            _stats['errors'] += 1
-        df = None
+            if _inflight >= _MAX_INFLIGHT:
+                return None
+            _inflight += 1
+            _last_request_ts = _now()
+            _stats['attempts'] += 1
+
+    df = None
+    source_id = provider_id or 'yfinance'
+    if provider_id in (None, 'yfinance'):
+        try:
+            import yfinance as yf
+            # yfinance's history method does not honor a timeout argument.
+            # Use the bounded shared executor so a stalled socket cannot pin
+            # a daily-history worker indefinitely.
+            from concurrent.futures import TimeoutError as _DhFTimeout
+            from app.services.scoring_service import _YF_BATCH_EXECUTOR, _YF_BATCH_EXECUTOR_LOCK
+            with _YF_BATCH_EXECUTOR_LOCK:
+                _executor = _YF_BATCH_EXECUTOR
+            _fut = _executor.submit(
+                lambda: yf.Ticker(sym).history(
+                    period=period, interval=interval,
+                    auto_adjust=adjustment_mode != _DEFAULT_ADJUSTMENT_MODE,
+                    prepost=session != _DEFAULT_SESSION,
+                )
+            )
+            try:
+                df = _fut.result(timeout=20.0)
+            except _DhFTimeout:
+                log.debug('daily_history yfinance.history timed out for %s after 20s', sym)
+                df = None
+            if df is None or getattr(df, 'empty', True):
+                df = None
+            else:
+                with _lock:
+                    _stats['hits_real'] += 1
+        except Exception as exc:  # noqa: BLE001
+            log.debug('daily_history fetch failed for %s: %s', sym, exc)
+            with _lock:
+                _stats['errors'] += 1
+            df = None
 
     # Phase 16: CryptoCompare fallback for the crypto tail.
-    if (df is None or getattr(df, 'empty', True)) and sym.upper().endswith('-USD'):
+    if (df is None or getattr(df, 'empty', True)) and sym.upper().endswith('-USD') and provider_id in (None, 'cryptocompare'):
         try:
             from app.services.providers import cryptocompare_provider
             cc_df = cryptocompare_provider.fetch_daily_history(sym, limit=90)
             if cc_df is not None and not getattr(cc_df, 'empty', True):
                 df = cc_df
+                source_id = 'cryptocompare'
                 with _lock:
                     _stats['hits_real'] += 1
                     _stats.setdefault('hits_cryptocompare', 0)
@@ -847,22 +983,35 @@ def get_daily_history(symbol: str, allow_fetch: bool = True, blocking: bool = Fa
             pass
     with _lock:
         _inflight = max(0, _inflight - 1)
-        _cache[sym] = (_now(), df)
+        if interval == _DEFAULT_INTERVAL and period == _DEFAULT_PERIOD and adjustment_mode == _DEFAULT_ADJUSTMENT_MODE and session == _DEFAULT_SESSION:
+            _cache[sym] = (_now(), df)
         # Phase 26.60: enforce LRU cap. Newly-inserted entry is already
         # at the MRU end (OrderedDict semantics); this evicts the oldest
         # if we're over capacity, flushing any dirty shard first so no
         # fetch data is lost.
-        _evict_lru_if_over_capacity()
-        _dirty_shards.add(_shard_key(sym))
+            _evict_lru_if_over_capacity()
+            _dirty_shards.add(_shard_key(sym))
     # Phase 26.33: drop the stale per-symbol records so the next flush
     # re-serializes from the new DataFrame instead of writing the prior
     # day's data back to disk.
+    if df is not None:
+        try:
+            from app.services.memory_store import memory_store
+            dimensions = _history_dimensions(sym, source_id, interval, period, adjustment_mode, session)
+            memory_store.set_daily_history(
+                dimensions, df, ttl_seconds=settings.daily_history_cache_ttl_seconds,
+                provider_id=source_id, source_timestamp=_history_source_timestamp(df),
+                priority=_history_priority(sym),
+            )
+        except Exception as exc:
+            log.debug('daily_history memory cache write failed for %s: %s', sym, exc)
     _records_cache.pop(sym, None)
     # Allow re-enqueue if the symbol gets invalidated later.
     with _prefetch_seen_lock:
         _prefetch_seen.discard(sym)
-    _flush_disk()
-    return df
+    if interval == _DEFAULT_INTERVAL and period == _DEFAULT_PERIOD and adjustment_mode == _DEFAULT_ADJUSTMENT_MODE and session == _DEFAULT_SESSION:
+        _flush_disk()
+    return _copy_history(df)
 
 
 def prefetch_daily_history(symbol: str) -> None:
@@ -876,6 +1025,17 @@ def prefetch_daily_history(symbol: str) -> None:
     sym = (symbol or '').upper()
     if not sym:
         return
+    # Preserve Tier 1/2 refresh capacity when the shared cache approaches its
+    # per-worker budget. Tier 3 can be re-queued after maintenance frees space.
+    try:
+        from app.services.memory_store import PRIORITY_TIER_3
+        from app.services.tier_cache_policy import low_priority_prefetch_halted
+        if low_priority_prefetch_halted() and _history_priority(sym) >= PRIORITY_TIER_3:
+            with _lock:
+                _stats['prefetch_dropped'] += 1
+            return
+    except Exception as exc:
+        log.debug('daily_history prefetch pressure check failed for %s: %s', sym, exc)
     _ensure_disk_loaded()
     _ensure_prefetch_pool_running()
     with _lock:

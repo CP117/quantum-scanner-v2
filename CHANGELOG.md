@@ -2,6 +2,20 @@
 
 ---
 
+## Phase 11 tier-aware cache orchestration
+
+- Tier promotions now reprioritize compatible RAM artifacts; Tier 1 promotions
+  queue a fresh full scoring pass with a bounded quote-age fallback and the
+  existing optional-options refresh policy. Valid daily history is retained.
+- Tier 3 demotions make derived artifacts first eviction candidates. Emergency
+  maintenance pauses Tier 3 prefetch, checkpoints Tier 3 summaries, and
+  relieves RAM pressure before affecting hotter data.
+- Blacklist and active-universe removals invalidate quote, history, options,
+  tier, and RAM artifacts. Provider session resets use generation-aware cache
+  identities and invalidate affected provider values.
+- Provider admission reserves a small Tier 3 share, reports backpressure, and
+  opens a bounded circuit after consecutive failures.
+
 ## RAM-first cache layer
 
 - Added a bounded, process-local cache foundation with monotonic TTL,
@@ -10,6 +24,68 @@
 - Added `MEMORY_CACHE_MODE` (`disabled`, `shadow_write`, or `enabled`) and a
   per-worker `MEMORY_CACHE_MAX_MB` budget. Existing route payloads are
   unchanged; disk-backed quote/history caches remain restart fallback.
+
+## Phase 10 derived-cache migration
+
+- Added opt-in Bayesian-prior caching keyed by validated source-history
+  content, model configuration/version, and symbol/market segment scope.
+  Incomplete or unvalidated histories never enter the cache.
+- Added opt-in factor-narrative caching keyed by complete factor inputs and
+  narrative template/configuration version. Cached results preserve the
+  existing public narrative payload exactly; provenance remains internal.
+
+## Phase 8 metadata cache migration
+
+- Added single-flight RAM caching for active universe metadata, keyed by its
+  source and grouped-universe definition with a configurable
+  `UNIVERSE_METADATA_TTL_SECONDS` TTL.
+- Added declarative scanner-preset validation and bounded, content-fingerprinted
+  filter-pipeline compilation; no preset expression is evaluated as code.
+- Added provider-, symbol-, expiration-selection-, and filter-aware options
+  chain RAM keys, `OPTIONS_CHAIN_CACHE_TTL_SECONDS`, and Tier 1 target-age
+  refresh gating via `OPTIONS_CHAIN_TIER1_REFRESH_SECONDS`.
+- Added `POST /api/cache/dedupe/memory/invalidate` for explicit universe,
+  options-chain, and scanner-preset cache invalidation. It retains provider
+  failure cooldowns when only options payloads are cleared.
+
+## Cache profiling gate
+
+- Added `scripts/profile_cache_baseline.py`, an offline deterministic
+  benchmark for cold/warm Tier 1 scoring, provider failures, Tier-shaped row
+  orchestration, allocation/GC signals, CPU profiles, and concurrent
+  same-symbol duplicate fetches.
+- Added focused tests and operations guidance. Generated profiling reports are
+  intentionally kept out of version control.
+
+## Cache deployment topology
+
+- Added process-local cache topology diagnostics, including worker detection
+  and per-worker versus estimated all-worker memory budgeting.
+- Documented the single-worker Uvicorn default and the lack of cross-worker
+  cache, lock, invalidation, and warmup coordination.
+
+## Shared memory-store controls
+
+- Added domain-aware quote/history helpers, cache rollout modes, TTL jitter,
+  bounded per-key single-flight refresh coordination, and Tier-aware priority
+  eviction under configured memory pressure.
+
+## Cache rollout configuration
+
+- Added per-domain flags, modes, TTLs, warmup controls, and a configurable
+  correctness-sampling rate. New derived-data domains default to disabled for
+  staged rollout safety.
+
+## Cache freshness contract
+
+- Added an internal domain contract registry for freshness, stale fallback,
+  cache-key dimensions, and non-sensitive provenance requirements.
+
+## Daily-history RAM migration
+
+- Added provider-, interval-, lookback-, adjustment-, and session-aware RAM
+  history keys, copy-isolated DataFrame reads, Tier-aware residency priority,
+  warmup jitter, and low-priority prefetch backpressure.
 
 ---
 
