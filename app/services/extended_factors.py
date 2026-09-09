@@ -25,11 +25,51 @@ five calls through the legacy scoring path.
 from __future__ import annotations
 
 import logging
+import math
+import time
 from typing import Any
 
+from app.config import settings
 from app.utils.normalize import UNAVAILABLE_FACTOR_PAYLOAD
 
 log = logging.getLogger('app.factors')
+_EXTENDED_FACTOR_ENGINE_VERSION = "phase7-extended-v1"
+
+
+def _complete_factor_payload(factors: object) -> bool:
+    """Only persist a full, finite derived-factor set."""
+    if not isinstance(factors, dict):
+        return False
+    required = (
+        'trend_volume_delta', 'institutional_confluence', 'options_positioning',
+        'institutional_order_block', 'dark_pool_proxy', 'volume_sentiment',
+        'reaction_map',
+    )
+    for name in required:
+        factor = factors.get(name)
+        if not isinstance(factor, dict):
+            return False
+        status = str(factor.get('status') or '').lower()
+        if status == 'not_applicable':
+            continue
+        if status not in {'implemented', 'implemented_from_icm', 'inferred'}:
+            return False
+        try:
+            if name == 'reaction_map':
+                values = (
+                    factor.get('propel_probability'),
+                    factor.get('reject_probability'),
+                    factor.get('chop_probability'),
+                )
+                if any(not math.isfinite(float(value)) or not 0.0 <= float(value) <= 1.0 for value in values):
+                    return False
+                continue
+            value = factor.get('directional_score') if name == 'volume_sentiment' else factor.get('score')
+            if not math.isfinite(float(value)) or not 0.0 <= float(value) <= 100.0:
+                return False
+        except (TypeError, ValueError):
+            return False
+    return True
 
 
 def _safe(value: Any, default: float = 0.0) -> float:
@@ -159,8 +199,47 @@ def compute_extended_factors(
     )
     from app.services.volume_sentiment import compute_volume_sentiment, UNAVAILABLE_VOLUME_SENTIMENT
     from app.services.reaction_clustering_service import compute_reaction_map, UNAVAILABLE_REACTION_MAP
+    from app.services.memory_store import memory_store, stable_fingerprint
+    from app.services.scoring_service import (
+        _SCORING_ENGINE_CONFIG,
+        _SCORING_ENGINE_VERSION,
+        _history_material_identity,
+        _record_score_cache_timing,
+    )
 
     info = info or {}
+    cache_started = time.perf_counter()
+    history_identity = _history_material_identity(daily_hist)
+    intraday_identity = _history_material_identity(hist)
+    normalized_symbol = memory_store.normalize_symbol(symbol)
+    material_inputs = {
+        'engine_version': _SCORING_ENGINE_VERSION,
+        'engine_config': _SCORING_ENGINE_CONFIG,
+        'factor_engine_version': _EXTENDED_FACTOR_ENGINE_VERSION,
+        'symbol': normalized_symbol,
+        'market': (market or '').lower(),
+        'last_price': last_price,
+        'previous_close': prev_close,
+        'info': info,
+        'daily_history': history_identity,
+        'intraday_history': intraday_identity,
+    }
+    cacheable_request = not use_real_options and history_identity['valid'] and intraday_identity['valid']
+    cache_fingerprint = stable_fingerprint(material_inputs)
+    cache_dimensions = {
+        'symbol': normalized_symbol,
+        'scoring_version': _SCORING_ENGINE_VERSION,
+        'component': 'extended_factors',
+        'market': (market or '').lower(),
+    }
+    if cacheable_request:
+        cached = memory_store.get(
+            'score_components', cache_dimensions, fingerprint=cache_fingerprint, provider_id='derived',
+        )
+        if _complete_factor_payload(cached):
+            _record_score_cache_timing('extended_factors', 'hits', cache_started)
+            return cached
+        _record_score_cache_timing('extended_factors', 'misses', cache_started)
     open_p = _safe(info.get('open'))
     day_low = _safe(info.get('dayLow'))
     day_high = _safe(info.get('dayHigh'))
@@ -384,7 +463,7 @@ def compute_extended_factors(
                  'neutral'
     dp['attraction_state'] = dp.get('attraction_state', attraction)
 
-    return {
+    result = {
         'trend_volume_delta': tvd,
         'institutional_confluence': icf,
         'options_positioning': op,
@@ -393,3 +472,24 @@ def compute_extended_factors(
         'volume_sentiment': vs,
         'reaction_map': rmap,
     }
+    if cacheable_request:
+        if _complete_factor_payload(result):
+            memory_store.set(
+                'score_components', cache_dimensions, result,
+                ttl_seconds=settings.score_component_cache_ttl_seconds,
+                fingerprint=cache_fingerprint, provider_id='derived', priority=2,
+                source_timestamp=history_identity['source_timestamp'],
+                provenance={
+                    'engine_version': _SCORING_ENGINE_VERSION,
+                    'factor_engine_version': _EXTENDED_FACTOR_ENGINE_VERSION,
+                    'engine_config': stable_fingerprint(_SCORING_ENGINE_CONFIG),
+                    'source_timestamp': history_identity['source_timestamp'],
+                    'history_fingerprint': history_identity['content_fingerprint'],
+                    'intraday_history_fingerprint': intraday_identity['content_fingerprint'],
+                    'material_fingerprint': cache_fingerprint,
+                },
+            )
+            _record_score_cache_timing('extended_factors', 'writes', cache_started)
+        else:
+            _record_score_cache_timing('extended_factors', 'rejected', cache_started)
+    return result

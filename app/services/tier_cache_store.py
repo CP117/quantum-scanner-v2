@@ -163,6 +163,27 @@ def clear_tier3_cache() -> None:
     log.info('tier_cache_store: Tier 3 disk cache cleared')
 
 
+def invalidate_symbol(symbol: str) -> int:
+    """Remove a symbol from both tier caches and its durable Tier 3 shard."""
+    key = (symbol or '').upper()
+    if not key:
+        return 0
+    removed = 0
+    with _t2_lock:
+        if _t2_cache.pop(key, None) is not None:
+            removed += 1
+    letter = _shard_key(key)
+    _load_shard(letter)
+    with _t3_shards_lock:
+        shard = _t3_shards.get(letter)
+        if shard and shard['data'].pop(key, None) is not None:
+            shard['dirty'] = True
+            removed += 1
+    if removed:
+        _flush_dirty_shards()
+    return removed
+
+
 def _flush_dirty_shards() -> int:
     """Write dirty shards to disk.  Returns count of shards flushed."""
     flushed = 0
@@ -182,6 +203,11 @@ def _flush_dirty_shards() -> int:
         except Exception:  # noqa: BLE001
             log.debug('tier_cache_store: failed to flush shard %s', letter, exc_info=True)
     return flushed
+
+
+def flush_tier3_summaries() -> int:
+    """Bounded synchronous checkpoint used by emergency maintenance."""
+    return _flush_dirty_shards()
 
 
 def _flush_loop() -> None:

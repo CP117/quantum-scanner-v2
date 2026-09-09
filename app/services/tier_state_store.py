@@ -72,6 +72,10 @@ class StateStore(ABC):
         """Return True when no tier assignments are stored yet."""
         return len(self.all_tiers()) == 0
 
+    def delete_symbol(self, symbol: str) -> None:
+        """Delete a removed-universe symbol (optional for custom stores)."""
+        return None
+
 
 # ---------------------------------------------------------------------------
 # In-memory implementation (default, backward-compatible)
@@ -105,6 +109,10 @@ class InMemoryStateStore(StateStore):
     def bulk_load(self, tiers: Dict[str, int], scores: Dict[str, float]) -> None:
         self._tiers.update(tiers)
         self._scores.update(scores)
+
+    def delete_symbol(self, symbol: str) -> None:
+        self._tiers.pop(symbol, None)
+        self._scores.pop(symbol, None)
 
 
 # ---------------------------------------------------------------------------
@@ -240,6 +248,12 @@ class RedisStateStore(StateStore):
         if scores:
             pipe.hset(self._scores_key, mapping={k: str(v) for k, v in scores.items()})
         pipe.execute()
+
+    def delete_symbol(self, symbol: str) -> None:
+        self._redis.hdel(self._tiers_key, symbol)
+        self._redis.hdel(self._scores_key, symbol)
+        self._cache.invalidate(self._tier_cache_key(symbol))
+        self._cache.invalidate(self._score_cache_key(symbol))
 
     def bootstrap_from_file(self, path: Path) -> None:
         """Seed Redis from *path* (tier_state.json) if Redis is currently empty.

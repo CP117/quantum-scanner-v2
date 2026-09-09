@@ -26,34 +26,35 @@ Phase 26: `_write_shard` now uses a unique tmp filename per call so two
 processes (e.g. uvicorn --reload's reloader + worker) cannot collide on the
 same tmp path and produce a FileNotFoundError on os.replace.
 
-Phase 26.30 (CPU win): the hot path no longer serializes-and-writes a JSON
-shard on every `save_quote()` call. py-spy profiling showed `_write_shard`
-consumed ~32% of batch wall time on a cold cache. The new architecture:
+Phase 9: quotes are RAM-first. The bounded process-local `memory_store`
+serves the common path, while sharded JSON remains a recoverable,
+write-behind durability layer. Disk recovery and writes always happen outside
+the quote locks; the application's managed maintenance worker drains the
+bounded, coalesced dirty set.
 
   - Shards are read from disk lazily into an in-memory dict on first access
     and become the canonical source of truth for that shard.
   - `save_quote` / `invalidate_quote` mutate the in-memory dict (~O(1)) and
     mark the shard "dirty"; reads see writes immediately.
-  - A background daemon thread (`_flusher_loop`) wakes every 250 ms and
-    persists any shard that has been dirty for >= 1 s. Bursts of saves
-    against the same shard coalesce into a single atomic disk write.
+  - The managed maintenance loop persists dirty shards after a debounce
+    window. Bursts of saves against the same shard coalesce into one atomic
+    disk write; failed writes remain dirty and retry with bounded backoff.
   - Serialization uses `orjson` (5-10x faster than stdlib `json`) and
     drops the cosmetic `indent=2, sort_keys=True` from the hot path (still
     sort-keys for determinism, but no pretty-print).
-  - `atexit` flushes all dirty shards on interpreter shutdown so we never
-    lose data on a clean exit.
+  - FastAPI shutdown performs a bounded final flush after stopping
+    maintenance. `atexit` is deliberately not used: lifecycle ownership must
+    remain with the application, rather than creating unmanaged writers.
 
 The public API (`save_quote`, `get_cached_quote`, `load_quote_cache`,
 `invalidate_quote`, `cache_status`) is unchanged, so the rest of the app
 doesn't need to know about the in-memory layer.
 """
 from __future__ import annotations
-import atexit
 import json
 import logging
 import os
 import string
-import threading
 import time
 import uuid
 from pathlib import Path
@@ -91,6 +92,7 @@ _MIGRATION_DONE = False
 # is updated asynchronously by the flusher thread.
 _SHARD_MEM: dict[str, dict] = {}
 _SHARD_LOADED: dict[str, bool] = {}
+_SHARD_VERSION: dict[str, int] = {}
 
 # Dirty bookkeeping (guarded by _DIRTY_LOCK):
 #   _DIRTY_SHARDS: shards whose in-memory state has unflushed writes.
@@ -99,18 +101,20 @@ _SHARD_LOADED: dict[str, bool] = {}
 _DIRTY_LOCK = Lock()
 _DIRTY_SHARDS: set[str] = set()
 _DIRTY_SINCE: dict[str, float] = {}
+_DIRTY_FAILURES: dict[str, int] = {}
+_DIRTY_RETRY_AT: dict[str, float] = {}
+_PERSISTING_SHARDS: set[str] = set()
 
 # Flusher configuration. Defensive defaults: 1 second of coalescing buys
 # us most of the wins from a hot scoring loop (which may dirty the same
 # shard dozens of times per second) without leaving data unflushed long
 # enough to be problematic on a clean exit.
-_DEBOUNCE_S = 1.0
-_FLUSHER_TICK_S = 0.25
-
-_FLUSHER_LOCK = Lock()
-_FLUSHER_THREAD: threading.Thread | None = None
-_FLUSHER_STOP = threading.Event()
-_ATEXIT_REGISTERED = False
+_DEBOUNCE_S = max(0.0, float(os.environ.get("QUOTE_CACHE_FLUSH_DEBOUNCE_SECONDS", "1.0")))
+_FLUSH_BATCH_SIZE = max(1, int(os.environ.get("QUOTE_CACHE_FLUSH_MAX_SHARDS", "4")))
+_FLUSH_RETRY_MAX_S = max(0.0, float(os.environ.get("QUOTE_CACHE_FLUSH_RETRY_MAX_SECONDS", "5.0")))
+_SHUTDOWN_FLUSH_MAX_SHARDS = max(1, int(os.environ.get("QUOTE_CACHE_SHUTDOWN_FLUSH_MAX_SHARDS", "8")))
+_SHUTDOWN_FLUSH_MAX_S = max(0.0, float(os.environ.get("QUOTE_CACHE_SHUTDOWN_FLUSH_SECONDS", "3.0")))
+_MEMORY_PROVIDER_ID = "yfinance"
 
 # cache_status() TTL cache: result is valid for this many seconds so that
 # frequent UI polling (e.g. every 2-3 s) doesn't re-scan all 27 shard locks.
@@ -175,25 +179,40 @@ def _read_shard_from_disk(shard: str) -> dict:
 
 
 def _ensure_shard_loaded(shard: str) -> dict:
-    """Ensure the in-memory shard is populated from disk, then return the
-    underlying dict (the caller MUST already hold _SHARD_LOCKS[shard])."""
-    if not _SHARD_LOADED.get(shard):
-        _SHARD_MEM[shard] = _read_shard_from_disk(shard)
-        _SHARD_LOADED[shard] = True
-    # The .get() guard is defensive in case something else cleared the
-    # mem dict between the load and the return.
-    return _SHARD_MEM.setdefault(shard, {})
+    """Recover one shard without ever doing disk I/O under its quote lock.
+
+    A concurrent cold caller may duplicate a small shard read, but only one
+    result is installed. This deliberately favors lock-free write admission
+    over making a first, cold read wait behind filesystem latency.
+    """
+    lock = _SHARD_LOCKS[shard]
+    with lock:
+        if _SHARD_LOADED.get(shard):
+            return _SHARD_MEM.setdefault(shard, {})
+
+    recovered = _read_shard_from_disk(shard)
+
+    with lock:
+        if not _SHARD_LOADED.get(shard):
+            # Preserve any memory state injected by a concurrent recovery or
+            # test harness; it is newer than the durable snapshot.
+            recovered.update(_SHARD_MEM.get(shard, {}))
+            _SHARD_MEM[shard] = recovered
+            _SHARD_LOADED[shard] = True
+            _SHARD_VERSION.setdefault(shard, 0)
+        return _SHARD_MEM.setdefault(shard, {})
 
 
 def _read_shard(shard: str) -> dict:
     """Backward-compatible read: returns the current in-memory shard
     contents (loading from disk on first access). Returns a *copy* to
     isolate callers from in-place mutations of the in-memory dict."""
+    _ensure_shard_loaded(shard)
     with _SHARD_LOCKS[shard]:
-        return dict(_ensure_shard_loaded(shard))
+        return dict(_SHARD_MEM.get(shard, {}))
 
 
-def _write_shard_bytes(shard: str, payload: bytes) -> None:
+def _write_shard_bytes(shard: str, payload: bytes) -> bool:
     """Atomically replace the shard file on disk with `payload`.
 
     The atomic-write + retry semantics are unchanged from Phase 26 so
@@ -229,7 +248,7 @@ def _write_shard_bytes(shard: str, payload: bytes) -> None:
     for delay_ms in delays_ms:
         try:
             if _attempt():
-                return
+                return True
         except Exception as exc:  # noqa: BLE001
             last_exc = exc
         time.sleep(delay_ms / 1000.0)
@@ -241,143 +260,153 @@ def _write_shard_bytes(shard: str, payload: bytes) -> None:
         final_ok = _attempt()
     except Exception:  # noqa: BLE001
         pass
-    if not final_ok and last_exc:
+    if not final_ok:
         _log.warning(
-            'shard %s flush failed after %d retries (last error: %s); '
-            'will retry on next dirty mark', shard, len(delays_ms), last_exc,
+            'shard %s flush failed after %d retries (last error: %s)',
+            shard, len(delays_ms), last_exc or 'replace did not succeed',
         )
+    return final_ok
 
 
-def _write_shard(shard: str, data: dict) -> None:
+def _write_shard(shard: str, data: dict) -> bool:
     """Backward-compatible synchronous write: serialize + atomically replace
     the shard file. Used by the one-time legacy migration and by `_flush_shard`.
     The hot path (`save_quote`/`invalidate_quote`) no longer calls this
     directly; it mutates memory and lets the background flusher persist."""
-    _write_shard_bytes(shard, _dumps(data))
+    return _write_shard_bytes(shard, _dumps(data))
 
-
-# ---------------------------------------------------------------------------
-# Background flusher
-# ---------------------------------------------------------------------------
 
 def _mark_dirty(shard: str) -> None:
-    """Mark a shard for asynchronous flushing. Idempotent within the
-    debounce window."""
+    """Mark a shard for managed write-behind persistence."""
     now = time.monotonic()
     with _DIRTY_LOCK:
         _DIRTY_SHARDS.add(shard)
         # setdefault preserves the FIRST-dirty timestamp so we flush
         # exactly _DEBOUNCE_S after the burst begins, not after it ends.
         _DIRTY_SINCE.setdefault(shard, now)
-    _ensure_flusher_started()
 
 
-def _snapshot_shard_for_flush(shard: str) -> bytes | None:
-    """Serialize the in-memory shard to bytes while holding the per-shard
-    lock so we don't observe a torn update. Returns None if there's nothing
-    to flush (shard was never loaded)."""
+def _snapshot_shard_for_flush(shard: str) -> tuple[bytes, int] | None:
+    """Return an internally consistent serialized snapshot and its version."""
     with _SHARD_LOCKS[shard]:
         data = _SHARD_MEM.get(shard)
         if data is None:
             return None
-        # orjson.dumps releases the GIL and is fast; still, do it inside
-        # the lock so any concurrent save_quote can't interleave a partial
-        # mutation into the serialized output.
-        return _dumps(data)
+        return _dumps(data), _SHARD_VERSION.get(shard, 0)
 
 
-def _flush_shard(shard: str) -> None:
-    payload = _snapshot_shard_for_flush(shard)
-    if payload is None:
-        return
-    _write_shard_bytes(shard, payload)
+def _complete_flush(shard: str, version: int, succeeded: bool, now: float) -> None:
+    """Clear only the exact snapshot that reached disk.
 
-
-def _flusher_loop() -> None:
-    """Daemon loop: every _FLUSHER_TICK_S seconds, flush any shard whose
-    dirty-age exceeds _DEBOUNCE_S."""
-    while not _FLUSHER_STOP.is_set():
-        # Sleep with the stop event so shutdown can interrupt immediately.
-        if _FLUSHER_STOP.wait(_FLUSHER_TICK_S):
-            break
-        try:
-            now = time.monotonic()
-            to_flush: list[str] = []
-            with _DIRTY_LOCK:
-                for s in list(_DIRTY_SHARDS):
-                    since = _DIRTY_SINCE.get(s, now)
-                    if (now - since) >= _DEBOUNCE_S:
-                        to_flush.append(s)
-                        _DIRTY_SHARDS.discard(s)
-                        _DIRTY_SINCE.pop(s, None)
-            for s in to_flush:
-                try:
-                    _flush_shard(s)
-                except Exception as exc:  # noqa: BLE001
-                    _log.warning('flusher: shard %s flush failed: %s', s, exc)
-        except Exception as exc:  # noqa: BLE001
-            # The flusher must NEVER die. Log and keep going.
-            _log.warning('flusher tick error: %s', exc)
-
-
-def _ensure_flusher_started() -> None:
-    """Lazy-start the background flusher on the first dirty mark."""
-    global _FLUSHER_THREAD, _ATEXIT_REGISTERED
-    if _FLUSHER_THREAD is not None and _FLUSHER_THREAD.is_alive():
-        return
-    with _FLUSHER_LOCK:
-        if _FLUSHER_THREAD is not None and _FLUSHER_THREAD.is_alive():
+    A save that races a slow write increments the shard version. Its dirty
+    marker therefore survives completion of the older snapshot and will be
+    persisted on a subsequent maintenance tick.
+    """
+    with _SHARD_LOCKS[shard]:
+        current_version = _SHARD_VERSION.get(shard, 0)
+    with _DIRTY_LOCK:
+        _PERSISTING_SHARDS.discard(shard)
+        if succeeded:
+            _DIRTY_FAILURES.pop(shard, None)
+            _DIRTY_RETRY_AT.pop(shard, None)
+            if current_version == version:
+                _DIRTY_SHARDS.discard(shard)
+                _DIRTY_SINCE.pop(shard, None)
             return
-        _FLUSHER_STOP.clear()
-        t = threading.Thread(
-            target=_flusher_loop,
-            name='quote-cache-flusher',
-            daemon=True,
+        failures = _DIRTY_FAILURES.get(shard, 0) + 1
+        _DIRTY_FAILURES[shard] = failures
+        _DIRTY_SHARDS.add(shard)
+        _DIRTY_SINCE.setdefault(shard, now)
+        _DIRTY_RETRY_AT[shard] = now + min(
+            _FLUSH_RETRY_MAX_S, 0.25 * (2 ** min(failures - 1, 6))
         )
-        t.start()
-        _FLUSHER_THREAD = t
-        if not _ATEXIT_REGISTERED:
-            atexit.register(_atexit_flush)
-            _ATEXIT_REGISTERED = True
+    _log.warning(
+        "quote-cache persistence failed for shard %s (attempt %d); retaining dirty snapshot",
+        shard, failures,
+    )
 
 
-def _atexit_flush() -> None:
-    """Drain all dirty shards on interpreter shutdown so a clean exit
-    never loses cached quotes."""
+def _flush_shard(shard: str) -> bool:
+    """Persist a versioned snapshot without holding either shared cache lock."""
+    # Claim only the in-flight marker under the bookkeeping lock. The
+    # serializer and every filesystem operation below run after releasing it.
+    with _DIRTY_LOCK:
+        if shard in _PERSISTING_SHARDS:
+            return False
+        _PERSISTING_SHARDS.add(shard)
+    snapshot = _snapshot_shard_for_flush(shard)
+    if snapshot is None:
+        _complete_flush(shard, 0, True, time.monotonic())
+        return True
+    payload, version = snapshot
     try:
-        _FLUSHER_STOP.set()
-    except Exception:
-        pass
-    try:
-        with _DIRTY_LOCK:
-            shards = list(_DIRTY_SHARDS)
-            _DIRTY_SHARDS.clear()
-            _DIRTY_SINCE.clear()
-        for s in shards:
-            try:
-                _flush_shard(s)
-            except Exception:
-                pass
-    except Exception:
-        pass
+        succeeded = _write_shard_bytes(shard, payload)
+    except Exception as exc:  # noqa: BLE001
+        _log.warning("quote-cache disk write crashed for shard %s: %s", shard, exc)
+        succeeded = False
+    _complete_flush(shard, version, succeeded, time.monotonic())
+    return succeeded
+
+
+def flush_due(
+    now: float | None = None,
+    *,
+    force: bool = False,
+    max_shards: int | None = None,
+) -> int:
+    """Flush a bounded set of due shards from the managed maintenance loop.
+
+    This intentionally has no background thread: callers own scheduling.
+    It returns successful writes, leaving failures dirty for backoff retry.
+    """
+    now = time.monotonic() if now is None else now
+    limit = _FLUSH_BATCH_SIZE if max_shards is None else max(0, max_shards)
+    with _DIRTY_LOCK:
+        candidates = [
+            shard for shard in sorted(_DIRTY_SHARDS)
+            if force
+            or (
+                now - _DIRTY_SINCE.get(shard, now) >= _DEBOUNCE_S
+                and now >= _DIRTY_RETRY_AT.get(shard, 0.0)
+            )
+        ][:limit]
+    succeeded = 0
+    for shard in candidates:
+        try:
+            succeeded += int(_flush_shard(shard))
+        except Exception as exc:  # noqa: BLE001
+            _log.warning("quote-cache flush crashed for shard %s: %s", shard, exc)
+            _complete_flush(shard, -1, False, time.monotonic())
+    return succeeded
 
 
 def flush_now() -> int:
-    """Synchronously flush every dirty shard. Returns the number of
-    shards written. Intended for tests, shutdown hooks, and operators
-    who want a definitive on-disk checkpoint."""
-    with _DIRTY_LOCK:
-        shards = list(_DIRTY_SHARDS)
-        _DIRTY_SHARDS.clear()
-        _DIRTY_SINCE.clear()
-    n = 0
-    for s in shards:
+    """Perform a bounded best-effort shutdown checkpoint.
+
+    Dirty work left after the deadline is intentionally retained in memory;
+    no unbounded shutdown or stale-write overwrite is permitted.
+    """
+    deadline = time.monotonic() + _SHUTDOWN_FLUSH_MAX_S
+    written = 0
+    attempted: set[str] = set()
+    while (
+        time.monotonic() <= deadline
+        and len(attempted) < _SHUTDOWN_FLUSH_MAX_SHARDS
+    ):
+        with _DIRTY_LOCK:
+            candidates = sorted(
+                _DIRTY_SHARDS - attempted - _PERSISTING_SHARDS
+            )
+        if not candidates:
+            break
+        shard = candidates[0]
+        attempted.add(shard)
         try:
-            _flush_shard(s)
-            n += 1
+            written += int(_flush_shard(shard))
         except Exception as exc:  # noqa: BLE001
-            _log.warning('flush_now: shard %s failed: %s', s, exc)
-    return n
+            _log.warning("quote-cache shutdown flush crashed for shard %s: %s", shard, exc)
+            _complete_flush(shard, -1, False, time.monotonic())
+    return written
 
 
 # ---------------------------------------------------------------------------
@@ -407,12 +436,15 @@ def _maybe_migrate_legacy() -> None:
             shard = _shard_for(sym)
             by_shard.setdefault(shard, {})[sym.upper()] = payload
         for shard, entries in by_shard.items():
+            _ensure_shard_loaded(shard)
             with _SHARD_LOCKS[shard]:
-                existing = _ensure_shard_loaded(shard)
+                existing = _SHARD_MEM.setdefault(shard, {})
                 existing.update(entries)
+                _SHARD_VERSION[shard] = _SHARD_VERSION.get(shard, 0) + 1
             # Migration is a one-shot operation; persist synchronously so
             # the legacy file is replaced atomically with the shard set.
-            _write_shard(shard, _SHARD_MEM.get(shard, {}))
+            if not _write_shard(shard, _SHARD_MEM.get(shard, {})):
+                _mark_dirty(shard)
         # Rename legacy so it isn't re-imported on next process start.
         try:
             _LEGACY_FILE.rename(_LEGACY_FILE.with_suffix(".json.migrated"))
@@ -425,6 +457,33 @@ def _maybe_migrate_legacy() -> None:
 # Public API
 # ---------------------------------------------------------------------------
 
+def warm_quote_cache(*, rate_limit_per_second: float = 10.0) -> int:
+    """Recover durable shards gradually during managed cold-start warmup.
+
+    This only reads local JSON; it never fetches providers or evicts a
+    foreground quote. The caller runs it after startup jitter so multiple
+    workers do not contend for the same shard files at once.
+    """
+    _maybe_migrate_legacy()
+    delay = 1.0 / rate_limit_per_second if rate_limit_per_second > 0 else 0.0
+    loaded = 0
+    for shard in list(string.ascii_uppercase) + ["_"]:
+        # Cold-start recovery is deliberately low priority.  Do not keep
+        # admitting Tier 3 disk entries while maintenance is relieving RAM
+        # pressure for active scanner work.
+        try:
+            from app.services.tier_cache_policy import low_priority_prefetch_halted
+            if low_priority_prefetch_halted():
+                break
+        except Exception:
+            pass
+        _ensure_shard_loaded(shard)
+        loaded += 1
+        if delay:
+            time.sleep(delay)
+    return loaded
+
+
 def load_quote_cache() -> dict:
     """Return the merged contents of every shard. Mostly used by
     `cache_status()` and end-to-end tests; the hot path uses
@@ -432,9 +491,50 @@ def load_quote_cache() -> dict:
     _maybe_migrate_legacy()
     out: dict = {}
     for shard in list(string.ascii_uppercase) + ["_"]:
+        _ensure_shard_loaded(shard)
         with _SHARD_LOCKS[shard]:
-            out.update(_ensure_shard_loaded(shard))
+            out.update(_SHARD_MEM.get(shard, {}))
     return out
+
+
+def _quote_priority(symbol: str) -> int:
+    """Use tier priority for bounded RAM eviction without coupling imports."""
+    try:
+        from app.services.memory_store import PRIORITY_TIER_1, PRIORITY_TIER_2, PRIORITY_TIER_3
+        from app.services.tier_manager import TIER_1, TIER_2, get_tier
+        tier = get_tier(symbol)
+        if tier == TIER_1:
+            return PRIORITY_TIER_1
+        if tier == TIER_2:
+            return PRIORITY_TIER_2
+        return PRIORITY_TIER_3
+    except Exception:
+        return 2
+
+
+def _memory_provider_id(quote: dict | None = None) -> str:
+    """Use provider generation in RAM identity while disk remains portable."""
+    source = ((quote or {}).get("source") or _MEMORY_PROVIDER_ID).strip().lower()
+    try:
+        from app.services.provider_session import provider_cache_identity
+        return provider_cache_identity(source)
+    except Exception:
+        return source
+
+
+def _put_memory_quote(symbol: str, quote: dict) -> None:
+    """Best-effort RAM admission; durable write-behind remains independent."""
+    try:
+        from app.services.memory_store import memory_store
+        memory_store.set_quote(
+            symbol,
+            quote,
+            provider_id=_memory_provider_id(quote),
+            ttl_seconds=settings.quote_cache_ttl_seconds,
+            priority=_quote_priority(symbol),
+        )
+    except Exception as exc:  # noqa: BLE001
+        _log.debug("quote RAM cache admission failed for %s: %s", symbol, exc)
 
 
 def save_quote(symbol: str, payload: dict) -> None:
@@ -443,15 +543,18 @@ def save_quote(symbol: str, payload: dict) -> None:
     _maybe_migrate_legacy()
     shard = _shard_for(symbol)
     sym = symbol.upper()
+    _ensure_shard_loaded(shard)
     with _SHARD_LOCKS[shard]:
-        data = _ensure_shard_loaded(shard)
-        data[sym] = {
+        entry = {
             "symbol": sym,
             "last_price": payload.get("last_price"),
             "previous_close": payload.get("previous_close"),
             "captured_at_utc": payload.get("captured_at_utc") or utcnow_iso(),
             "source": payload.get("source", "yfinance"),
         }
+        _SHARD_MEM.setdefault(shard, {})[sym] = entry
+        _SHARD_VERSION[shard] = _SHARD_VERSION.get(shard, 0) + 1
+    _put_memory_quote(sym, entry)
     _mark_dirty(shard)
 
 
@@ -463,28 +566,83 @@ def invalidate_quote(symbol: str) -> bool:
     shard = _shard_for(symbol)
     sym = symbol.upper()
     removed = False
+    _ensure_shard_loaded(shard)
     with _SHARD_LOCKS[shard]:
-        data = _ensure_shard_loaded(shard)
+        data = _SHARD_MEM.setdefault(shard, {})
         if sym in data:
             del data[sym]
+            _SHARD_VERSION[shard] = _SHARD_VERSION.get(shard, 0) + 1
             removed = True
     if removed:
+        try:
+            from app.services.memory_store import memory_store
+            memory_store.invalidate_symbol(sym, domains={"quotes"})
+        except Exception:
+            pass
         _mark_dirty(shard)
+    return removed
+
+
+def invalidate_provider_quotes(provider_id: str) -> int:
+    """Remove durable quotes sourced by a provider after its session resets."""
+    provider = (provider_id or '').strip().lower()
+    if not provider:
+        return 0
+    _maybe_migrate_legacy()
+    removed = 0
+    for shard in list(string.ascii_uppercase) + ["_"]:
+        _ensure_shard_loaded(shard)
+        with _SHARD_LOCKS[shard]:
+            data = _SHARD_MEM.setdefault(shard, {})
+            stale = [
+                symbol for symbol, quote in data.items()
+                if (quote.get("source") or _MEMORY_PROVIDER_ID).strip().lower() == provider
+            ]
+            for symbol in stale:
+                del data[symbol]
+                removed += 1
+            if stale:
+                _SHARD_VERSION[shard] = _SHARD_VERSION.get(shard, 0) + 1
+        if stale:
+            _mark_dirty(shard)
+    if removed:
+        try:
+            from app.services.memory_store import memory_store
+            memory_store.invalidate_provider(provider)
+        except Exception:
+            pass
     return removed
 
 
 def get_cached_quote(symbol: str) -> dict | None:
     if not symbol:
         return None
-    _maybe_migrate_legacy()
-    shard = _shard_for(symbol)
     sym = symbol.upper()
+    # This is the quote hot path: return the bounded RAM value without
+    # touching shard locks or the filesystem whenever possible.
+    try:
+        from app.services.memory_store import memory_store
+        # The durable quote shard is source-agnostic, but RAM entries retain
+        # their provider generation. Probe the small supported-source set so
+        # crypto quotes do not fall through to disk on every read.
+        for source in ("yfinance", "coingecko", "cryptocompare"):
+            hit = memory_store.get_quote(sym, provider_id=_memory_provider_id({"source": source}))
+            if hit is not None:
+                return dict(hit)
+    except Exception as exc:  # noqa: BLE001
+        _log.debug("quote RAM cache read failed for %s: %s", sym, exc)
+
+    _maybe_migrate_legacy()
+    shard = _shard_for(sym)
+    _ensure_shard_loaded(shard)
     with _SHARD_LOCKS[shard]:
-        data = _ensure_shard_loaded(shard)
-        hit = data.get(sym)
+        hit = _SHARD_MEM.get(shard, {}).get(sym)
         # Return a shallow copy so callers can't mutate the canonical
         # in-memory state by accident.
-        return dict(hit) if hit is not None else None
+        recovered = dict(hit) if hit is not None else None
+    if recovered is not None:
+        _put_memory_quote(sym, recovered)
+    return recovered
 
 
 def quote_age_seconds(cached: dict | None) -> int:

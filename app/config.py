@@ -74,6 +74,8 @@ class Settings(BaseModel):
     # Provider quota — raised from 300 to 600 req/min.
     # Tier 1 gets 60 %, Tier 2 20 %, Tier 3 0 % (EOD only).
     provider_budget_per_minute: int = int(os.getenv("PROVIDERBUDGETPERMINUTE", "600"))
+    provider_tier3_min_requests_per_minute: int = int(os.getenv("PROVIDER_TIER3_MIN_REQUESTS_PER_MINUTE", "12"))
+    provider_circuit_breaker_seconds: float = float(os.getenv("PROVIDER_CIRCUIT_BREAKER_SECONDS", "30"))
 
     # Watchlist SQLite DB path (relative to repo root if not absolute).
     watchlist_db_path: str = os.getenv("WATCHLIST_DB_PATH", "data/watchlists.db")
@@ -113,6 +115,43 @@ class Settings(BaseModel):
     memory_cache_max_mb: int = int(os.getenv("MEMORY_CACHE_MAX_MB", "256"))
     memory_cache_max_entries_per_domain: int = int(os.getenv("MEMORY_CACHE_MAX_ENTRIES_PER_DOMAIN", "5000"))
     memory_cache_prune_interval_seconds: int = int(os.getenv("MEMORY_CACHE_PRUNE_INTERVAL_SECONDS", "60"))
+    memory_cache_emergency_percent: float = float(os.getenv("MEMORY_CACHE_EMERGENCY_PERCENT", "0.90"))
+    memory_cache_emergency_recovery_percent: float = float(os.getenv("MEMORY_CACHE_EMERGENCY_RECOVERY_PERCENT", "0.75"))
+    cache_ttl_jitter_percent: float = float(os.getenv("CACHE_TTL_JITTER_PERCENT", "0.10"))
+    memory_cache_singleflight_timeout_seconds: float = float(os.getenv("MEMORY_CACHE_SINGLEFLIGHT_TIMEOUT_SECONDS", "2.0"))
+    memory_cache_warmup_enabled: bool = _env_bool("MEMORY_CACHE_WARMUP_ENABLED", True)
+    memory_cache_warmup_jitter_seconds: int = int(os.getenv("MEMORY_CACHE_WARMUP_JITTER_SECONDS", "30"))
+    cache_correctness_sample_rate: float = float(os.getenv("CACHE_CORRECTNESS_SAMPLE_RATE", "0.01"))
+
+    # Domain flags and rollout modes permit incremental, immediate rollback.
+    cache_enable_quotes: bool = _env_bool("CACHE_ENABLE_QUOTES", True)
+    cache_enable_daily_history: bool = _env_bool("CACHE_ENABLE_DAILY_HISTORY", True)
+    cache_enable_score_components: bool = _env_bool("CACHE_ENABLE_SCORE_COMPONENTS", False)
+    cache_enable_composite_scores: bool = _env_bool("CACHE_ENABLE_COMPOSITE_SCORES", False)
+    cache_enable_options_chains: bool = _env_bool("CACHE_ENABLE_OPTIONS_CHAINS", True)
+    cache_enable_universe_metadata: bool = _env_bool("CACHE_ENABLE_UNIVERSE_METADATA", True)
+    cache_enable_narratives: bool = _env_bool("CACHE_ENABLE_NARRATIVES", False)
+    cache_enable_bayesian_priors: bool = _env_bool("CACHE_ENABLE_BAYESIAN_PRIORS", False)
+    cache_mode_quotes: str = os.getenv("CACHE_MODE_QUOTES", os.getenv("MEMORY_CACHE_MODE", "enabled")).strip().lower()
+    cache_mode_daily_history: str = os.getenv("CACHE_MODE_DAILY_HISTORY", os.getenv("MEMORY_CACHE_MODE", "enabled")).strip().lower()
+    cache_mode_score_components: str = os.getenv("CACHE_MODE_SCORE_COMPONENTS", os.getenv("MEMORY_CACHE_MODE", "enabled")).strip().lower()
+    cache_mode_composite_scores: str = os.getenv("CACHE_MODE_COMPOSITE_SCORES", os.getenv("MEMORY_CACHE_MODE", "enabled")).strip().lower()
+    cache_mode_options_chains: str = os.getenv("CACHE_MODE_OPTIONS_CHAINS", os.getenv("MEMORY_CACHE_MODE", "enabled")).strip().lower()
+    cache_mode_universe_metadata: str = os.getenv("CACHE_MODE_UNIVERSE_METADATA", os.getenv("MEMORY_CACHE_MODE", "enabled")).strip().lower()
+    cache_mode_narratives: str = os.getenv("CACHE_MODE_NARRATIVES", os.getenv("MEMORY_CACHE_MODE", "enabled")).strip().lower()
+    cache_mode_bayesian_priors: str = os.getenv("CACHE_MODE_BAYESIAN_PRIORS", os.getenv("MEMORY_CACHE_MODE", "enabled")).strip().lower()
+
+    quote_cache_ttl_seconds: int = int(os.getenv("QUOTE_CACHE_TTL_SECONDS", "15"))
+    tier_1_quote_max_age_seconds: int = int(os.getenv("TIER1_QUOTE_MAX_AGE_SECONDS", "15"))
+    options_chain_cache_ttl_seconds: int = int(os.getenv("OPTIONS_CHAIN_CACHE_TTL_SECONDS", "120"))
+    options_chain_tier1_refresh_seconds: int = int(os.getenv("OPTIONS_CHAIN_TIER1_REFRESH_SECONDS", "30"))
+    universe_metadata_ttl_seconds: int = int(os.getenv("UNIVERSE_METADATA_TTL_SECONDS", "3600"))
+    scanner_preset_cache_max_entries: int = int(os.getenv("SCANNER_PRESET_CACHE_MAX_ENTRIES", "128"))
+    daily_history_cache_ttl_seconds: int = int(os.getenv("DAILY_HISTORY_CACHE_TTL_SECONDS", "3600"))
+    score_component_cache_ttl_seconds: int = int(os.getenv("SCORE_COMPONENT_CACHE_TTL_SECONDS", "60"))
+    composite_score_cache_ttl_seconds: int = int(os.getenv("COMPOSITE_SCORE_CACHE_TTL_SECONDS", "30"))
+    narrative_cache_ttl_seconds: int = int(os.getenv("NARRATIVE_CACHE_TTL_SECONDS", "120"))
+    bayesian_prior_ttl_seconds: int = int(os.getenv("BAYESIAN_PRIOR_TTL_SECONDS", "86400"))
 
 
 settings = Settings()

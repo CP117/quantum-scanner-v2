@@ -168,6 +168,15 @@ def record_failure(symbol: str) -> bool:
                 sym, len(e['failure_days']), e['failure_count_total'],
             )
         _persist()
+    if promoted:
+        # A blacklisted symbol must not survive through a RAM/disk fallback
+        # or remain eligible for a tier scanner after its first blacklist
+        # transition.
+        try:
+            from app.services.tier_cache_policy import invalidate_symbol_artifacts
+            invalidate_symbol_artifacts(sym, remove_tier_state=True)
+        except Exception:
+            log.debug('symbol_blacklist: cache invalidation failed for %s', sym, exc_info=True)
     return promoted
 
 

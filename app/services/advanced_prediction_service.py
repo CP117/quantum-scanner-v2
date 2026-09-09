@@ -450,6 +450,10 @@ def predict_price_advanced(symbol: str,
         horizon=horizon_units,
         is_intraday=use_intraday,
         regulatory_signal=reg_signal,
+        symbol=sym,
+        segment=market,
+        source_history=closes,
+        history_validated=len(closes) >= 20,
     )
     drift_per_unit_pct = blend.posterior_drift_per_period_pct
     drift_horizon_pct = blend.total_drift_horizon_pct

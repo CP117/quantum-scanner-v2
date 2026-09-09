@@ -217,6 +217,28 @@ def update_composite_score(symbol: str, score: float) -> None:
     get_store().set_score(sym, _score)
 
 
+def remove_symbol(symbol: str) -> bool:
+    """Forget a symbol that has left the active universe or was blacklisted."""
+    sym = (symbol or '').upper()
+    if not sym:
+        return False
+    with _state_lock:
+        existed = sym in _tier_assignments
+        previous = _tier_assignments.pop(sym, None)
+        if previous in _tier_members:
+            _tier_members[previous].discard(sym)
+        _last_promoted_at.pop(sym, None)
+        _last_scored_at.pop(sym, None)
+        _composite_scores.pop(sym, None)
+        _pinned_symbols.discard(sym)
+        _user_interaction_symbols.pop(sym, None)
+    try:
+        get_store().delete_symbol(sym)
+    except Exception:
+        log.debug('tier_manager: state-store delete failed for %s', sym, exc_info=True)
+    return existed
+
+
 # ---------------------------------------------------------------------------
 # Promotion / demotion
 # ---------------------------------------------------------------------------
@@ -254,6 +276,11 @@ def promote(symbol: str, reason: str = 'score') -> bool:
         _tier_members[new_tier].add(sym)
         _last_promoted_at[sym] = time.monotonic()
     get_store().set_tier(sym, new_tier)
+    try:
+        from app.services.tier_cache_policy import on_tier_change
+        on_tier_change(sym, current, new_tier)
+    except Exception:
+        log.debug('tier_manager: cache promotion hook failed for %s', sym, exc_info=True)
     log.info('tier_manager: %s promoted T%d → T%d (%s)', sym, current, new_tier, reason)
     return True
 
@@ -285,6 +312,11 @@ def demote(symbol: str, reason: str = 'score') -> bool:
         _tier_members[current].discard(sym)
         _tier_members[new_tier].add(sym)
     get_store().set_tier(sym, new_tier)
+    try:
+        from app.services.tier_cache_policy import on_tier_change
+        on_tier_change(sym, current, new_tier)
+    except Exception:
+        log.debug('tier_manager: cache demotion hook failed for %s', sym, exc_info=True)
     log.info('tier_manager: %s demoted T%d → T%d (%s)', sym, current, new_tier, reason)
     return True
 
@@ -354,6 +386,7 @@ def rebalance(market: str = 'stocks') -> dict:
             target_tiers[sym] = TIER_2
 
     promoted = demoted = unchanged = 0
+    tier_changes: list[tuple[str, int, int]] = []
     with _state_lock:
         # Prune expired user-interaction entries so the dict doesn't grow forever.
         _now = time.monotonic()
@@ -372,6 +405,7 @@ def rebalance(market: str = 'stocks') -> dict:
                     _tier_assignments[sym] = target
                     _last_promoted_at[sym] = time.monotonic()
                     promoted += 1
+                    tier_changes.append((sym, current, target))
                     log.debug('rebalance: promote %s T%d→T%d', sym, current, target)
                     get_store().set_tier(sym, target)
             else:  # demote
@@ -385,8 +419,16 @@ def rebalance(market: str = 'stocks') -> dict:
                 _tier_members[target].add(sym)
                 _tier_assignments[sym] = target
                 demoted += 1
+                tier_changes.append((sym, current, target))
                 log.debug('rebalance: demote %s T%d→T%d', sym, current, target)
                 get_store().set_tier(sym, target)
+
+    for sym, current, target in tier_changes:
+        try:
+            from app.services.tier_cache_policy import on_tier_change
+            on_tier_change(sym, current, target)
+        except Exception:
+            log.debug('tier_manager: cache transition hook failed for %s', sym, exc_info=True)
 
     log.info(
         'tier_manager: rebalance market=%s promoted=%d demoted=%d unchanged=%d',

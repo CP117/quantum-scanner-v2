@@ -55,6 +55,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse, FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
+from app.config import settings
 from app.routes.health import router as health_router
 from app.routes.search import router as search_router
 from app.routes.results import router as results_router
@@ -163,7 +164,44 @@ async def lifespan(app: FastAPI):
             )
     except Exception:
         pass
+    try:
+        # Own the quote-cache write-behind worker through FastAPI's
+        # lifecycle. Import-time startup created an unmanaged writer in
+        # reload/watch processes and could outlive application shutdown.
+        from app.services.maintenance_service import start_maintenance_thread
+        start_maintenance_thread()
+    except Exception as exc:
+        logging.getLogger('app.maintenance').warning(
+            'quote-cache maintenance startup failed: %s', exc,
+        )
     start_warmer()
+    if settings.memory_cache_warmup_enabled:
+        try:
+            import asyncio as _asyncio
+            import random
+            from app.services.quote_cache import warm_quote_cache
+
+            async def _warm_quote_disk_cache():
+                jitter = max(0, settings.memory_cache_warmup_jitter_seconds)
+                if jitter:
+                    await _asyncio.sleep(random.uniform(0, jitter))
+                # Local recovery has an explicit low rate. It cannot trigger
+                # providers and tier-aware RAM admission on quote reads keeps
+                # foreground/Tier-1 entries ahead of this background work.
+                loaded = await _asyncio.to_thread(
+                    warm_quote_cache, rate_limit_per_second=10.0,
+                )
+                logging.getLogger('app.quote_cache').info(
+                    'cold-start quote-cache recovery loaded %d shards', loaded,
+                )
+
+            app.state._quote_cache_warmup_task = _asyncio.create_task(
+                _warm_quote_disk_cache()
+            )
+        except Exception as exc:
+            logging.getLogger('app.quote_cache').warning(
+                'cold-start quote-cache recovery failed to schedule: %s', exc,
+            )
     # Phase 24: cold-start daily-history pre-warm.  Each cold launch otherwise
     # has to lazily fetch ~7,200 90-day OHLCV blobs during the first scan
     # sweep, which dominates first-sweep wall time.  We enqueue every
@@ -175,28 +213,31 @@ async def lifespan(app: FastAPI):
     #
     # Skip the prewarm when `PREFETCH_DAILY_HISTORY=0` (lets the user
     # disable it on memory-constrained machines).
-    if os.environ.get('PREFETCH_DAILY_HISTORY', '1') != '0':
+    if settings.memory_cache_warmup_enabled and os.environ.get('PREFETCH_DAILY_HISTORY', '1') != '0':
         try:
+            import asyncio as _asyncio
+            import random
             from app.services.universe_service import load_universe
             from app.services.daily_history_service import prefetch_daily_history
             stock_uni = load_universe('stocks') or []
             crypto_uni = load_universe('crypto') or []
-            queued = 0
-            for row in stock_uni:
-                sym = row.get('symbol') if isinstance(row, dict) else None
-                if sym:
-                    prefetch_daily_history(sym)
-                    queued += 1
-            for row in crypto_uni:
-                sym = row.get('symbol') if isinstance(row, dict) else None
-                if sym:
-                    prefetch_daily_history(sym)
-                    queued += 1
+            async def _enqueue_history_warmup():
+                jitter = max(0, settings.memory_cache_warmup_jitter_seconds)
+                if jitter:
+                    await _asyncio.sleep(random.uniform(0, jitter))
+                queued = 0
+                for row in [*stock_uni, *crypto_uni]:
+                    sym = row.get('symbol') if isinstance(row, dict) else None
+                    if sym:
+                        prefetch_daily_history(sym)
+                        queued += 1
+                _log.getLogger('app.daily_history').info(
+                    'cold-start prewarm: enqueued %d symbols (stocks=%d crypto=%d) for background fetch',
+                    queued, len(stock_uni), len(crypto_uni),
+                )
+            _asyncio.create_task(_enqueue_history_warmup())
             import logging as _log
-            _log.getLogger('app.daily_history').info(
-                'cold-start prewarm: enqueued %d symbols (stocks=%d crypto=%d) for background fetch',
-                queued, len(stock_uni), len(crypto_uni),
-            )
+            _log.getLogger('app.daily_history').info('cold-start prewarm scheduled with up to %ds jitter', settings.memory_cache_warmup_jitter_seconds)
         except Exception as exc:
             import logging as _log
             _log.getLogger('app.daily_history').warning(
@@ -263,6 +304,19 @@ async def lifespan(app: FastAPI):
     yield
     stop_warmer()
     try:
+        task = getattr(app.state, '_quote_cache_warmup_task', None)
+        if task and not task.done():
+            task.cancel()
+    except Exception:
+        pass
+    try:
+        # Stop the sole periodic cache writer before the final bounded
+        # checkpoint so no older maintenance snapshot can race shutdown.
+        from app.services.maintenance_service import stop_maintenance_thread
+        stop_maintenance_thread()
+    except Exception:
+        pass
+    try:
         if getattr(app.state, '_reg_stop_scheduler', None):
             await app.state._reg_stop_scheduler()
     except Exception:
@@ -280,9 +334,9 @@ async def lifespan(app: FastAPI):
     except Exception:
         pass
     try:
-        # Phase 26.30: drain any in-memory quote-cache shards to disk so a
-        # clean uvicorn shutdown never loses the most recent batch of
-        # saved quotes (atexit also covers SIGTERM but explicit is safer).
+        # Drain a bounded best-effort set after maintenance has stopped.
+        # The quote cache intentionally does not create atexit/per-write
+        # workers; remaining dirty data stays available until process exit.
         from app.services.quote_cache import flush_now as _qc_flush
         _qc_flush()
     except Exception:
@@ -535,10 +589,8 @@ except Exception as exc:
 try:
     from app.routes.public_url_admin import router as public_url_admin_router
     from app.routes.admin import router as admin_router
-    from app.services.maintenance_service import start_maintenance_thread
     app.include_router(public_url_admin_router)
     app.include_router(admin_router)
-    start_maintenance_thread()
 except Exception as exc:
     import logging as _log
     _log.getLogger('app.maintenance').exception('maintenance/admin mount failed: %s', exc)

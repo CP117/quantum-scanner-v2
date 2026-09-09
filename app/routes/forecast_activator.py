@@ -22,21 +22,25 @@ log = logging.getLogger('app.forecast_activator')
 router = APIRouter(prefix='/api/forecast', tags=['forecast'])
 
 _CACHE_TTL_S = 30.0
-_cache: dict[str, tuple[float, dict]] = {}
+_cache: dict[tuple[str, str], tuple[float, dict]] = {}
 _cache_lock = threading.Lock()
-_symbol_locks: dict[str, threading.Lock] = {}
+_symbol_locks: dict[tuple[str, str], threading.Lock] = {}
 _symbol_locks_guard = threading.Lock()
 
 
-def _lock_for(symbol: str) -> threading.Lock:
+def _cache_key(symbol: str, market: str) -> tuple[str, str]:
+    return ((market or 'stocks').strip().lower(), (symbol or '').upper())
+
+
+def _lock_for(cache_key: tuple[str, str]) -> threading.Lock:
     with _symbol_locks_guard:
-        lk = _symbol_locks.get(symbol)
+        lk = _symbol_locks.get(cache_key)
         if lk is None:
             lk = threading.Lock()
-            _symbol_locks[symbol] = lk
+            _symbol_locks[cache_key] = lk
             if len(_symbol_locks) > 2048:
                 _symbol_locks.clear()
-                _symbol_locks[symbol] = lk
+                _symbol_locks[cache_key] = lk
         return lk
 
 
@@ -139,31 +143,33 @@ def _build_payload(symbol: str, market: str) -> dict[str, Any]:
 @router.post('/run/{symbol}')
 def run_forecast(symbol: str, market: str = Query('stocks'), force: bool = Query(False)):
     sym = (symbol or '').upper()
+    requested_market = market or 'stocks'
+    cache_key = _cache_key(sym, requested_market)
     now = time.monotonic()
     if not force:
         with _cache_lock:
-            cached = _cache.get(sym)
+            cached = _cache.get(cache_key)
             if cached and (now - cached[0]) < _CACHE_TTL_S:
                 payload = dict(cached[1])
                 payload['cached'] = True
                 return payload
-    lk = _lock_for(sym)
+    lk = _lock_for(cache_key)
     with lk:
         # Re-check under the lock — a concurrent request may have filled it.
         with _cache_lock:
-            cached = _cache.get(sym)
+            cached = _cache.get(cache_key)
             if not force and cached and (time.monotonic() - cached[0]) < _CACHE_TTL_S:
                 payload = dict(cached[1])
                 payload['cached'] = True
                 return payload
         try:
-            payload = _build_payload(sym, market or 'stocks')
+            payload = _build_payload(sym, requested_market)
         except Exception as exc:  # noqa: BLE001
             log.exception('forecast activator failed for %s: %s', sym, exc)
             payload = {'symbol': sym, 'market': market, 'state': 'error', 'error': str(exc)[:200]}
         if payload.get('state') in ('ok', 'reduced_confidence'):
             with _cache_lock:
-                _cache[sym] = (time.monotonic(), payload)
+                _cache[cache_key] = (time.monotonic(), payload)
                 if len(_cache) > 512:
                     oldest = sorted(_cache.items(), key=lambda kv: kv[1][0])[:128]
                     for k, _v in oldest:

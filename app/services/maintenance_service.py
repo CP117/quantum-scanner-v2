@@ -67,6 +67,9 @@ CACHE_DEDUPE_INTERVAL_SECONDS = int(
 MEMORY_CACHE_PRUNE_INTERVAL_SECONDS = int(
     os.environ.get('MEMORY_CACHE_PRUNE_INTERVAL_SECONDS', '60')
 )
+QUOTE_CACHE_FLUSH_TICK_SECONDS = max(
+    0.05, float(os.environ.get('QUOTE_CACHE_FLUSH_TICK_SECONDS', '0.25'))
+)
 REGULATORY_RETENTION_DAYS = int(os.environ.get('REGULATORY_RETENTION_DAYS', '180'))
 PREDICTION_RETENTION_DAYS = int(os.environ.get('PREDICTION_RETENTION_DAYS', '90'))
 
@@ -109,6 +112,10 @@ _state: dict[str, Any] = {
     'started_at_utc': None,
     'memory_cache_prunes': 0,
     'last_memory_cache_prune_utc': None,
+    'quote_cache_flushes': 0,
+    'last_quote_cache_flush_utc': None,
+    'memory_cache_emergency_reliefs': 0,
+    'last_memory_cache_emergency_relief': None,
 }
 
 
@@ -142,6 +149,7 @@ def maintenance_status() -> dict:
             'regulatory_db_path': str(_pick(_REG_DB_CANDIDATES) or _REG_DB_CANDIDATES[0]),
             'prediction_db_path': str(_pick(_PRED_DB_CANDIDATES) or _PRED_DB_CANDIDATES[0]),
             'memory_cache_prune_interval_seconds': MEMORY_CACHE_PRUNE_INTERVAL_SECONDS,
+            'quote_cache_flush_tick_seconds': QUOTE_CACHE_FLUSH_TICK_SECONDS,
         }
 
 
@@ -425,6 +433,19 @@ def _loop() -> None:
     while not _thread_stop.is_set():
         try:
             now_mono = time.monotonic()
+            # Quote-cache persistence is deliberately owned by this managed
+            # lifecycle worker. save_quote() only updates RAM + a dirty bit;
+            # no request path creates an ad-hoc writer thread.
+            try:
+                from app.services.quote_cache import flush_due
+                flushed = flush_due(now_mono)
+                if flushed:
+                    with _state_lock:
+                        _state['quote_cache_flushes'] += flushed
+                        _state['last_quote_cache_flush_utc'] = _utc_now_iso()
+            except Exception as exc:  # noqa: BLE001
+                log.warning('quote-cache write-behind tick failed: %s', exc)
+
             if now_mono - last_counter_rotate >= COUNTER_ROTATE_INTERVAL_SECONDS:
                 try:
                     rotate_provider_counters()
@@ -444,10 +465,28 @@ def _loop() -> None:
             if now_mono - last_memory_cache_prune >= MEMORY_CACHE_PRUNE_INTERVAL_SECONDS:
                 from app.services.memory_store import memory_store
                 removed = memory_store.prune_expired()
+                emergency_relief = None
+                if memory_store.get_stats().get('emergency_mode'):
+                    # Checkpoint Tier 3 summaries before their derived RAM
+                    # counterparts are evicted.  This keeps emergency relief
+                    # bounded and avoids dropping durable work unnecessarily.
+                    try:
+                        from app.services.tier_cache_store import flush_tier3_summaries
+                        flush_tier3_summaries()
+                    except Exception:
+                        log.debug('Tier 3 emergency flush failed', exc_info=True)
+                    try:
+                        from app.services.tier_cache_policy import relieve_emergency_pressure
+                        emergency_relief = relieve_emergency_pressure()
+                    except Exception:
+                        log.debug('Tier 3 emergency cache relief failed', exc_info=True)
                 with _state_lock:
                     _state['memory_cache_prunes'] += 1
                     _state['last_memory_cache_prune_utc'] = _utc_now_iso()
                     _state['last_memory_cache_prune_removed'] = removed
+                    if emergency_relief is not None:
+                        _state['memory_cache_emergency_reliefs'] += 1
+                        _state['last_memory_cache_emergency_relief'] = emergency_relief
                 last_memory_cache_prune = now_mono
 
             do_prune = (now_mono - last_db_prune >= DB_PRUNE_INTERVAL_SECONDS) or (
@@ -462,8 +501,9 @@ def _loop() -> None:
                 first_db_prune_due = 0  # consumed
         except Exception as exc:  # noqa: BLE001
             log.exception('maintenance loop tick crashed: %s', exc)
-        # Sleep in short increments so a stop signal is honored promptly.
-        _thread_stop.wait(30.0)
+        # Quote persistence needs a short cadence for its debounce window;
+        # Event.wait still makes shutdown prompt without an extra thread.
+        _thread_stop.wait(QUOTE_CACHE_FLUSH_TICK_SECONDS)
 
 
 def start_maintenance_thread() -> None:
@@ -484,6 +524,9 @@ def start_maintenance_thread() -> None:
 
 def stop_maintenance_thread() -> None:
     _thread_stop.set()
+    thread = _thread
+    if thread and thread.is_alive() and thread is not threading.current_thread():
+        thread.join(timeout=max(1.0, QUOTE_CACHE_FLUSH_TICK_SECONDS * 4))
 
 
 # ---------------------------------------------------------------------------

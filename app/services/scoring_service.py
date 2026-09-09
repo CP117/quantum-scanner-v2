@@ -3,6 +3,7 @@ import logging
 import math
 import os as _os
 import threading as _threading
+import time as _time
 from concurrent.futures import (
     ThreadPoolExecutor as _ScoringTpe,
     TimeoutError as _ScoringFTimeout,
@@ -1310,6 +1311,328 @@ def _context_flat_fields(ssp: dict, pvi: dict, exp_ctx: dict) -> dict:
     }
 
 
+_SCORING_ENGINE_VERSION = "phase7-score-v2"
+_SCORING_ENGINE_CONFIG = {
+    "core_weights": (0.35, 0.25, 0.20, 0.20),
+    "exit_penalty_weight": 0.22,
+    "extended_weight": 0.20,
+    "extended_families": 7,
+    "predictive_modifier": "v1",
+}
+_SCORE_CACHE_DEBUG_LOCK = _threading.Lock()
+_SCORE_CACHE_DEBUG_STATS: dict[str, dict[str, float | int]] = {}
+
+
+def _record_score_cache_timing(component: str, outcome: str, started: float) -> None:
+    """Keep process-local cache timing telemetry out of the score payload."""
+    elapsed_ms = (_time.perf_counter() - started) * 1000
+    with _SCORE_CACHE_DEBUG_LOCK:
+        stats = _SCORE_CACHE_DEBUG_STATS.setdefault(
+            component, {"hits": 0, "misses": 0, "writes": 0, "rejected": 0, "total_ms": 0.0},
+        )
+        if outcome in stats:
+            stats[outcome] += 1
+        stats["total_ms"] += elapsed_ms
+    log.debug("score cache component=%s outcome=%s elapsed_ms=%.3f", component, outcome, elapsed_ms)
+
+
+def score_cache_debug_stats() -> dict[str, dict[str, float | int]]:
+    """Return cache-only timing counters for diagnostics without altering API rows."""
+    with _SCORE_CACHE_DEBUG_LOCK:
+        return {name: dict(values) for name, values in _SCORE_CACHE_DEBUG_STATS.items()}
+
+
+def _history_material_identity(history) -> dict:
+    """Fingerprint the actual history values consumed by score calculations."""
+    try:
+        if history is None:
+            return {
+                "valid": True, "latest_bar": None, "source_timestamp": None,
+                "row_count": 0, "columns": (), "content_fingerprint": "none",
+            }
+        index = history.index
+        columns = tuple(str(column) for column in history.columns)
+        rows = []
+        for row in history.itertuples(index=False, name=None):
+            normalized_row = []
+            for value in row:
+                try:
+                    value = value.item()
+                except AttributeError:
+                    pass
+                if isinstance(value, float) and (math.isnan(value) or math.isinf(value)):
+                    normalized_row.append(str(value))
+                elif isinstance(value, (str, int, float, bool)) or value is None:
+                    normalized_row.append(value)
+                else:
+                    normalized_row.append(str(value))
+            rows.append(normalized_row)
+        latest = index.max() if len(index) else None
+        try:
+            source_timestamp = float(latest.timestamp()) if latest is not None else None
+        except (AttributeError, TypeError, ValueError, OverflowError):
+            source_timestamp = None
+        from app.services.memory_store import stable_fingerprint
+        return {
+            "valid": True,
+            "latest_bar": str(latest) if latest is not None else None,
+            "source_timestamp": source_timestamp,
+            "row_count": len(history),
+            "columns": columns,
+            "content_fingerprint": stable_fingerprint({
+                "index": [str(item) for item in index],
+                "columns": columns,
+                "rows": rows,
+            }),
+        }
+    except (AttributeError, TypeError, ValueError):
+        return {
+            "valid": False, "latest_bar": None, "source_timestamp": None,
+            "row_count": 0, "columns": (), "content_fingerprint": None,
+        }
+
+
+def _is_complete_core_breakdown(candidate: object) -> bool:
+    """A malformed or degraded calculation must never become a cache entry."""
+    if not isinstance(candidate, dict) or candidate.get("score_explanation") is not None:
+        return False
+    audit = candidate.get("confidence_audit")
+    ratings = candidate.get("ratings")
+    if not isinstance(audit, dict) or audit.get("live_count") != 4 or not isinstance(ratings, dict):
+        return False
+    required = ("momentum", "quality", "trend", "stability", "exit_risk")
+    if any(not isinstance(ratings.get(name), dict) for name in required):
+        return False
+    try:
+        values = [float(candidate["final_score"])]
+        values.extend(float(ratings[name]["score"]) for name in required[:-1])
+        values.append(float(ratings["exit_risk"]["score"]))
+        return all(math.isfinite(value) and 0.0 <= value <= 100.0 for value in values)
+    except (KeyError, TypeError, ValueError):
+        return False
+
+
+def _is_complete_quality_breakdown(candidate: object) -> bool:
+    if not isinstance(candidate, dict):
+        return False
+    expected = {
+        "relative_volume", "turnover", "session_extension", "range_position",
+        "gap_efficiency", "intraday_volatility", "spread_quality",
+    }
+    components = candidate.get("components")
+    weights = candidate.get("weights")
+    inputs = candidate.get("intraday_inputs")
+    if (
+        not isinstance(components, dict) or not isinstance(weights, dict)
+        or not isinstance(inputs, dict) or set(components) != expected or set(weights) != expected
+    ):
+        return False
+    try:
+        values = [float(candidate["score"])]
+        values.extend(float(components[name]) for name in expected)
+        if not all(math.isfinite(value) and 0.0 <= value <= 100.0 for value in values):
+            return False
+        return (
+            float(inputs["previous_close"]) > 0.0
+            and float(inputs["open"]) > 0.0
+            and float(inputs["day_low"]) > 0.0
+            and float(inputs["day_high"]) > float(inputs["day_low"])
+            and float(inputs["last_price"]) > 0.0
+            and float(inputs["volume"]) > 0.0
+            and float(inputs["average_volume"]) > 0.0
+        )
+    except (KeyError, TypeError, ValueError):
+        return False
+
+
+def _is_complete_extended_components(families: object) -> bool:
+    """Accept only live or structurally-not-applicable factor families."""
+    if not isinstance(families, dict):
+        return False
+    required = (
+        "trend_volume_delta", "institutional_confluence", "options_positioning",
+        "institutional_order_block", "dark_pool_proxy", "volume_sentiment",
+        "reaction_clustering",
+    )
+    for name in required:
+        family = families.get(name)
+        if not isinstance(family, dict):
+            return False
+        if str(family.get("status") or "").lower() == "not_applicable":
+            continue
+        if str(family.get("status") or "").lower() not in {
+            "implemented", "implemented_from_icm", "inferred",
+        }:
+            return False
+        try:
+            score = float(family["directional_score"] if name == "volume_sentiment" else family["score"])
+            if not math.isfinite(score) or not 0.0 <= score <= 100.0:
+                return False
+        except (KeyError, TypeError, ValueError):
+            return False
+    return True
+
+
+def _secondary_composite_candidate(breakdown: dict, families: dict) -> dict:
+    """Calculate the existing full-depth blend from already validated components."""
+    family_order = [
+        'trend_volume_delta', 'institutional_confluence',
+        'options_positioning', 'institutional_order_block',
+        'dark_pool_proxy', 'volume_sentiment', 'reaction_clustering',
+    ]
+    extended_scores = []
+    family_score_breakdown = {}
+    for name in family_order:
+        family = families.get(name) or {}
+        score = float(family.get('score', 50.0) or 50.0)
+        extended_scores.append(score)
+        family_score_breakdown[name] = round(score, 2)
+    extended_avg = sum(extended_scores) / len(extended_scores) if extended_scores else 50.0
+    core_final = float(breakdown.get('final_score', 0.0))
+    blended = round(core_final * 0.80 + extended_avg * 0.20, 2)
+    modifier, modifier_notes = _predictive_consensus_modifier(families)
+    blended_final = max(0.0, min(100.0, blended + modifier))
+    if breakdown.get('score_explanation'):
+        blended_final = min(blended_final, core_final)
+    return {
+        'final_score': round(blended_final, 2),
+        'tier': classify_tier(blended_final) if not breakdown.get('score_explanation') else breakdown.get('tier'),
+        'secondary_composite': {
+            'extended_avg': round(extended_avg, 2),
+            'core_final': round(core_final, 2),
+            'blended_pre_modifier': blended,
+            'predictive_modifier': round(modifier, 2),
+            'blended_final': round(blended_final, 2),
+            'weight': 0.20,
+            'family_scores': family_score_breakdown,
+            'modifier_notes': modifier_notes,
+        },
+    }
+
+
+def _is_complete_composite(candidate: object) -> bool:
+    if not isinstance(candidate, dict) or not isinstance(candidate.get('secondary_composite'), dict):
+        return False
+    try:
+        return math.isfinite(float(candidate['final_score'])) and candidate.get('tier') in {'A', 'B', 'C', 'D'}
+    except (KeyError, TypeError, ValueError):
+        return False
+
+
+def _core_algorithm_breakdown(
+    *,
+    symbol: str,
+    market_kind: str,
+    px: float,
+    prev_close: float,
+    source: str,
+    age_seconds: int,
+    provider_note: str | None,
+    fundamentals_info: dict,
+    daily_hist,
+) -> dict:
+    """Reuse only a complete, deterministic core M/Q/T/S calculation."""
+    from app.services.memory_store import memory_store, stable_fingerprint
+
+    normalized_symbol = memory_store.normalize_symbol(symbol)
+    history_identity = _history_material_identity(daily_hist)
+    material_inputs = {
+        "engine_version": _SCORING_ENGINE_VERSION,
+        "engine_config": _SCORING_ENGINE_CONFIG,
+        "symbol": normalized_symbol,
+        "market": market_kind,
+        "last_price": px,
+        "previous_close": prev_close,
+        "source": source,
+        "fundamentals": fundamentals_info,
+        "history": history_identity,
+    }
+    fingerprint = stable_fingerprint(material_inputs)
+    dimensions = {
+        "symbol": normalized_symbol,
+        "scoring_version": _SCORING_ENGINE_VERSION,
+        "component": "core_algorithm",
+        "market": market_kind,
+    }
+    started = _time.perf_counter()
+    breakdown = memory_store.get(
+        "score_components", dimensions, fingerprint=fingerprint, provider_id=source,
+    )
+    if breakdown is not None and not _is_complete_core_breakdown(breakdown):
+        breakdown = None
+        _record_score_cache_timing("core_algorithm", "rejected", started)
+    cache_hit = breakdown is not None
+    _record_score_cache_timing("core_algorithm", "hits" if cache_hit else "misses", started)
+    if breakdown is None:
+        quality_started = _time.perf_counter()
+        quality_fingerprint = stable_fingerprint({
+            "engine_version": _SCORING_ENGINE_VERSION,
+            "engine_config": _SCORING_ENGINE_CONFIG,
+            "market": market_kind,
+            "fundamentals": fundamentals_info,
+            "history": history_identity,
+        })
+        quality_dimensions = {**dimensions, "component": "quality"}
+        quality = memory_store.get(
+            "score_components", quality_dimensions, fingerprint=quality_fingerprint, provider_id=source,
+        )
+        if quality is not None and not _is_complete_quality_breakdown(quality):
+            quality = None
+            _record_score_cache_timing("quality", "rejected", quality_started)
+        quality_hit = quality is not None
+        _record_score_cache_timing("quality", "hits" if quality_hit else "misses", quality_started)
+        if quality is None:
+            quality = build_quality_breakdown(fundamentals_info)
+            if _is_complete_quality_breakdown(quality):
+                memory_store.set(
+                    "score_components", quality_dimensions, quality,
+                    ttl_seconds=settings.score_component_cache_ttl_seconds,
+                    fingerprint=quality_fingerprint, provider_id=source, priority=2,
+                    source_timestamp=history_identity["source_timestamp"],
+                    provenance={
+                        "engine_version": _SCORING_ENGINE_VERSION,
+                        "engine_config": stable_fingerprint(_SCORING_ENGINE_CONFIG),
+                        "source_timestamp": history_identity["source_timestamp"],
+                        "history_fingerprint": history_identity["content_fingerprint"],
+                        "material_fingerprint": quality_fingerprint,
+                    },
+                )
+                _record_score_cache_timing("quality", "writes", quality_started)
+            else:
+                _record_score_cache_timing("quality", "rejected", quality_started)
+        candidate = build_algorithm_breakdown(px, prev_close, source, age_seconds, provider_note, quality)
+        if _is_complete_core_breakdown(candidate) and history_identity["valid"]:
+            memory_store.set(
+                "score_components", dimensions, candidate,
+                ttl_seconds=settings.score_component_cache_ttl_seconds,
+                fingerprint=fingerprint, provider_id=source, priority=2,
+                source_timestamp=history_identity["source_timestamp"],
+                provenance={
+                    "engine_version": _SCORING_ENGINE_VERSION,
+                    "engine_config": stable_fingerprint(_SCORING_ENGINE_CONFIG),
+                    "source_timestamp": history_identity["source_timestamp"],
+                    "history_latest_bar": history_identity["latest_bar"],
+                    "history_fingerprint": history_identity["content_fingerprint"],
+                    "material_fingerprint": fingerprint,
+                },
+            )
+            _record_score_cache_timing("core_algorithm", "writes", started)
+        else:
+            _record_score_cache_timing("core_algorithm", "rejected", started)
+        breakdown = candidate
+    # Source metadata is request-specific and never allowed to become stale
+    # merely because the numeric calculation was a cache hit.
+    market = breakdown.setdefault("market", {})
+    market.update({
+        "last_price": round(px, 4),
+        "previous_close": round(prev_close, 4),
+        "age_seconds": age_seconds,
+        "source": source,
+        "provider_note": provider_note or "",
+    })
+    return breakdown
+
+
 def score_from_prices(row: dict, px: float, prev_close: float, source: str, age_seconds: int, as_of_utc: str, provider_note: str | None = None, fundamentals_info: dict | None = None, use_real_options: bool = False, hist=None, daily_hist=None, reg_index_snapshot: dict | None = None, score_depth: str = 'full') -> dict:
     """Score a single symbol from price + auxiliary data.
 
@@ -1351,7 +1674,6 @@ def score_from_prices(row: dict, px: float, prev_close: float, source: str, age_
                         fundamentals_info['averageVolume10days'] = float(vols.tail(min(10, len(vols))).mean())
         except Exception:
             pass
-    breakdown = build_algorithm_breakdown(px, prev_close, source, age_seconds, provider_note, build_quality_breakdown(fundamentals_info or {}))
     # Phase 26.18 / Tier 3.3: short-circuit the expensive secondary-factor
     # pipeline when running Pass 1 of the two-pass loop. We still emit a
     # well-shaped row (with the core M/Q/T/S composite, market metadata,
@@ -1361,6 +1683,17 @@ def score_from_prices(row: dict, px: float, prev_close: float, source: str, age_
     # 2 re-invokes this function with score_depth='full'.
     symbol = row.get('symbol', '') or ''
     market_kind = 'crypto' if str(symbol).upper().endswith('-USD') else 'stocks'
+    breakdown = _core_algorithm_breakdown(
+        symbol=symbol,
+        market_kind=market_kind,
+        px=px,
+        prev_close=prev_close,
+        source=source,
+        age_seconds=age_seconds,
+        provider_note=provider_note,
+        fundamentals_info=fundamentals_info,
+        daily_hist=daily_hist,
+    )
 
     if score_depth == 'cheap':
         # No extended_factors / narratives / 7-family blend / predictive
@@ -1536,53 +1869,75 @@ def score_from_prices(row: dict, px: float, prev_close: float, source: str, age_
         log.debug('factor narratives failed: %s', exc)
 
     # ---------- 7-family equal-weight composite blend ----------
-    # All seven factor families contribute equally to extended_avg.  The
-    # core M/Q/T/S composite still carries 80% weight; the extended blend
-    # carries 20%.  Then a predictive-consensus modifier (capped at +/-5)
-    # acknowledges/depreciates predictive families when they agree or
-    # contradict the rest of the consensus.
-    try:
-        family_order = [
-            'trend_volume_delta', 'institutional_confluence',
-            'options_positioning', 'institutional_order_block',
-            'dark_pool_proxy', 'volume_sentiment', 'reaction_clustering',
-        ]
-        extended_scores = []
-        family_score_breakdown = {}
-        for name in family_order:
-            fam = families_7.get(name) or {}
-            s = float(fam.get('score', 50.0) or 50.0)
-            extended_scores.append(s)
-            family_score_breakdown[name] = round(s, 2)
-        extended_avg = sum(extended_scores) / len(extended_scores) if extended_scores else 50.0
-        core_final = float(breakdown.get('final_score', 0.0))
-        blended = round(core_final * 0.80 + extended_avg * 0.20, 2)
-
-        # ---- predictive-consensus modifier ----
-        mod_value, mod_notes = _predictive_consensus_modifier(families_7)
-        blended_with_mod = blended + mod_value
-
-        if breakdown.get('score_explanation'):
-            # Low-confidence row: never let the blend push above the cap.
-            blended_with_mod = min(blended_with_mod, core_final)
-        # Final guardrail clamp to [0, 100].
-        blended_with_mod = max(0.0, min(100.0, blended_with_mod))
-
-        breakdown['final_score'] = round(blended_with_mod, 2)
-        # Re-classify tier from the new composite UNLESS the sanity rule
-        # already forced D.
-        if not breakdown.get('score_explanation'):
-            breakdown['tier'] = classify_tier(blended_with_mod)
-        breakdown['secondary_composite'] = {
-            'extended_avg': round(extended_avg, 2),
-            'core_final': round(core_final, 2),
-            'blended_pre_modifier': blended,
-            'predictive_modifier': round(mod_value, 2),
-            'blended_final': round(blended_with_mod, 2),
-            'weight': 0.20,
-            'family_scores': family_score_breakdown,
-            'modifier_notes': mod_notes,
+    # Cache only a complete blend whose current core and factor inputs have
+    # passed their validation gates.  Request metadata remains outside this
+    # artifact and is applied by the normal response path below.
+    composite_started = _time.perf_counter()
+    composite_history = _history_material_identity(daily_hist)
+    composite_intraday_history = _history_material_identity(hist)
+    composite_cacheable = (
+        _is_complete_core_breakdown(breakdown)
+        and _is_complete_extended_components(families_7)
+        and composite_history['valid']
+        and composite_intraday_history['valid']
+    )
+    composite_candidate = None
+    if composite_cacheable:
+        from app.services.memory_store import memory_store, stable_fingerprint
+        composite_material = {
+            'engine_version': _SCORING_ENGINE_VERSION,
+            'engine_config': _SCORING_ENGINE_CONFIG,
+            'core': {
+                'final_score': breakdown.get('final_score'),
+                'ratings': breakdown.get('ratings'),
+                'exit_penalty': breakdown.get('exit_penalty'),
+            },
+            'families': families_7,
+            'daily_history': composite_history,
+            'intraday_history': composite_intraday_history,
         }
+        composite_fingerprint = stable_fingerprint(composite_material)
+        composite_dimensions = {
+            'symbol': memory_store.normalize_symbol(symbol),
+            'scoring_version': _SCORING_ENGINE_VERSION,
+            'component': 'full_composite',
+            'market': market_kind,
+        }
+        composite_candidate = memory_store.get(
+            'composite_scores', composite_dimensions, fingerprint=composite_fingerprint, provider_id=source,
+        )
+        if _is_complete_composite(composite_candidate):
+            _record_score_cache_timing('full_composite', 'hits', composite_started)
+        else:
+            composite_candidate = None
+            _record_score_cache_timing('full_composite', 'misses', composite_started)
+    try:
+        if composite_candidate is None:
+            composite_candidate = _secondary_composite_candidate(breakdown, families_7)
+            if composite_cacheable:
+                if _is_complete_composite(composite_candidate):
+                    memory_store.set(
+                        'composite_scores', composite_dimensions, composite_candidate,
+                        ttl_seconds=settings.composite_score_cache_ttl_seconds,
+                        fingerprint=composite_fingerprint, provider_id=source, priority=2,
+                        source_timestamp=composite_history['source_timestamp'],
+                        provenance={
+                            'engine_version': _SCORING_ENGINE_VERSION,
+                            'engine_config': stable_fingerprint(_SCORING_ENGINE_CONFIG),
+                            'source_timestamp': composite_history['source_timestamp'],
+                            'history_fingerprint': composite_history['content_fingerprint'],
+                            'intraday_history_fingerprint': composite_intraday_history['content_fingerprint'],
+                            'material_fingerprint': composite_fingerprint,
+                            'component_validation': 'complete_current',
+                        },
+                    )
+                    _record_score_cache_timing('full_composite', 'writes', composite_started)
+                else:
+                    _record_score_cache_timing('full_composite', 'rejected', composite_started)
+        breakdown['final_score'] = composite_candidate['final_score']
+        if composite_candidate.get('tier'):
+            breakdown['tier'] = composite_candidate['tier']
+        breakdown['secondary_composite'] = composite_candidate['secondary_composite']
     except Exception as exc:  # noqa: BLE001
         log.debug('extended composite blend failed: %s', exc)
 
@@ -2236,7 +2591,12 @@ def fetch_fundamentals(symbol: str, market: str = 'stocks') -> dict:
         mark_provider_failure(str(exc))
         return {}
 
-def score_symbol_rows(rows: List[dict], force_full_pass2: bool = False) -> List[dict]:
+def score_symbol_rows(
+    rows: List[dict],
+    force_full_pass2: bool = False,
+    tier1_options_refresh: bool = False,
+    max_quote_age_seconds: int | None = None,
+) -> List[dict]:
     """Run the full scanner scoring pipeline on a list of seed rows.
 
     Phase 26.39 — `force_full_pass2`:
@@ -2457,7 +2817,13 @@ def score_symbol_rows(rows: List[dict], force_full_pass2: bool = False) -> List[
                 if px > 0:
                     sp_pairs.append((sym, px))
             if sp_pairs:
-                outcomes = prefetch_options_chains(sp_pairs)
+                outcomes = prefetch_options_chains(
+                    sp_pairs,
+                    tier1_target_age_seconds=(
+                        settings.options_chain_tier1_refresh_seconds
+                        if tier1_options_refresh else None
+                    ),
+                )
                 if outcomes:
                     hits = sum(1 for v in outcomes.values() if v == 'hit')
                     log.debug(
@@ -2521,7 +2887,15 @@ def score_symbol_rows(rows: List[dict], force_full_pass2: bool = False) -> List[
                 pass2_indices[symbol] = len(output) - 1
             continue
         cached = get_cached_quote(symbol)
-        if cached and cached_quote_is_usable(cached):
+        cache_age_limit = (
+            settings.cache_max_age_seconds if max_quote_age_seconds is None
+            else max(0, int(max_quote_age_seconds))
+        )
+        if (
+            cached
+            and cached_quote_is_usable(cached)
+            and quote_age_seconds(cached) <= cache_age_limit
+        ):
             age = quote_age_seconds(cached)
             _cached_as_of = cached.get('captured_at_utc') or utcnowiso()
             _depth = 'cheap' if _TWO_PASS_ACTIVE else 'full'
