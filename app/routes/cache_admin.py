@@ -19,3 +19,10 @@ def get_dedupe_status():
 async def trigger_dedupe(trigger: str = Query('manual_admin')):
     result = await asyncio.to_thread(run_full_dedupe, trigger)
     return {'ok': True, 'result': result, 'status': dedupe_status()}
+
+
+@router.get('/memory/status')
+def get_memory_cache_status():
+    """Aggregated process-local cache diagnostics; no cache keys or payloads."""
+    from app.services.memory_store import memory_store
+    return memory_store.get_stats()

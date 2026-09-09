@@ -64,6 +64,9 @@ DB_PRUNE_INTERVAL_SECONDS = int(
 CACHE_DEDUPE_INTERVAL_SECONDS = int(
     os.environ.get('CACHE_DEDUPE_INTERVAL_SECONDS', str(6 * 3600))
 )
+MEMORY_CACHE_PRUNE_INTERVAL_SECONDS = int(
+    os.environ.get('MEMORY_CACHE_PRUNE_INTERVAL_SECONDS', '60')
+)
 REGULATORY_RETENTION_DAYS = int(os.environ.get('REGULATORY_RETENTION_DAYS', '180'))
 PREDICTION_RETENTION_DAYS = int(os.environ.get('PREDICTION_RETENTION_DAYS', '90'))
 
@@ -104,6 +107,8 @@ _state: dict[str, Any] = {
     'last_db_prune_utc': None,
     'last_db_prune_summary': None,
     'started_at_utc': None,
+    'memory_cache_prunes': 0,
+    'last_memory_cache_prune_utc': None,
 }
 
 
@@ -136,6 +141,7 @@ def maintenance_status() -> dict:
             'prediction_retention_days': PREDICTION_RETENTION_DAYS,
             'regulatory_db_path': str(_pick(_REG_DB_CANDIDATES) or _REG_DB_CANDIDATES[0]),
             'prediction_db_path': str(_pick(_PRED_DB_CANDIDATES) or _PRED_DB_CANDIDATES[0]),
+            'memory_cache_prune_interval_seconds': MEMORY_CACHE_PRUNE_INTERVAL_SECONDS,
         }
 
 
@@ -409,6 +415,7 @@ def _loop() -> None:
     last_counter_rotate = time.monotonic()
     last_db_prune = time.monotonic()
     last_cache_dedupe = time.monotonic()
+    last_memory_cache_prune = time.monotonic()
 
     # First DB prune runs 5 minutes after startup so the user sees the
     # housekeeping kick in on day one of a fresh install (instead of waiting
@@ -433,6 +440,15 @@ def _loop() -> None:
                 except Exception as exc:  # noqa: BLE001
                     log.exception('cache dedupe crashed: %s', exc)
                 last_cache_dedupe = now_mono
+
+            if now_mono - last_memory_cache_prune >= MEMORY_CACHE_PRUNE_INTERVAL_SECONDS:
+                from app.services.memory_store import memory_store
+                removed = memory_store.prune_expired()
+                with _state_lock:
+                    _state['memory_cache_prunes'] += 1
+                    _state['last_memory_cache_prune_utc'] = _utc_now_iso()
+                    _state['last_memory_cache_prune_removed'] = removed
+                last_memory_cache_prune = now_mono
 
             do_prune = (now_mono - last_db_prune >= DB_PRUNE_INTERVAL_SECONDS) or (
                 first_db_prune_due and now_mono >= first_db_prune_due

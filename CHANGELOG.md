@@ -2,6 +2,17 @@
 
 ---
 
+## RAM-first cache layer
+
+- Added a bounded, process-local cache foundation with monotonic TTL,
+  deterministic fingerprints, namespace isolation, approximate memory
+  accounting, and aggregate diagnostics.
+- Added `MEMORY_CACHE_MODE` (`disabled`, `shadow_write`, or `enabled`) and a
+  per-worker `MEMORY_CACHE_MAX_MB` budget. Existing route payloads are
+  unchanged; disk-backed quote/history caches remain restart fallback.
+
+---
+
 ## Next Phase: `quantum_interference_certainty` rename and validation
 
 This pass closes the third item from the previous "still open" list.
