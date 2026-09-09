@@ -105,5 +105,14 @@ class Settings(BaseModel):
     # Namespace prefix for all snapshot Redis keys.
     redis_snapshot_prefix: str = os.getenv("REDIS_SNAPSHOT_PREFIX", "qs:snap")
 
+    # RAM-first cache is intentionally process-local.  In multi-worker
+    # deployments this budget applies to each worker, not the host total.
+    memory_cache_enabled: bool = _env_bool("MEMORY_CACHE_ENABLED", True)
+    memory_cache_mode: str = os.getenv("MEMORY_CACHE_MODE", "enabled").strip().lower()
+    memory_cache_namespace: str = os.getenv("MEMORY_CACHE_NAMESPACE", "v1")
+    memory_cache_max_mb: int = int(os.getenv("MEMORY_CACHE_MAX_MB", "256"))
+    memory_cache_max_entries_per_domain: int = int(os.getenv("MEMORY_CACHE_MAX_ENTRIES_PER_DOMAIN", "5000"))
+    memory_cache_prune_interval_seconds: int = int(os.getenv("MEMORY_CACHE_PRUNE_INTERVAL_SECONDS", "60"))
+
 
 settings = Settings()

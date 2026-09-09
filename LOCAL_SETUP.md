@@ -63,6 +63,17 @@ The `start.sh` / `start.bat` scripts wrap this if you prefer.
 | Port 8001 in use | `uvicorn app.main:app --port 8002` and adjust the frontend URL |
 | `yfinance` rate limit warnings | Expected during heavy scans — the fallback providers pick up the slack automatically |
 
+## RAM-first cache operations
+
+The in-process cache foundation is enabled by default. Set
+`MEMORY_CACHE_MODE=disabled` for an immediate rollback, `shadow_write` to
+populate without serving values, or `enabled` to serve compatible entries.
+`MEMORY_CACHE_MAX_MB` defaults to 256 and is a **per-Uvicorn-worker** budget;
+the supplied launchers start one worker. Cache diagnostics are available at
+`/api/cache/dedupe/memory/status` and intentionally expose only aggregate
+counts and approximate memory use. Restarting clears RAM entries; the existing
+sharded quote and daily-history stores remain the durable fallback.
+
 ## 8. Update the source
 
 To re-download the latest bundle from a running server:
