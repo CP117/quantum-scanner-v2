@@ -58,3 +58,22 @@ change formulas, ranking behavior, or live data paths in the parity phase.
   baselines are actually measured.
 - A database, queue, event transport, and deployment topology remain decisions
   for a later increment; see [architecture decisions](architecture_decisions.md).
+
+## Phase 2 status (catalog foundation)
+
+Preconditions verified: Phase 0 docs present, parity fixtures/helpers present
+(`backend/tests/parity_support.py`, `test_parity_scaffolding.py` pass), no
+production path replaced.
+
+Implemented additively: `app/services/catalog_service.py` (SQLite,
+`CATALOG_DB_PATH`, default `data/catalog.db`; tables `venue`, `instrument`,
+`provider_instrument_mapping`, `universe_membership`, `catalog_sync_run`),
+read-only `/api/catalog/instruments` and `/api/catalog/counts`, and
+`backend/tests/test_catalog_service.py`. Identity, status transitions and
+retention rules are documented in the module docstring.
+
+Remaining / blockers: nothing yet calls `sync_listing` (existing
+`universe_service` lists are not wired in); symbol renames create a new
+instrument; the HTTP route was not exercised because FastAPI is not installed
+in this sandbox; quote/analysis coverage counts and a Postgres port are
+follow-on work (database choice remains open per the architecture decisions).
