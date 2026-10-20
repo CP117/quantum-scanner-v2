@@ -1,0 +1,37 @@
+{
+  "chart": {
+    "error": null,
+    "result": [
+      {
+        "indicators": {
+          "quote": [
+            {
+              "close": [
+                530.0
+              ]
+            }
+          ]
+        },
+        "meta": {
+          "chartPreviousClose": 529.0,
+          "currency": "USD",
+          "dataGranularity": "1d",
+          "exchangeName": "PCX",
+          "exchangeTimezoneName": "America/New_York",
+          "fullExchangeName": "NYSEArca",
+          "gmtoffset": -14400,
+          "instrumentType": "EQUITY",
+          "range": "5d",
+          "regularMarketPrice": 530.0,
+          "regularMarketTime": 1718046000,
+          "regularMarketVolume": 30000000,
+          "symbol": "SPY",
+          "timezone": "EDT"
+        },
+        "timestamp": [
+          1718046000
+        ]
+      }
+    ]
+  }
+}

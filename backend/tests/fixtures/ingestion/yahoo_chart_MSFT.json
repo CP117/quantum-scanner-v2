@@ -1,0 +1,37 @@
+{
+  "chart": {
+    "error": null,
+    "result": [
+      {
+        "indicators": {
+          "quote": [
+            {
+              "close": [
+                420.25
+              ]
+            }
+          ]
+        },
+        "meta": {
+          "chartPreviousClose": 419.25,
+          "currency": "USD",
+          "dataGranularity": "1d",
+          "exchangeName": "NMS",
+          "exchangeTimezoneName": "America/New_York",
+          "fullExchangeName": "NasdaqGS",
+          "gmtoffset": -14400,
+          "instrumentType": "EQUITY",
+          "range": "5d",
+          "regularMarketPrice": 420.25,
+          "regularMarketTime": 1718046000,
+          "regularMarketVolume": 0,
+          "symbol": "MSFT",
+          "timezone": "EDT"
+        },
+        "timestamp": [
+          1718046000
+        ]
+      }
+    ]
+  }
+}

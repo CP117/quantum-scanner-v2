@@ -614,6 +614,14 @@ except Exception as exc:
     import logging as _log
     _log.getLogger('app.catalog').exception('catalog mount failed: %s', exc)
 
+# Phase 3: read-only catalog + latest market state (no provider calls).
+try:
+    from app.routes.market_state import router as market_state_router
+    app.include_router(market_state_router)
+except Exception as exc:
+    import logging as _log
+    _log.getLogger('app.market_state').exception('market_state mount failed: %s', exc)
+
 # Future Forecast Activator: per-row forecast execution route used by the
 # scanner table's details-column button.
 try:

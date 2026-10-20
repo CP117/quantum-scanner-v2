@@ -1,0 +1,36 @@
+{
+  "chart": {
+    "error": null,
+    "result": [
+      {
+        "indicators": {
+          "quote": [
+            {
+              "close": [
+                200.1
+              ]
+            }
+          ]
+        },
+        "meta": {
+          "chartPreviousClose": 199.1,
+          "currency": "USD",
+          "dataGranularity": "1d",
+          "exchangeName": "NYQ",
+          "exchangeTimezoneName": "America/New_York",
+          "fullExchangeName": "NYSE",
+          "gmtoffset": -14400,
+          "instrumentType": "EQUITY",
+          "range": "5d",
+          "regularMarketPrice": 200.1,
+          "regularMarketTime": 1718046000,
+          "symbol": "JPM",
+          "timezone": "EDT"
+        },
+        "timestamp": [
+          1718046000
+        ]
+      }
+    ]
+  }
+}

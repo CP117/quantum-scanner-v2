@@ -82,6 +82,9 @@ class Settings(BaseModel):
 
     # Durable instrument catalog SQLite DB path (relative to repo root if not absolute).
     catalog_db_path: str = os.getenv("CATALOG_DB_PATH", "data/catalog.db")
+    # Public-display entitlements for ingested market data, "provider:kind:verified_by,...".
+    # Default empty = deny: market state is withheld from public responses (see docs/ingestion_contracts.md).
+    market_data_display_entitlements: str = os.getenv("MARKET_DATA_DISPLAY_ENTITLEMENTS", "")
 
     # Resilience: error threshold before user sees reset prompt.
     tier_error_threshold: int = int(os.getenv("TIER_ERROR_THRESHOLD", "5"))
