@@ -59,21 +59,37 @@ change formulas, ranking behavior, or live data paths in the parity phase.
 - A database, queue, event transport, and deployment topology remain decisions
   for a later increment; see [architecture decisions](architecture_decisions.md).
 
-## Phase 2 status (catalog foundation)
+## Phase 2 status (catalog foundation) — PENDING VALIDATION
 
-Preconditions verified: Phase 0 docs present, parity fixtures/helpers present
-(`backend/tests/parity_support.py`, `test_parity_scaffolding.py` pass), no
-production path replaced.
+Additive only: `app/services/catalog_service.py`, `app/routes/catalog.py`
+(read-only `/api/catalog/instruments`, `/api/catalog/counts`),
+`app/services/catalog_seed.py` (operator command), `CATALOG_DB_PATH` setting,
+and the `backend/tests/test_catalog_*.py` tests. Nothing in the scan/result
+pipeline reads or writes the catalog. Identity and rename continuity:
+[catalog_identity.md](catalog_identity.md). Database decision:
+[architecture decisions](architecture_decisions.md).
 
-Implemented additively: `app/services/catalog_service.py` (SQLite,
-`CATALOG_DB_PATH`, default `data/catalog.db`; tables `venue`, `instrument`,
-`provider_instrument_mapping`, `universe_membership`, `catalog_sync_run`),
-read-only `/api/catalog/instruments` and `/api/catalog/counts`, and
-`backend/tests/test_catalog_service.py`. Identity, status transitions and
-retention rules are documented in the module docstring.
+Seeding (explicit, never from HTTP or startup):
+`python -m app.services.catalog_seed --market stocks` (dry run) and
+`... --apply`. Venue comes only from the legacy `exchange` field; crypto rows
+are skipped because the legacy universe has no real venue/pair identity.
 
-Remaining / blockers: nothing yet calls `sync_listing` (existing
-`universe_service` lists are not wired in); symbol renames create a new
-instrument; the HTTP route was not exercised because FastAPI is not installed
-in this sandbox; quote/analysis coverage counts and a Postgres port are
-follow-on work (database choice remains open per the architecture decisions).
+Validation record (sandbox, no CI yet): catalog + parity-scaffolding tests
+56 passed. Full `backend/tests` against a live local server (port 8001, temp
+catalog/watchlist DBs): 43 failed / 246 passed / 6 errors; the pre-Phase-2
+commit (145409e) under the same conditions: 40 failed / 200 passed / 6 errors.
+The failing set is the legacy live-server/network/data-state tests (no
+outbound network in the sandbox); the only extra failures in that run were
+`test_stock_share_populated` and `test_tier_state_store::test_promote_updates_store`
+(both pass/fail depending on server snapshot and on-disk tier state; the latter
+passes in isolation) and an overlapping-connection race in the new catalog
+test, which was a real bug and is fixed. No repository lint/type/security gate
+is configured; ad-hoc ruff/mypy/bandit on the new files show no correctness
+issues (remaining: bandit B608 false positives on static SQL fragments, ruff
+B008 FastAPI `Depends` idiom). Scaffolding tests are not algorithm parity.
+
+Remaining before Phase 2 can be marked complete: CI run of the full suite in
+the intended environment (the six live-server integration modules need a
+running server and network), maintainer review of the diff, quote/analysis
+coverage counts, automatic rename detection, venue alias table, crypto
+venue/pair ingestion, and the production database decision.
