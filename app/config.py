@@ -80,6 +80,9 @@ class Settings(BaseModel):
     # Watchlist SQLite DB path (relative to repo root if not absolute).
     watchlist_db_path: str = os.getenv("WATCHLIST_DB_PATH", "data/watchlists.db")
 
+    # Durable instrument catalog SQLite DB path (relative to repo root if not absolute).
+    catalog_db_path: str = os.getenv("CATALOG_DB_PATH", "data/catalog.db")
+
     # Resilience: error threshold before user sees reset prompt.
     tier_error_threshold: int = int(os.getenv("TIER_ERROR_THRESHOLD", "5"))
     tier_error_window_seconds: float = float(os.getenv("TIER_ERROR_WINDOW_SECONDS", "600.0"))

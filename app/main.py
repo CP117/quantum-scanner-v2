@@ -606,6 +606,14 @@ except Exception as exc:
     import logging as _log
     _log.getLogger('app.cache_dedupe').exception('cache dedupe mount failed: %s', exc)
 
+# Durable instrument catalog (Phase 2): read-only browse endpoints.
+try:
+    from app.routes.catalog import router as catalog_router
+    app.include_router(catalog_router)
+except Exception as exc:
+    import logging as _log
+    _log.getLogger('app.catalog').exception('catalog mount failed: %s', exc)
+
 # Future Forecast Activator: per-row forecast execution route used by the
 # scanner table's details-column button.
 try:

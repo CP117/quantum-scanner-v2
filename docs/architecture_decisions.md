@@ -42,6 +42,37 @@ application and existing persistence, but provide no measured workload,
 deployment topology, recovery target, or operational ownership sufficient to
 select replacement infrastructure.
 
+## ADR: Catalog database (Phase 2, provisional)
+
+**Decision:** The durable instrument catalog uses a dedicated SQLite file
+(`CATALOG_DB_PATH`, default `data/catalog.db`), separate from every legacy
+store. This is provisional: it matches the repository's existing SQLite
+persistence (watchlists) and the single-host deployment, without committing to
+the production database (still an open blocker below).
+
+**Properties verified by tests** (`backend/tests/test_catalog_service.py`):
+foreign keys are enabled per connection (`PRAGMA foreign_keys=ON`; SQLite does
+not persist it); schema is versioned with `PRAGMA user_version` and a newer
+version is refused; each sync is a single `BEGIN IMMEDIATE` transaction so a
+failure rolls back all data and is recorded as a `failed` run afterwards;
+`busy_timeout` (5 s) plus `BEGIN IMMEDIATE` serialise overlapping writers across
+threads/processes; the path is resolved per call (explicit argument, else
+settings, relative paths anchored at the repo root); each caller uses its own
+connection (WAL mode for file DBs); tests use temporary DB paths only.
+
+**Migration boundary:** all SQL lives in `app/services/catalog_service.py`
+behind functions that take a connection and use portable SQL apart from
+`INSERT OR IGNORE`, `ON CONFLICT` upserts, `PRAGMA` and `LIKE ... ESCAPE`.
+Instrument IDs are opaque strings and sync-run IDs are integers, so a move to
+PostgreSQL is a schema port plus a one-time copy; the identity strategy does not
+change. No legacy file under `data/` or `app/data/` is read or modified by the
+catalog. A `.db` file created at runtime must not be committed.
+Limits: a single writer at a time; multi-host deployment or high write
+concurrency would trigger the PostgreSQL port.
+
+**Status:** Phase 2 remains *pending validation*; see the Phase 2 section of
+the conversion plan for open gates.
+
 ## Blockers / questions for later phases
 
 - What is the supported instrument universe, including venues, crypto pairs,
