@@ -65,3 +65,26 @@ def is_late_update(existing_source_ts: Optional[float], incoming_source_ts: Opti
     if existing_source_ts is None or incoming_source_ts is None:
         return False
     return incoming_source_ts < existing_source_ts
+
+
+MAX_FUTURE_SKEW_S = 300.0
+_MIN_EPOCH_S = 315532800.0  # 1980-01-01; smaller values are not plausible epochs
+
+
+def parse_epoch_seconds(value, now_ts: float):
+    """Interpret a provider timestamp as epoch *seconds* (UTC).
+
+    Returns ``(source_ts, semantics)``. Anything that is not an unambiguous
+    plausible epoch-seconds number (missing, non-numeric, bool, milliseconds,
+    pre-1980, or more than 5 minutes in the future) yields
+    ``(None, AMBIGUOUS)`` -- we never guess units or timezones.
+    """
+    if value is None or isinstance(value, bool):
+        return None, TimestampSemantics.AMBIGUOUS
+    try:
+        ts = float(value)
+    except (TypeError, ValueError):
+        return None, TimestampSemantics.AMBIGUOUS
+    if not (ts == ts) or ts < _MIN_EPOCH_S or ts > now_ts + MAX_FUTURE_SKEW_S:
+        return None, TimestampSemantics.AMBIGUOUS
+    return ts, TimestampSemantics.PROVIDER_UTC

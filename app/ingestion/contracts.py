@@ -104,6 +104,7 @@ class Quote:
     symbol: str
     price: Field[float]
     volume: Field[float] = field(default_factory=lambda: Field.unavailable())
+    instrument_id: Optional[str] = None  # canonical catalog ID; never a bare ticker
 
 
 @dataclass(frozen=True)

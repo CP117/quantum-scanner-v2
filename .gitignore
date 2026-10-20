@@ -5,3 +5,7 @@ credentials.json
 *.pem
 *.key
 .credentials
+
+# bytecode (new files only; previously committed .pyc left untouched)
+__pycache__/
+*.pyc

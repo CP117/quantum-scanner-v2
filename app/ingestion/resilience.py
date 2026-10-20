@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import threading
 import time
+from dataclasses import dataclass
 from collections import deque
 from typing import Callable, Iterable, Iterator, Sequence, TypeVar
 
@@ -100,3 +101,32 @@ def fetch_with_retry(fn: Callable[[], R], *, budget: RateLimitBudget, health: Pr
             if attempt < retries:
                 sleep(backoff_delay(attempt))
     raise FetchRefused(f"retries exhausted: {last}") from last
+
+
+@dataclass(frozen=True)
+class FailoverResult:
+    provider: str
+    value: object
+    attempts: tuple  # ((provider, "ok" | error text), ...) in order tried
+    failed_over: bool
+
+
+def fetch_with_failover(chain, *, budgets, healths, max_retries: int = 2,
+                        sleep: Callable[[float], None] = time.sleep) -> FailoverResult:
+    """Try ``chain`` = [(provider_name, fn), ...] strictly in the given order.
+
+    Failover is explicit: the result names the provider that actually served
+    the data (never merged with another) and lists every attempt. If all
+    providers fail, ``FetchRefused`` is raised.
+    """
+    attempts = []
+    for i, (name, fn) in enumerate(chain):
+        try:
+            value = fetch_with_retry(fn, budget=budgets[name], health=healths[name],
+                                     max_retries=max_retries, sleep=sleep)
+        except FetchRefused as exc:
+            attempts.append((name, str(exc)))
+            continue
+        attempts.append((name, "ok"))
+        return FailoverResult(name, value, tuple(attempts), i > 0)
+    raise FetchRefused("all providers failed: " + "; ".join(f"{n}: {e}" for n, e in attempts))

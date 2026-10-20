@@ -1,0 +1,37 @@
+{
+  "chart": {
+    "error": null,
+    "result": [
+      {
+        "indicators": {
+          "quote": [
+            {
+              "close": [
+                190.5
+              ]
+            }
+          ]
+        },
+        "meta": {
+          "chartPreviousClose": 189.5,
+          "currency": "USD",
+          "dataGranularity": "1d",
+          "exchangeName": "NMS",
+          "exchangeTimezoneName": "America/New_York",
+          "fullExchangeName": "NasdaqGS",
+          "gmtoffset": -14400,
+          "instrumentType": "EQUITY",
+          "range": "5d",
+          "regularMarketPrice": 190.5,
+          "regularMarketTime": 1718046000,
+          "regularMarketVolume": 51000000,
+          "symbol": "AAPL",
+          "timezone": "EDT"
+        },
+        "timestamp": [
+          1718046000
+        ]
+      }
+    ]
+  }
+}
