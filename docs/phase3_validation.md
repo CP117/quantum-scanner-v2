@@ -1,5 +1,12 @@
 # Phase 3 ingestion slice — validation record
 
+**Status: fixture-validated, NOT live-verified.** Live ingestion rollout is BLOCKED until
+`scripts/verify_yahoo_chart_live.py` passes in a network-enabled environment. Public quote display stays denied
+(default-deny entitlements); technical provider compatibility does not establish display/redistribution rights,
+which must be verified separately. Phase 3 remains in progress. Not ready for full-market throughput (see #14).
+
+Tested head: `bab4cef5e96cc66ba2a515c2f3e8ab27cf7abc7b`; base: `c32d10e8f6ac2ea68ca9a1d95b0c2455af861c4e`.
+
 Everything below was actually run in this PR's environment (no network; Python 3.12). Nothing here is a
 performance-improvement claim.
 
@@ -51,6 +58,13 @@ while backup row stays. Failover is fetch-level only: a primary that answers wit
 rejection, not a failover. Both providers returned by the API separately; no "best provider" selection exists.
 
 ## 5. yahoo-chart mapping
+Live script side effects (inspected before running): read-only; one HTTPS GET per symbol to
+`query1.finance.yahoo.com/v8/finance/chart/{symbol}` via `resilient_get` (`max_attempts=1`); no DB, file or
+catalog writes; prints a report; exit 0 ok / 1 mismatch / 2 unreachable. Re-run at the tested head
+(`python scripts/verify_yahoo_chart_live.py AAPL`): DNS resolution failure, exit 2 -> still PENDING. No live
+fixtures were captured; none are claimed. When it can be run, validate symbol/venue label, currency, price and
+`regularMarketTime` semantics, and only then add sanitized fixtures if the provider terms permit.
+
 Deterministic: fixtures in `backend/tests/fixtures/ingestion/` follow the documented chart-API response shape;
 they were hand-built and sanitized, NOT captured from the live provider. **Live validation is PENDING**:
 `python scripts/verify_yahoo_chart_live.py` -> every symbol `UNREACHABLE` (DNS resolution failure in this
@@ -79,6 +93,10 @@ Documented and returned in each response as `freshness_policy: "age_only"`: `sta
   p95 89 ms / max 106 ms; the writer took 10.5 s vs ~0.25 s alone (per-quote transactions contend with readers
   / GIL). No lock errors, but ingestion throughput degrades under read load — a known limitation.
 - Stability over 10 further ingest+GET cycles: RSS 64.5 -> 65.2 MB, fds 12 -> 12; WAL 4.3 MB / DB 0.9 MB.
+
+## Follow-up issues
+- #13 legacy startup/scan rewrites tracked runtime files (pre-existing on base).
+- #14 ingestion slows under concurrent reads.
 
 ## 9. Security / review
 `bandit -q -r app/ingestion app/routes/market_state.py scripts/probe_real_app.py`: no remaining findings (one
