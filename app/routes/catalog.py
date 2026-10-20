@@ -46,7 +46,7 @@ def instruments(filters: dict = Depends(_filters),
     try:
         return cs.list_instruments(conn, after=after, limit=limit, **filters)
     except cs.CatalogQueryError as exc:
-        raise HTTPException(400, str(exc))
+        raise HTTPException(400, str(exc)) from exc
 
 
 @router.get('/counts')

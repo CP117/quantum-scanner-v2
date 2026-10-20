@@ -9,9 +9,18 @@ Status: Phase 2, pending validation.
 - `asset_class` ∈ `equity`, `crypto_pair`, `crypto_asset`. The finer
   `instrument_type` (stock, etf, ...) is a mutable attribute and deliberately
   **not** part of the identity, so reclassification never changes an ID.
-- `venue` is mandatory and never guessed: upper-cased, whitespace → `_`. No
-  MIC/alias mapping exists yet, so providers that name one venue differently
-  will produce different instruments until an explicit alias table is added.
+- `venue` is mandatory and never guessed: upper-cased, whitespace → `_`.
+- **Venue/provider-alias contract.** Canonical venue IDs are chosen by the
+  operator (MIC codes such as `XNAS` are recommended, not enforced). A
+  provider's own label maps to a canonical venue only through an explicit,
+  provider-scoped row in `venue_alias` (`add_venue_alias`). Ingestion records
+  may carry `provider_venue` instead of `venue`; `resolve_venue` looks it up and
+  an unresolved label fails (and rolls back) the whole run. A canonical ID is
+  not an implicit alias, aliases are never shared across providers, re-declaring
+  the same mapping is a no-op, and re-pointing an alias to another venue raises.
+  **Live multi-provider ingestion must not start until the alias rows for each
+  enabled provider have been reviewed and loaded**; the alias data itself is
+  not shipped yet.
 - Equity symbols: `-`, `/`, whitespace → `.` so `BRK-B`, `BRK/B`, `BRK.B`
   resolve together across providers; share classes remain distinct symbols.
 - Crypto pairs: `BASE-QUOTE` with an explicit quote; the same pair on two
@@ -33,7 +42,8 @@ Because the ID is derived from the natural key, a ticker change produces a
    becomes `superseded` (explicit-only; sync never resurrects it) and its
    history is retained.
 3. Consumers that follow an ID call `resolve_canonical_id(id)` to reach the
-   current instrument; chains are followed and cycles are rejected. Historical
+   current instrument; chains are followed and cycles are rejected. An old ID
+   can have only one successor (a second link raises and changes nothing). Historical
    records keep the ID they were issued under (issued predictions are never
    rewritten).
 4. Deferred: automatic detection (e.g. same provider ID/FIGI-style identifier

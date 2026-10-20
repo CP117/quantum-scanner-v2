@@ -263,7 +263,7 @@ def test_persistence_across_restart(db_path):
 
 
 def test_schema_version_foreign_keys_and_row_factory(conn, db_path):
-    assert cs.schema_version(conn) == cs.SCHEMA_VERSION == 1
+    assert cs.schema_version(conn) == cs.SCHEMA_VERSION == 2
     assert conn.execute('PRAGMA foreign_keys').fetchone()[0] == 1
     with pytest.raises(sqlite3.IntegrityError):
         conn.execute("INSERT INTO universe_membership VALUES ('u','p','ins_missing','active',0,'x','x')")
@@ -351,3 +351,99 @@ def test_unanalyzed_instruments_visible_without_any_analysis_tables(conn):
     tables = {r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")}
     assert not any('analysis' in t or 'quote' in t or 'score' in t for t in tables)
     assert cs.list_instruments(conn)['items'][0]['status'] == 'active'
+
+
+# --- symbol relink (documented continuity mechanism) -------------------------
+
+def _ids(conn, *syms, venue='XNAS'):
+    return [cs.get_instrument_id(conn, 'equity', venue, s) for s in syms]
+
+
+def test_relink_chain_resolves_and_history_retained(conn):
+    cs.sync_listing(conn, 'p', 'u', [_s('A1'), _s('A2'), _s('A3')])
+    a1, a2, a3 = _ids(conn, 'A1', 'A2', 'A3')
+    cs.link_succession(conn, a1, a2, 'rename')
+    cs.link_succession(conn, a2, a3, 'rename again')
+    assert cs.resolve_canonical_id(conn, a1) == a3
+    assert cs.resolve_canonical_id(conn, 'ins_unknown') == 'ins_unknown'
+    assert {i['display_ticker']: i['status'] for i in cs.list_instruments(conn)['items']} == {
+        'A1': 'superseded', 'A2': 'superseded', 'A3': 'active'}
+    hist = [h['new_status'] for h in conn.execute(
+        'SELECT new_status FROM instrument_status_history WHERE instrument_id=? ORDER BY id', (a1,))]
+    assert hist == ['active', 'superseded']
+
+
+def test_relink_conflicts_leave_state_unchanged(conn):
+    cs.sync_listing(conn, 'p', 'u', [_s('A1'), _s('A2'), _s('A3')])
+    a1, a2, a3 = _ids(conn, 'A1', 'A2', 'A3')
+    cs.link_succession(conn, a1, a2, 'rename')
+    with pytest.raises(sqlite3.IntegrityError):  # old already has a successor
+        cs.link_succession(conn, a1, a3, 'conflict')
+    assert cs.resolve_canonical_id(conn, a1) == a2
+    with pytest.raises(ValueError):  # a2 -> a1 would close a cycle
+        cs.link_succession(conn, a2, a1, 'cycle')
+    with pytest.raises(ValueError):  # indirect cycle a3 -> a1 (a1 -> a2)
+        cs.link_succession(conn, a2, a3, 'ok')
+        cs.link_succession(conn, a3, a1, 'cycle')
+    assert not conn.in_transaction
+    assert conn.execute('SELECT COUNT(*) FROM instrument_succession').fetchone()[0] == 2
+
+
+def test_relink_persists_across_restart(db_path):
+    c = cs.connect(db_path)
+    cs.sync_listing(c, 'p', 'u', [_s('A1'), _s('A2')])
+    a1, a2 = _ids(c, 'A1', 'A2')
+    cs.link_succession(c, a1, a2, 'rename')
+    c.close()
+    c = cs.connect(db_path)
+    assert cs.resolve_canonical_id(c, a1) == a2
+    c.close()
+
+
+# --- venue / provider alias contract -----------------------------------------
+
+def test_alias_resolves_cross_provider_to_one_instrument(conn):
+    cs.add_venue_alias(conn, 'pa', 'NASDAQ', 'XNAS')
+    cs.add_venue_alias(conn, 'pb', 'Nasdaq GS', 'XNAS')
+    cs.sync_listing(conn, 'pa', 'ua', [{'asset_class': 'equity', 'provider_venue': 'nasdaq', 'symbol': 'AAPL'}])
+    cs.sync_listing(conn, 'pb', 'ub', [{'asset_class': 'equity', 'provider_venue': 'NASDAQ  GS', 'symbol': 'AAPL'}])
+    assert cs.catalog_counts(conn)['total'] == 1
+    iid = cs.get_instrument_id(conn, 'equity', 'XNAS', 'AAPL')
+    assert cs.resolve_provider_symbol(conn, 'pa', 'AAPL') == cs.resolve_provider_symbol(conn, 'pb', 'AAPL') == [iid]
+
+
+def test_alias_is_provider_scoped_and_never_guessed(conn):
+    cs.add_venue_alias(conn, 'pa', 'NASDAQ', 'XNAS')
+    assert cs.resolve_venue(conn, 'pa', 'nasdaq') == 'XNAS'
+    assert cs.resolve_venue(conn, 'pb', 'NASDAQ') is None
+    assert cs.resolve_venue(conn, 'pa', 'XNAS') is None  # canonical id is not an implicit alias
+    with pytest.raises(ValueError):
+        cs.sync_listing(conn, 'pb', 'u', [_s('OK'), {'asset_class': 'equity', 'provider_venue': 'NASDAQ', 'symbol': 'X'}])
+    assert cs.catalog_counts(conn)['total'] == 0
+
+
+def test_alias_conflicts_and_idempotence(conn):
+    cs.add_venue_alias(conn, 'pa', 'NASDAQ', 'XNAS')
+    cs.add_venue_alias(conn, 'pa', 'NASDAQ', 'xnas')  # same mapping: no-op
+    with pytest.raises(ValueError):
+        cs.add_venue_alias(conn, 'pa', 'NASDAQ', 'XNYS')
+    with pytest.raises(ValueError):
+        cs.add_venue_alias(conn, 'pa', '', 'XNAS')
+    with pytest.raises(ValueError):  # explicit venue contradicting the alias
+        cs.sync_listing(conn, 'pa', 'u', [{'asset_class': 'equity', 'provider_venue': 'NASDAQ',
+                                           'venue': 'XNYS', 'symbol': 'X'}])
+    assert conn.execute('SELECT COUNT(*) FROM venue_alias').fetchone()[0] == 1
+
+
+def test_v1_database_migrates_to_v2_without_data_loss(db_path):
+    raw = sqlite3.connect(db_path)
+    for stmt in cs._MIGRATIONS[1]:
+        raw.execute(stmt)
+    raw.execute('PRAGMA user_version=1')
+    raw.execute("INSERT INTO venue VALUES ('XNAS','equity','t')")
+    raw.commit()
+    raw.close()
+    c = cs.connect(db_path)
+    assert cs.schema_version(c) == 2
+    assert c.execute("SELECT COUNT(*) FROM venue").fetchone()[0] == 1
+    c.close()

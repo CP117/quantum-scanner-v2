@@ -19,8 +19,9 @@ etf, ...) is a mutable attribute and is NOT part of the identity, so
 reclassifying a stock as an ETF cannot change its ID.  Equity share-class
 separators (``-``, ``/``, space) are canonicalised to ``.`` so providers that
 write ``BRK-B`` and ``BRK.B`` resolve to one instrument.  Venues are
-upper-cased with whitespace -> ``_``; no venue aliasing/MIC mapping is
-invented.  Crypto pairs carry an explicit quote symbol; an aggregated asset
+upper-cased with whitespace -> ``_``.  Provider venue labels are mapped to
+canonical venues only via explicit ``venue_alias`` rows (``add_venue_alias``);
+nothing is inferred, and unresolved labels fail the run.  Crypto pairs carry an explicit quote symbol; an aggregated asset
 (no quote) is a different identity from any exchange pair.
 
 Sync scope and status transitions
@@ -62,7 +63,7 @@ from typing import Iterable, Optional
 
 from app.utils.time import utcnow_iso
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 MISSING_GRACE_RUNS = 3
 BUSY_TIMEOUT_MS = 5000
 ASSET_CLASSES = ('equity', 'crypto_pair', 'crypto_asset')
@@ -159,6 +160,14 @@ _MIGRATIONS = {
             marked_missing INTEGER NOT NULL DEFAULT 0,
             reactivated    INTEGER NOT NULL DEFAULT 0,
             error          TEXT)""",
+    ],
+    2: [
+        """CREATE TABLE venue_alias (
+            provider       TEXT NOT NULL,
+            alias          TEXT NOT NULL,
+            venue_id       TEXT NOT NULL REFERENCES venue(venue_id),
+            recorded_at    TEXT NOT NULL,
+            PRIMARY KEY (provider, alias))""",
     ],
 }
 
@@ -300,6 +309,55 @@ def normalize_record(rec: dict) -> dict:
     }
 
 
+def add_venue_alias(conn: sqlite3.Connection, provider: str, alias: str, venue: str,
+                    kind: str = 'equity') -> None:
+    """Explicitly declare that ``provider`` calls canonical ``venue`` by
+    ``alias``.  Aliases are provider-scoped and never inferred.  Re-declaring
+    the same mapping is a no-op; pointing an existing alias at a different
+    venue raises (a conflicting alias must be reviewed, not overwritten)."""
+    provider = str(provider or '').strip()
+    a, v = _norm_venue(alias), _norm_venue(venue)
+    if not provider or not a or not v:
+        raise ValueError('provider, alias and venue are required')
+    if kind not in ('equity', 'crypto'):
+        raise ValueError('kind must be equity or crypto')
+    with _tx(conn):
+        cur = conn.execute('SELECT venue_id FROM venue_alias WHERE provider=? AND alias=?', (provider, a)).fetchone()
+        if cur is not None:
+            if cur['venue_id'] != v:
+                raise ValueError(f'alias {provider}:{a} already maps to {cur["venue_id"]}')
+            return
+        conn.execute('INSERT OR IGNORE INTO venue (venue_id, kind, created_at) VALUES (?,?,?)',
+                     (v, kind, utcnow_iso()))
+        conn.execute('INSERT INTO venue_alias (provider, alias, venue_id, recorded_at) VALUES (?,?,?,?)',
+                     (provider, a, v, utcnow_iso()))
+
+
+def resolve_venue(conn: sqlite3.Connection, provider: str, provider_venue: str) -> Optional[str]:
+    """Canonical venue for a provider's venue label, or None if no explicit
+    alias is registered (callers must treat None as unresolved, never guess)."""
+    row = conn.execute('SELECT venue_id FROM venue_alias WHERE provider=? AND alias=?',
+                       (str(provider or '').strip(), _norm_venue(provider_venue))).fetchone()
+    return row['venue_id'] if row else None
+
+
+def _resolve_record_venues(conn, provider: str, records) -> list[dict]:
+    """Records may carry ``provider_venue`` instead of ``venue``; it is
+    resolved through the explicit alias table.  A record giving both must agree."""
+    out = []
+    for r in records:
+        pv = r.get('provider_venue')
+        if pv:
+            resolved = resolve_venue(conn, provider, pv)
+            if resolved is None:
+                raise ValueError(f'unresolved venue alias {provider}:{pv!r}')
+            if r.get('venue') and _norm_venue(r['venue']) != resolved:
+                raise ValueError(f'venue {r["venue"]!r} conflicts with alias {pv!r} -> {resolved}')
+            r = {**r, 'venue': resolved}
+        out.append(r)
+    return out
+
+
 def get_instrument_id(conn: sqlite3.Connection, asset_class: str, venue: str, symbol: str,
                       quote_symbol: Optional[str] = None) -> Optional[str]:
     """Resolve a (class, venue, symbol[, quote]) to an existing instrument_id."""
@@ -358,7 +416,7 @@ def sync_listing(conn: sqlite3.Connection, provider: str, universe_key: str,
         universe_key = str(universe_key or '').strip()
         if not provider or not universe_key:
             raise ValueError('provider and universe_key are required')
-        normalized = [normalize_record(r) for r in records]
+        normalized = [normalize_record(r) for r in _resolve_record_venues(conn, provider, records)]
         if complete and not normalized and not allow_empty:
             raise CatalogSyncError('empty complete listing rejected (treated as provider failure)')
         return _sync_tx(conn, provider, universe_key, normalized, complete, started)
@@ -565,7 +623,9 @@ def list_instruments(conn: sqlite3.Connection, *, q: Optional[str] = None,
         tick, iid = _decode_cursor(after, fp)
         where.append('(i.display_ticker > ? OR (i.display_ticker = ? AND i.instrument_id > ?))')
         args += [tick, tick, iid]
-    sql = ('SELECT i.* FROM instrument i' + (' WHERE ' + ' AND '.join(where) if where else '') +
+    # Only fixed clause literals with ? placeholders are concatenated (see _filters).
+    sql = ('SELECT i.* FROM instrument i' +  # nosec B608
+           (' WHERE ' + ' AND '.join(where) if where else '') +
            ' ORDER BY i.display_ticker, i.instrument_id LIMIT ?')
     rows = [dict(r) for r in conn.execute(sql, args + [limit + 1])]
     more = len(rows) > limit
@@ -583,9 +643,9 @@ def catalog_counts(conn: sqlite3.Connection, *, q: Optional[str] = None,
     where, args, _ = _filters(q, asset_class, instrument_type, venue, status, universe_key)
     w = (' WHERE ' + ' AND '.join(where)) if where else ''
 
-    def group(col):
+    def group(col):  # col is only ever a hard-coded column name below
         return {r['k']: r['n'] for r in conn.execute(
-            f'SELECT i.{col} AS k, COUNT(*) AS n FROM instrument i{w} GROUP BY i.{col}', args)}
+            f'SELECT i.{col} AS k, COUNT(*) AS n FROM instrument i{w} GROUP BY i.{col}', args)}  # nosec B608
     by_status = group('status')
     total = sum(by_status.values())
     return {'total': total, 'cataloged': total, 'by_status': by_status,
