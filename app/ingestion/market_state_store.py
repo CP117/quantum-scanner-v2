@@ -25,44 +25,71 @@ from app.services import catalog_service as cs
 
 from .contracts import DataState, Field, Quote
 
-_MARKER = 'market_state_v1'
-_DDL = [
-    """CREATE TABLE IF NOT EXISTS market_state_latest (
-        instrument_id TEXT NOT NULL REFERENCES instrument(instrument_id),
-        provider      TEXT NOT NULL,
-        kind          TEXT NOT NULL,
-        price         REAL,
-        price_state   TEXT NOT NULL,
-        volume        REAL,
-        volume_state  TEXT NOT NULL,
-        source_ts     REAL,
-        ts_semantics  TEXT NOT NULL,
-        ingested_at   REAL NOT NULL,
-        interval      TEXT,
-        adjustment    TEXT NOT NULL,
-        currency      TEXT,
-        venue         TEXT,
-        quality       TEXT NOT NULL,
-        source_revision TEXT,
-        content_hash  TEXT NOT NULL,
-        PRIMARY KEY (instrument_id, provider, kind))""",
-    """CREATE TABLE IF NOT EXISTS market_ingestion_run (
-        run_id      INTEGER PRIMARY KEY AUTOINCREMENT,
-        started_at  REAL NOT NULL,
-        finished_at REAL,
-        provider    TEXT NOT NULL,
-        summary     TEXT)""",
-    "CREATE TABLE IF NOT EXISTS market_state_meta (k TEXT PRIMARY KEY)",
-]
-APPLIED, DUPLICATE = 'applied', 'duplicate'
-REJECTED_OLDER, REJECTED_CONFLICT, REJECTED_UNKNOWN_TS = 'rejected_older', 'rejected_conflict', 'rejected_unknown_ts'
+# Schema ownership: the catalog owns ``PRAGMA user_version`` (catalog_service);
+# the market-state tables are versioned independently by ``market_state_schema``
+# in the same file. Each migration runs in one BEGIN IMMEDIATE transaction
+# together with its version bump, so a failing step rolls everything back.
+SCHEMA_VERSION = 1
+_MIGRATIONS = {
+    1: [
+        """CREATE TABLE IF NOT EXISTS market_state_latest (
+            instrument_id TEXT NOT NULL REFERENCES instrument(instrument_id),
+            provider      TEXT NOT NULL,
+            kind          TEXT NOT NULL,
+            price         REAL,
+            price_state   TEXT NOT NULL,
+            volume        REAL,
+            volume_state  TEXT NOT NULL,
+            source_ts     REAL,
+            ts_semantics  TEXT NOT NULL,
+            ingested_at   REAL NOT NULL,
+            interval      TEXT,
+            adjustment    TEXT NOT NULL,
+            currency      TEXT,
+            venue         TEXT,
+            quality       TEXT NOT NULL,
+            source_revision TEXT,
+            content_hash  TEXT NOT NULL,
+            PRIMARY KEY (instrument_id, provider, kind))""",
+        """CREATE TABLE IF NOT EXISTS market_ingestion_run (
+            run_id      INTEGER PRIMARY KEY AUTOINCREMENT,
+            started_at  REAL NOT NULL,
+            finished_at REAL,
+            provider    TEXT NOT NULL,
+            summary     TEXT)""",
+    ],
+}
 
 
-def ensure_schema(conn: sqlite3.Connection) -> None:
+class MarketStateSchemaError(RuntimeError):
+    """Stored market-state schema is newer than this code supports."""
+
+
+def schema_version(conn: sqlite3.Connection) -> int:
+    """0 = market-state tables not created yet."""
+    try:
+        row = conn.execute('SELECT MAX(version) AS v FROM market_state_schema').fetchone()
+    except sqlite3.OperationalError:
+        return 0
+    return int(row['v'] or 0)
+
+
+def ensure_schema(conn: sqlite3.Connection) -> int:
+    """Create/upgrade market-state tables. Requires an up-to-date catalog
+    schema (``cs.connect`` guarantees it). Idempotent; never drops data."""
+    if schema_version(conn) == SCHEMA_VERSION:
+        return SCHEMA_VERSION
     with cs._tx(conn):
-        for stmt in _DDL:
-            conn.execute(stmt)
-        conn.execute('INSERT OR IGNORE INTO market_state_meta (k) VALUES (?)', (_MARKER,))
+        conn.execute('CREATE TABLE IF NOT EXISTS market_state_schema (version INTEGER PRIMARY KEY)')
+        current = schema_version(conn)  # re-check under the write lock
+        if current > SCHEMA_VERSION:
+            raise MarketStateSchemaError(
+                f'market-state schema v{current} is newer than supported v{SCHEMA_VERSION}')
+        for version in range(current + 1, SCHEMA_VERSION + 1):
+            for stmt in _MIGRATIONS[version]:
+                conn.execute(stmt)
+            conn.execute('INSERT INTO market_state_schema (version) VALUES (?)', (version,))
+    return SCHEMA_VERSION
 
 
 def _hash(q: Quote) -> str:
@@ -70,6 +97,10 @@ def _hash(q: Quote) -> str:
         [q.price.state.value, q.price.value, q.volume.state.value, q.volume.value,
          q.meta.currency, q.meta.venue, q.meta.adjustment.value, q.meta.interval],
         sort_keys=True).encode()).hexdigest()
+
+
+APPLIED, DUPLICATE = 'applied', 'duplicate'
+REJECTED_OLDER, REJECTED_CONFLICT, REJECTED_UNKNOWN_TS = 'rejected_older', 'rejected_conflict', 'rejected_unknown_ts'
 
 
 def apply_quote(conn: sqlite3.Connection, q: Quote) -> str:

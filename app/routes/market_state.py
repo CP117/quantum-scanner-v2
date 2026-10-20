@@ -2,7 +2,8 @@
 
 GET only; reads the durable catalog DB and never contacts providers, runs
 ingestion or triggers analysis. Instruments without a quote stay in the
-response with ``market_state: null``. Public display rights are enforced here:
+response with ``market_state: null``. Freshness is age-only (flat ``max_age_seconds``;
+not session/holiday aware) and the response says so via ``freshness_policy``. Public display rights are enforced here:
 a stored quote is returned only if the configured entitlement registry allows
 public display for its provider+kind; otherwise it is withheld with a reason.
 """
@@ -54,4 +55,5 @@ def catalog_with_market_state(filters: dict = Depends(_filters),
         if quotes and not shown:
             item['market_state_withheld'] = 'display_rights_not_verified'
         items.append(item)
-    return {'items': items, 'next_cursor': page['next_cursor']}
+    return {'items': items, 'next_cursor': page['next_cursor'], 'freshness_policy': 'age_only',
+            'max_age_seconds': max_age_seconds}
